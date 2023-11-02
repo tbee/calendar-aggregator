@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+		xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+<!--
+https://dba-presents.com/liquibase/216-liquibase-3-6-x-data-types-mapping-table
+https://docs.liquibase.com/concepts/changelogs/attributes/include.html
+-->
+
+<!--    <preConditions>  -->
+<!--        <runningAs username="liquibase"/>  -->
+<!--    </preConditions>  -->
+
+	<!-- dbms short names https://docs.liquibase.com/start/tutorials/home.html -->
+	<property name="uuid_function" value="uuid()" dbms="hsqldb"/>
+	<includeAll path="changes" relativeToChangelogFile="true"/>
+</databaseChangeLog>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20231101a" author="tom">
+        <createTable tableName="person">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lazylock" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="username" type="varchar(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="password" type="varchar(64)"> <!-- https://www.codejava.net/frameworks/spring-boot/form-authentication-with-jdbc-and-mysql -->
+                <constraints nullable="false"/>
+            </column>
+            <column name="role" type="varchar(64)"> <!-- https://www.codejava.net/frameworks/spring-boot/form-authentication-with-jdbc-and-mysql -->
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="enabled" type="boolean" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <insert tableName="person">
+            <column name="username" value="superuser"/>
+            <column name="password" value="$2a$10$g7x95yHg2wN27QUol6I81OMkc1iHHi6gFH90cFXuuEypjGwDBRA0q"/> <!-- su<esc1L10> -->
+            <column name="role" value="ROLE_ADMIN"/>
+        </insert>
+
+        <createTable tableName="calendar_source">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lazylock" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(50)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="calendar_event">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lazylock" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="calendar_source_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+            <column name="subject" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint  constraintName="calendar_event__calendar_source"
+                                  baseTableName="calendar_event"
+                                  baseColumnNames="calendar_source_id"
+                                  referencedTableName="calendar_source"
+                                  referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.0.0</version>
+		<relativePath/> <!-- lookup parent from repository -->
+	</parent>
+	<groupId>org.tbee</groupId>
+	<artifactId>calendarAggregator</artifactId>
+	<version>0.1.0-SNAPSHOT</version>
+	<name>Calendar Aggregator</name>
+	<description>Merge all kinds of calendar sources into one calendar</description>
+	
+	<properties>
+		<java.version>17</java.version>
+		<vaadin.version>24.1.1</vaadin.version> <!-- https://vaadin.com/releases -->
+		<ebean.version>13.20.0</ebean.version> <!-- https://github.com/ebean-orm/ebean/releases -->
+		<testcontainers.version>1.17.3</testcontainers.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.vaadin</groupId>
+				<artifactId>vaadin-bom</artifactId>
+				<version>${vaadin.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.junit</groupId>
+				<artifactId>junit-bom</artifactId>
+				<version>5.9.2</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-spring-boot-starter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
+		</dependency>
+
+		<!-- https://immutables.github.io/json.html -->
+		<dependency>
+			<groupId>org.immutables</groupId>
+			<artifactId>value</artifactId>
+			<version>2.8.2</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.ebean</groupId>
+			<artifactId>ebean-spring-txn</artifactId>
+			<version>13.9.1</version>
+		</dependency>
+		<dependency>
+			<groupId>io.ebean</groupId>
+			<artifactId>ebean</artifactId>
+			<version>${ebean.version}</version>
+		</dependency>
+		<!-- java annotation processor to generate query beans
+		<dependency>
+			<groupId>io.ebean</groupId>
+			<artifactId>querybean-generator</artifactId>
+			<version>${ebean.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.ebean</groupId>
+			<artifactId>ebean-test</artifactId>
+			<version>${ebean.version}</version>
+			<scope>test</scope>
+		</dependency>
+		-->
+
+		<!--
+		https://vaadin.com/directory/component/css-grid-layout
+		https://appreciated-collection.herokuapp.com/grid-layout/
+		<dependency>
+		    <groupId>com.github.appreciated</groupId>
+		    <artifactId>vaadin-css-grid</artifactId>
+		    <version>2.0.0</version>
+		</dependency>
+		-->
+		<!--
+		https://vaadin.com/directory/component/crud-ui-add-on
+		-->
+		<dependency>
+			<groupId>org.vaadin.crudui</groupId>
+			<artifactId>crudui</artifactId>
+			<version>7.0.0</version>
+		</dependency>
+
+		<!--
+		https://vaadin.com/directory/component/html-table/
+		Sources imported in vdn/tags/table to enable a fluent API
+		<dependency>
+			<groupId>org.vaadin.stefan</groupId>
+			<artifactId>html-table</artifactId>
+			<version>1.2.0</version>
+		</dependency>
+		-->
+
+		<!--
+		https://www.passay.org/
+		https://java2blog.com/validate-password-java/
+		https://www.baeldung.com/java-passay
+		-->
+		<dependency>
+			<groupId>org.passay</groupId>
+			<artifactId>passay</artifactId>
+			<version>1.6.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>2.7.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-suite</artifactId>
+			<version>1.9.2</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.microsoft.playwright</groupId>
+			<artifactId>playwright</artifactId>
+			<version>1.29.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.tbee.giwth</groupId>
+			<artifactId>giwth</artifactId>
+			<version>1.0.0</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+    <repositories>
+        <repository>
+            <id>Vaadin Directory</id>
+            <url>https://maven.vaadin.com/vaadin-addons</url>
+        </repository>
+        <!-- Repository needed for prerelease versions of Vaadin -->
+        <repository>
+            <id>Vaadin prereleases</id>
+            <url>https://maven.vaadin.com/vaadin-prereleases</url>
+        </repository>
+		<repository>
+			<id>vaadin-addons</id>
+			<url>https://maven.vaadin.com/vaadin-addons</url>
+		</repository>
+        <!-- The bintray repository contain webjars immediately after generation. If the webjar is available in Maven central, you do not need this repository -->
+        <repository>
+            <id>webjars</id>
+            <url>https://dl.bintray.com/webjars/maven</url>
+        </repository>
+		<repository>
+			<id>swx</id>
+			<url>http://nexus.softworks.nl/repository/maven-releases/</url>
+		</repository>
+    </repositories>
+    
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+					<release>${java.version}</release>
+					<!-- Trying to fix - but failing:  Using deprecated '-debug' fallback for parameter name resolution. Compile the affected code with '-parameters' instead or avoid its introspection: com.vaadin.flow.spring.SpringSecurityAutoConfiguration -->
+					<parameters>true</parameters>
+					<compilerArgs>
+						<arg>-parameters</arg>
+					</compilerArgs>
+				</configuration>
+			</plugin>
+<!--
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.10.1</version>
+				<configuration>
+					<release>${java.version}</release>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>io.ebean</groupId>
+							<artifactId>querybean-generator</artifactId>
+							<version>${ebean.version}</version>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>io.repaint.maven</groupId>
+				<artifactId>tiles-maven-plugin</artifactId>
+				<version>2.24</version>
+				<extensions>true</extensions>
+				<configuration>
+					<tiles>
+						<!- -            <tile>org.avaje.tile:java-compile:1.1</tile>- ->
+						<tile>io.ebean.tile:enhancement:13.0.0</tile>
+					</tiles>
+				</configuration>
+			</plugin>
+-->
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.0.0-M8</version>
+				<configuration>
+					<properties>
+						<configurationParameters>
+						</configurationParameters>
+					</properties>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>production</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.vaadin</groupId>
+						<artifactId>vaadin-maven-plugin</artifactId>
+						<version>${vaadin.version}</version>
+						<executions>
+							<execution>
+								<id>frontend</id>
+								<phase>compile</phase>
+								<goals>
+									<goal>prepare-frontend</goal>
+									<goal>build-frontend</goal>
+								</goals>
+								<configuration>
+									<productionMode>true</productionMode>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.springframework.boot</groupId>
+						<artifactId>spring-boot-maven-plugin</artifactId>
+			            <configuration>
+			                <excludeDevtools>true</excludeDevtools>
+			            </configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+</project>
