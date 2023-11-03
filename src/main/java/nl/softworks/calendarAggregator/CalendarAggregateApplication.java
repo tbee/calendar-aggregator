@@ -59,17 +59,19 @@ public class CalendarAggregateApplication {
 		catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		String datasourceUrl = applicationProperties.getProperty("spring.datasource.url");
+		final String datasourceUrl = applicationProperties.getProperty("spring.datasource.url");
 		if (!datasourceUrl.startsWith("jdbc:hsqldb:hsql://")) {
 			LOG.warn("Not starting HSQLDB because URL seems to be of a different RDBMS: " + datasourceUrl);
 			return;
 		}
-		datasourceUrl = datasourceUrl.substring(datasourceUrl.lastIndexOf(":") + 1);
-		String portnr = datasourceUrl.substring(0, datasourceUrl.indexOf("/"));
-		String dbname = datasourceUrl.substring(datasourceUrl.indexOf("/") + 1);
+		String datasourceUrlSuffix = datasourceUrl.substring(datasourceUrl.lastIndexOf(":") + 1);
+		String portnr = datasourceUrlSuffix.substring(0, datasourceUrlSuffix.indexOf("/"));
+		String dbname = datasourceUrlSuffix.substring(datasourceUrlSuffix.indexOf("/") + 1);
+		final String username = applicationProperties.getProperty("spring.datasource.username");
+		final String password = applicationProperties.getProperty("spring.datasource.password");
 
 		HsqlProperties props = new HsqlProperties();
-	    props.setProperty("server.database.0", "file:hsqldb/" + dbname + ";");
+	    props.setProperty("server.database.0", "file:hsqldb/" + dbname + ";user=" + username + ";password=" + password);
 	    props.setProperty("server.dbname.0", dbname);
 		props.setProperty("server.port", portnr);
 	    org.hsqldb.Server dbServer = new org.hsqldb.Server();

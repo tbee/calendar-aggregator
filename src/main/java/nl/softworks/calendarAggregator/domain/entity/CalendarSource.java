@@ -2,8 +2,12 @@ package nl.softworks.calendarAggregator.domain.entity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.DiscriminatorColumn;
+import jakarta.persistence.DiscriminatorType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.InheritanceType;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
@@ -14,6 +18,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING, name = "type")
 public class CalendarSource extends EntityBase<CalendarSource> {
 	private static final Logger LOG = LoggerFactory.getLogger(CalendarSource.class);
 
@@ -26,6 +32,16 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 	public void setName(String v) {
 		this.name = v;
+	}
+
+	@NotNull
+	private String url;
+	static public final String URL_PROPERTYID = "url";
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String v) {
+		this.url = v;
 	}
 
 

@@ -42,8 +42,14 @@
             <column name="lazylock" type="bigint" defaultValue="1">
                 <constraints nullable="false"/>
             </column>
-            <column name="name" type="varchar(50)">
+            <column name="type" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
                 <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="url" type="varchar(255)">
+                <constraints nullable="true"/>
             </column>
         </createTable>
 
@@ -57,7 +63,10 @@
             <column name="calendar_source_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
-            <column name="start_date" type="date">
+            <column name="start_date_time" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date_time" type="datetime">
                 <constraints nullable="false"/>
             </column>
             <column name="subject" type="varchar(255)">

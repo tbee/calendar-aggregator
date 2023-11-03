@@ -12,14 +12,6 @@ import org.springframework.context.annotation.Bean;
 public class Configuration {
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
 
-//	@Bean
-//	public SpringLiquibase liquibase() {
-//	    SpringLiquibase liquibase = new SpringLiquibase();
-//	    liquibase.setChangeLog("classpath:liquibase-changeLog.xml");
-//	    liquibase.setDataSource(dataSource());
-//	    return liquibase;
-//	}
-
     @Bean
     public WebServerFactoryCustomizer<TomcatServletWebServerFactory> cookieProcessorCustomizer() {
         return (TomcatServletWebServerFactory factory) -> {
