@@ -18,17 +18,29 @@ import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.server.VaadinSession;
 import nl.softworks.calendarAggregator.boundary.SpringUtils;
 import nl.softworks.calendarAggregator.domain.ValidationException;
+import nl.softworks.calendarAggregator.domain.boundary.R;
+import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
+import nl.softworks.calendarAggregator.domain.entity.CalendarSourceManual;
 import nl.softworks.calendarAggregator.domain.entity.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
+import java.time.LocalDateTime;
 import java.util.concurrent.Callable;
 
 class CalendarAggregatorAppLayout extends AppLayout // https://vaadin.com/docs/latest/components/app-layout
 implements HasDynamicTitle {
 	private static final Logger LOG = LoggerFactory.getLogger(CalendarAggregatorAppLayout.class);
+
+	@Autowired
+	private PlatformTransactionManager transactionManager;
 
 	@Override
 	public String getPageTitle() {
@@ -70,8 +82,8 @@ implements HasDynamicTitle {
 		menuBar.setWidthFull();
 		// Admin
 		if (userHasRole(Person.Role.ROLE_ADMIN)) {
-			menuBar.addItem("Beheer", event -> {
-			});//UI.getCurrent().navigate(AdminView.class)).setId("maintainNavbarItem");
+			menuBar.addItem("Add test data", event -> inTransaction(() -> addTestdata()));
+			//UI.getCurrent().navigate(AdminView.class)).setId("maintainNavbarItem");
 		}
 
 		// Tabs
@@ -158,5 +170,29 @@ implements HasDynamicTitle {
 		public AlreadyDisplayedException(Exception e) {
 			super(e);
 		}
+	}
+
+	protected void inTransaction(Runnable runnable) {
+		new TransactionTemplate(transactionManager).execute(new TransactionCallbackWithoutResult() {
+			@Override
+			protected void doInTransactionWithoutResult(TransactionStatus status) {
+				runnable.run();
+			}
+		});
+	}
+	private void addTestdata() {
+		CalendarSourceManual calendarSourceManual = new CalendarSourceManual();
+		calendarSourceManual.setUrl("https://www.dansstudiovieberink.nl/kalender.html");
+		calendarSourceManual.setName("Dansstudio Vieberink");
+		R.calendarSource().save(calendarSourceManual);
+
+		CalendarEvent calendarEvent = new CalendarEvent();
+		calendarEvent.setStartDateTime(LocalDateTime.now());
+		calendarEvent.setEndDateTime(LocalDateTime.now().plusHours(3));
+		calendarEvent.setSubject("dancing");
+		calendarSourceManual.addCalendarEvent(calendarEvent);
+		R.calendarEvent().save(calendarEvent);
+
+		showSuccessNotification("Test data added");
 	}
 }

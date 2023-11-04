@@ -18,13 +18,13 @@ public class R {
 
     @Autowired
     CalendarSourceRepo calendarSourceRepo;
-    static public CalendarSourceRepo rosterDateRepo() {
+    static public CalendarSourceRepo calendarSource() {
         return R.singleton.calendarSourceRepo;
     }
 
     @Autowired
     CalendarEventRepo calendarEventRepo;
-    static public CalendarEventRepo rosterPeriodRepo() {
+    static public CalendarEventRepo calendarEvent() {
         return R.singleton.calendarEventRepo;
     }
 }
