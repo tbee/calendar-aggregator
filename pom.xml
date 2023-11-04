@@ -15,7 +15,7 @@
 	<description>Merge all kinds of calendar sources into one calendar</description>
 	
 	<properties>
-		<java.version>17</java.version>
+		<java.version>17</java.version> <!-- https://vaadin.com/docs/latest/configuration/live-reload/hotswap-agent -->
 		<vaadin.version>24.1.1</vaadin.version> <!-- https://vaadin.com/releases -->
 		<ebean.version>13.20.0</ebean.version> <!-- https://github.com/ebean-orm/ebean/releases -->
 		<testcontainers.version>1.17.3</testcontainers.version>

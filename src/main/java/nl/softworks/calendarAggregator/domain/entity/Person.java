@@ -55,7 +55,7 @@ public class Person extends EntityBase<Person> {
 		this.role = role;
 	}
 
-	static public enum Role {ROLE_USER, ROLE_PLANNER}
+	static public enum Role {ROLE_USER, ROLE_ADMIN}
 
 	@NotNull
 	private boolean enabled = true;
