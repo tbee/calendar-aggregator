@@ -6,6 +6,9 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+/**
+ * Services
+ */
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
 public class S {
@@ -17,8 +20,8 @@ public class S {
     }
 
     @Autowired
-    CalendarSourceService rosterPeriodService;
-    static public CalendarSourceService rosterPeriodService() {
-        return S.singleton.rosterPeriodService;
+    CalendarSourceService calendarSourceService;
+    static public CalendarSourceService calendarSourceService() {
+        return S.singleton.calendarSourceService;
     }
 }

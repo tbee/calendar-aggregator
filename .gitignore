@@ -29,3 +29,8 @@ hsqldb
 target
 .idea
 logs
+/package.json
+/package-lock.json
+/tsconfig.json
+/types.d.ts
+/src/main/dev-bundle/

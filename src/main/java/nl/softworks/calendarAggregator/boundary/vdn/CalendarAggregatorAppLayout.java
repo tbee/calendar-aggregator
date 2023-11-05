@@ -87,10 +87,11 @@ implements HasDynamicTitle {
 		}
 
 		// Tabs
+		Tab overviewTab = new Tab(VaadinIcon.TABLE.create(), new Span("Overview") );
 		Tab manualTab = new Tab(VaadinIcon.USER.create(), new Span("Manual") );
 		Tab scraperTab = new Tab(VaadinIcon.SCISSORS.create(), new Span("Scraper"));
 		Tab icalTab = new Tab(VaadinIcon.CALENDAR.create(), new Span("iCal"));
-		Tabs tabs = new Tabs(manualTab, scraperTab, icalTab);
+		Tabs tabs = new Tabs(overviewTab, manualTab, scraperTab, icalTab);
 		tabs.setOrientation(Tabs.Orientation.VERTICAL);
 		tabs.addSelectedChangeListener(event -> {
 //			if (event.getSelectedTab().equals(manualTab)) {
@@ -186,13 +187,22 @@ implements HasDynamicTitle {
 		calendarSourceManual.setName("Dansstudio Vieberink");
 		R.calendarSource().save(calendarSourceManual);
 
-		CalendarEvent calendarEvent = new CalendarEvent();
-		calendarEvent.setStartDateTime(LocalDateTime.now());
-		calendarEvent.setEndDateTime(LocalDateTime.now().plusHours(3));
-		calendarEvent.setSubject("dancing");
-		calendarSourceManual.addCalendarEvent(calendarEvent);
-		R.calendarEvent().save(calendarEvent);
-
+		{
+			CalendarEvent calendarEvent = new CalendarEvent();
+			calendarEvent.setStartDateTime(LocalDateTime.now());
+			calendarEvent.setEndDateTime(LocalDateTime.now().plusHours(3));
+			calendarEvent.setSubject("dancing");
+			calendarSourceManual.addCalendarEvent(calendarEvent);
+			R.calendarEvent().save(calendarEvent);
+		}
+		{
+			CalendarEvent calendarEvent = new CalendarEvent();
+			calendarEvent.setStartDateTime(LocalDateTime.now().plusDays(1));
+			calendarEvent.setEndDateTime(LocalDateTime.now().plusDays(1).plusHours(3));
+			calendarEvent.setSubject("dancing2");
+			calendarSourceManual.addCalendarEvent(calendarEvent);
+			R.calendarEvent().save(calendarEvent);
+		}
 		showSuccessNotification("Test data added");
 	}
 }

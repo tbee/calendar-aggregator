@@ -1,6 +1,6 @@
 package nl.softworks.calendarAggregator;
 
-import nl.softworks.calendarAggregator.boundary.jpa.CustomRepositoryImpl;
+import nl.softworks.calendarAggregator.boundary.jpa.RepoBaseImpl;
 import org.hsqldb.persist.HsqlProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +22,7 @@ import java.util.Properties;
  * TODO:
  */
 @SpringBootApplication
-@EnableJpaRepositories(repositoryBaseClass = CustomRepositoryImpl.class)
+@EnableJpaRepositories(repositoryBaseClass = RepoBaseImpl.class)
 public class CalendarAggregateApplication {
 	private static final Logger LOG = LoggerFactory.getLogger(CalendarAggregateApplication.class);
 
