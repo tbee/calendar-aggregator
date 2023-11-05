@@ -1,5 +1,6 @@
 package nl.softworks.calendarAggregator.boundary.vdn;
 
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.html.H1;
@@ -42,6 +43,12 @@ implements HasDynamicTitle {
 	@Autowired
 	private PlatformTransactionManager transactionManager;
 
+	final protected Tab overviewTab = new Tab(VaadinIcon.TABLE.create(), new Span("Overview") );
+	final protected Tab manualTab = new Tab(VaadinIcon.USER.create(), new Span("Manual") );
+	final protected Tab scraperTab = new Tab(VaadinIcon.SCISSORS.create(), new Span("Scraper"));
+	final protected Tab icalTab = new Tab(VaadinIcon.CALENDAR.create(), new Span("iCal"));
+	final protected Tabs tabs = new Tabs(overviewTab, manualTab, scraperTab, icalTab);
+
 	@Override
 	public String getPageTitle() {
 		return "Calendar Aggregator";
@@ -82,21 +89,15 @@ implements HasDynamicTitle {
 		menuBar.setWidthFull();
 		// Admin
 		if (userHasRole(Person.Role.ROLE_ADMIN)) {
-			menuBar.addItem("Add test data", event -> inTransaction(() -> addTestdata()));
-			//UI.getCurrent().navigate(AdminView.class)).setId("maintainNavbarItem");
+			menuBar.addItem(createMenuContent("Add test data", VaadinIcon.DATABASE), event -> inTransaction(() -> addTestdata()));
 		}
 
 		// Tabs
-		Tab overviewTab = new Tab(VaadinIcon.TABLE.create(), new Span("Overview") );
-		Tab manualTab = new Tab(VaadinIcon.USER.create(), new Span("Manual") );
-		Tab scraperTab = new Tab(VaadinIcon.SCISSORS.create(), new Span("Scraper"));
-		Tab icalTab = new Tab(VaadinIcon.CALENDAR.create(), new Span("iCal"));
-		Tabs tabs = new Tabs(overviewTab, manualTab, scraperTab, icalTab);
 		tabs.setOrientation(Tabs.Orientation.VERTICAL);
 		tabs.addSelectedChangeListener(event -> {
-//			if (event.getSelectedTab().equals(manualTab)) {
-//				setContent(createRosterPeriodContent());
-//			}
+			if (event.getSelectedTab().equals(manualTab)) {
+				UI.getCurrent().navigate(ManualView.class);
+			}
 //			if (event.getSelectedTab().equals(scraperTab)) {
 //				setContent(createPersonContent());
 //			}
@@ -112,7 +113,7 @@ implements HasDynamicTitle {
 
 	private HorizontalLayout createMenuContent(String text, VaadinIcon suffixIcon) {
 		Icon submenuIcon = new Icon(suffixIcon);
-		submenuIcon.setSize("0.8em");
+//		submenuIcon.setSize("0.8em");
 		HorizontalLayout content = new HorizontalLayout(new NativeLabel(text), submenuIcon);
 		content.setMargin(false);
 		content.setSpacing(false);

@@ -2,6 +2,10 @@ iframe {
     border: 0px;
 }
 
+border1px {
+    border: 1px solid black;
+}
+
 vaadin-grid-cell-content {
     height: 100%;
 }

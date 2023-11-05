@@ -1,5 +1,6 @@
 package nl.softworks.calendarAggregator.boundary.vdn;
 
+import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
@@ -19,18 +20,20 @@ import java.util.List;
 import java.util.function.Function;
 
 @Route("/")
-//@StyleSheet("context://../vaadin.css")
+@StyleSheet("context://../vaadin.css")
 //@RolesAllowed("ROLE_PLANNER")
 @PermitAll
 public class MainView extends CalendarAggregatorAppLayout
 implements AfterNavigationObserver
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MainView.class);
+	private static final DateTimeFormatter YYYYMMDDHHMM = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
 	private TreeGrid<TreeNode> treeGrid;
 
 	public MainView() {
 		super("Overview");
+		tabs.setSelectedTab(overviewTab);
 		treeGrid = new TreeGrid<TreeNode>();
 		treeGrid.addHierarchyColumn(TreeNode::getText).setHeader("Name");
 		treeGrid.addColumn(TreeNode::getStartDate).setHeader("Start");
@@ -75,12 +78,12 @@ implements AfterNavigationObserver
 
 		@Override
 		public String getStartDate() {
-			return calendarEvent.getStartDateTime().format(DateTimeFormatter.ISO_DATE);
+			return calendarEvent.getStartDateTime().format(YYYYMMDDHHMM);
 		}
 
 		@Override
 		public String getEndDate() {
-			return calendarEvent.getEndDateTime().format(DateTimeFormatter.ISO_DATE);
+			return calendarEvent.getEndDateTime().format(YYYYMMDDHHMM);
 		}
 	}
 
