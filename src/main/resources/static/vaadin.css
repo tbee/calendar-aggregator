@@ -2,7 +2,12 @@ iframe {
     border: 0px;
 }
 
-border1px {
+
+.title {
+    font-weight: bold;
+}
+
+.border1px {
     border: 1px solid black;
 }
 
