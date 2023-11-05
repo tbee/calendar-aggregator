@@ -34,3 +34,4 @@ logs
 /tsconfig.json
 /types.d.ts
 /src/main/dev-bundle/
+/calendarAggregator.iml

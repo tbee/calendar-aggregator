@@ -22,7 +22,6 @@ import nl.softworks.calendarAggregator.domain.ValidationException;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
-import nl.softworks.calendarAggregator.domain.entity.CalendarSourceManual;
 import nl.softworks.calendarAggregator.domain.entity.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -184,7 +183,7 @@ implements HasDynamicTitle {
 		});
 	}
 	private void addTestdata() {
-		CalendarSource calendarSourceManual = new CalendarSourceManual()
+		CalendarSource calendarSourceManual = new CalendarSource()
 				.url("https://www.dansstudiovieberink.nl/kalender.html")
 				.name("Dansstudio Vieberink")
 				.lat(51.9314535)
