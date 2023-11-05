@@ -21,6 +21,7 @@ import nl.softworks.calendarAggregator.boundary.SpringUtils;
 import nl.softworks.calendarAggregator.domain.ValidationException;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
+import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceManual;
 import nl.softworks.calendarAggregator.domain.entity.Person;
 import org.slf4j.Logger;
@@ -183,27 +184,28 @@ implements HasDynamicTitle {
 		});
 	}
 	private void addTestdata() {
-		CalendarSourceManual calendarSourceManual = new CalendarSourceManual();
-		calendarSourceManual.setUrl("https://www.dansstudiovieberink.nl/kalender.html");
-		calendarSourceManual.setName("Dansstudio Vieberink");
-		R.calendarSource().save(calendarSourceManual);
+		CalendarSource calendarSourceManual = new CalendarSourceManual()
+				.url("https://www.dansstudiovieberink.nl/kalender.html")
+				.name("Dansstudio Vieberink")
+				.lat(51.9314535)
+				.lon(6.5908473);
 
 		{
-			CalendarEvent calendarEvent = new CalendarEvent();
-			calendarEvent.setStartDateTime(LocalDateTime.now());
-			calendarEvent.setEndDateTime(LocalDateTime.now().plusHours(3));
-			calendarEvent.setSubject("dancing");
+			CalendarEvent calendarEvent = new CalendarEvent()
+					.startDateTime(LocalDateTime.now())
+					.endDateTime(LocalDateTime.now().plusHours(3))
+					.subject("dancing");
 			calendarSourceManual.addCalendarEvent(calendarEvent);
-			R.calendarEvent().save(calendarEvent);
 		}
 		{
-			CalendarEvent calendarEvent = new CalendarEvent();
-			calendarEvent.setStartDateTime(LocalDateTime.now().plusDays(1));
-			calendarEvent.setEndDateTime(LocalDateTime.now().plusDays(1).plusHours(3));
-			calendarEvent.setSubject("dancing2");
+			CalendarEvent calendarEvent = new CalendarEvent()
+					.startDateTime(LocalDateTime.now().plusDays(1))
+					.endDateTime(LocalDateTime.now().plusDays(1).plusHours(3))
+					.subject("dancing2");
 			calendarSourceManual.addCalendarEvent(calendarEvent);
-			R.calendarEvent().save(calendarEvent);
 		}
+
+		R.calendarSource().save(calendarSourceManual);
 		showSuccessNotification("Test data added");
 	}
 }

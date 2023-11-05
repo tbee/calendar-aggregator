@@ -5,6 +5,8 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
+    <!-- https://xenovation.com/blog/development/java/java-professional-developer/liquibase-related-sql-java-types -->
+
     <changeSet id="20231101a" author="tom">
         <createTable tableName="person">
             <column name="id" type="bigint" autoIncrement="true" startWith="1">
@@ -50,6 +52,12 @@
             </column>
             <column name="url" type="varchar(255)">
                 <constraints nullable="true"/>
+            </column>
+            <column name="lon" type="double">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lat" type="double">
+                <constraints nullable="false"/>
             </column>
         </createTable>
 

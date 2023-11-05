@@ -3,7 +3,6 @@ package nl.softworks.calendarAggregator.domain.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -16,31 +15,34 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 	@NotNull
 	private LocalDateTime startDateTime;
 	static public final String STARTDATETIME_PROPERTYID = "startDateTime";
-	public LocalDateTime getStartDateTime() {
+	public LocalDateTime startDateTime() {
 		return startDateTime;
 	}
-	public void setStartDateTime(LocalDateTime v) {
+	public CalendarEvent startDateTime(LocalDateTime v) {
 		this.startDateTime = v;
+		return this;
 	}
 
 	@NotNull
 	private LocalDateTime endDateTime;
 	static public final String ENDDATETIME_PROPERTYID = "endDateTime";
-	public LocalDateTime getEndDateTime() {
+	public LocalDateTime endDateTime() {
 		return endDateTime;
 	}
-	public void setEndDateTime(LocalDateTime v) {
+	public CalendarEvent endDateTime(LocalDateTime v) {
 		this.endDateTime = v;
+		return this;
 	}
 
 	private String subject;
 	static public final String SUBJECT_PROPERTYID = "subject";
-	public String getSubject() {
+	public String subject() {
 		return subject;
 	}
 
-	public void setSubject(String v) {
+	public CalendarEvent subject(String v) {
 		this.subject = v;
+		return this;
 	}
 
 	@Override

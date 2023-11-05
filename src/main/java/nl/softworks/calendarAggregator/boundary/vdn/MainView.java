@@ -12,7 +12,6 @@ import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,7 +56,7 @@ implements AfterNavigationObserver
 	record TreeNodeCalendarSource(CalendarSource calendarSource) implements TreeNode {
 		@Override
 		public String getText() {
-			return calendarSource().getName();
+			return calendarSource().name();
 		}
 
 		@Override
@@ -73,17 +72,17 @@ implements AfterNavigationObserver
 	record TreeNodeCalendarEvent (CalendarEvent calendarEvent) implements TreeNode {
 		@Override
 		public String getText() {
-			return calendarEvent.getSubject();
+			return calendarEvent.subject();
 		}
 
 		@Override
 		public String getStartDate() {
-			return calendarEvent.getStartDateTime().format(YYYYMMDDHHMM);
+			return calendarEvent.startDateTime().format(YYYYMMDDHHMM);
 		}
 
 		@Override
 		public String getEndDate() {
-			return calendarEvent.getEndDateTime().format(YYYYMMDDHHMM);
+			return calendarEvent.endDateTime().format(YYYYMMDDHHMM);
 		}
 	}
 
