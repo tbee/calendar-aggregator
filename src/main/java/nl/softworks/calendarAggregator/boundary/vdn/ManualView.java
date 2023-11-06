@@ -39,22 +39,12 @@ implements AfterNavigationObserver {
 
 	private final ListBox<CalendarSource> calendarSourceListBox;
 	private final ListBox<CalendarEvent> calendarEventListBox;
-	private final TextField nameTextField = new TextField("Name");
-	private final TextField urlTextField = new TextField("Url");
-	private final NumberField latNumberField = new NumberField("LAT");
-	private final NumberField lonNumberField = new NumberField("LON");
-	private final DatePicker startDatePicker = new DatePicker("Start date");
-	private final TimePicker startTimePicker = new TimePicker("Start time");
-	private final DatePicker endDatePicker = new DatePicker("End date");
-	private final TimePicker endTimePicker = new TimePicker("End time");
-	private final TextField summaryTextField = new TextField("Summary");
+	private final CalendarSourceForm calendarSourceForm = new CalendarSourceForm();
+	private final CalendarEventForm calendarEventForm = new CalendarEventForm();
 
 	public ManualView() {
 		super("Manual");
 		tabs.setSelectedTab(manualTab);
-
-		DatePicker.DatePickerI18n datePickerIsoFormat = new DatePicker.DatePickerI18n();
-		datePickerIsoFormat.setDateFormat("yyyy-MM-dd");
 
 		// calendarSourceListBox
 		calendarSourceListBox = new ListBox<>();
@@ -79,25 +69,14 @@ implements AfterNavigationObserver {
 		}));
 		calendarEventListBox.addValueChangeListener(e -> setFormFields(e.getValue()));
 
-		// sourceFormLayout
-		FormLayout sourceFormLayout = new FormLayout();
-		sourceFormLayout.add(nameTextField, urlTextField, latNumberField, lonNumberField);
-
-		// eventFormLayout
-		startDatePicker.setI18n(datePickerIsoFormat);
-		endDatePicker.setI18n(datePickerIsoFormat);
-		FormLayout eventFormLayout = new FormLayout();
-		eventFormLayout.add(startDatePicker, startTimePicker, endDatePicker, endTimePicker, summaryTextField);
-		eventFormLayout.setColspan(summaryTextField, 2);
-
 		// content
 		HorizontalLayout content = new HorizontalLayout();
 		content.setAlignItems(FlexComponent.Alignment.START);
 		content.add(vertical(title("Sources"), calendarSourceListBox)
 				, new Divider()
-				, vertical(title("Source"), sourceFormLayout, new NativeLabel("Events"), calendarEventListBox)
+				, vertical(title("Source"), calendarSourceForm, new NativeLabel("Events"), calendarEventListBox)
 				, new Divider()
-				, vertical(title("Event"), eventFormLayout));
+				, vertical(title("Event"), calendarEventForm));
 		setContent(content);
 	}
 
@@ -114,23 +93,12 @@ implements AfterNavigationObserver {
 	}
 
 	private void setFormFields(CalendarSource calendarSource) {
-		nameTextField.setValue(calendarSource == null ? null : calendarSource.name());
-		urlTextField.setValue(calendarSource == null ? null : calendarSource.url());
-		latNumberField.setValue(calendarSource == null ? null : calendarSource.lat());
-		lonNumberField.setValue(calendarSource == null ? null : calendarSource.lon());
+		calendarSourceForm.populateWith(calendarSource);
 		calendarEventListBox.setItems(calendarSource == null ? List.of() : calendarSource.getCalendarEvents());
 	}
 
 	private void setFormFields(CalendarEvent calendarEvent) {
-		LocalDateTime startDateTime = calendarEvent.startDateTime();
-		LocalDateTime endDateTime = calendarEvent.endDateTime();
-		String subject = calendarEvent.subject();
-
-		startDatePicker.setValue(startDateTime == null ? null : startDateTime.toLocalDate());
-		startTimePicker.setValue(startDateTime == null ? null : startDateTime.toLocalTime());
-		endDatePicker.setValue(endDateTime == null ? null : endDateTime.toLocalDate());
-		endTimePicker.setValue(endDateTime == null ? null : calendarEvent.endDateTime().toLocalTime());
-		summaryTextField.setValue(subject);
+		calendarEventForm.populateWith(calendarEvent);
 	}
 
 	private VerticalLayout vertical(Component... children) {

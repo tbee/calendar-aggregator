@@ -95,6 +95,9 @@ implements HasDynamicTitle {
 		// Tabs
 		tabs.setOrientation(Tabs.Orientation.VERTICAL);
 		tabs.addSelectedChangeListener(event -> {
+			if (event.getSelectedTab().equals(overviewTab)) {
+				UI.getCurrent().navigate(MainView.class);
+			}
 			if (event.getSelectedTab().equals(manualTab)) {
 				UI.getCurrent().navigate(ManualView.class);
 			}

@@ -1,10 +1,18 @@
 package nl.softworks.calendarAggregator.boundary.vdn;
 
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.StyleSheet;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.theme.lumo.LumoIcon;
 import jakarta.annotation.security.PermitAll;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
@@ -16,6 +24,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Route("/")
@@ -28,16 +38,38 @@ implements AfterNavigationObserver
 	private static final Logger LOG = LoggerFactory.getLogger(MainView.class);
 	private static final DateTimeFormatter YYYYMMDDHHMM = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-	private TreeGrid<TreeNode> treeGrid;
+	private final TreeGrid<TreeNode> treeGrid = new TreeGrid<>();
+	private final CalendarSourceForm calendarSourceForm = new CalendarSourceForm();
+	private final Dialog calendarSourceDialog = new Dialog("Source", calendarSourceForm);
+	private final CalendarEventForm calendarEventForm = new CalendarEventForm();
+	private final Dialog calendarEventDialog = new Dialog("Event", calendarEventForm);
 
 	public MainView() {
 		super("Overview");
 		tabs.setSelectedTab(overviewTab);
-		treeGrid = new TreeGrid<TreeNode>();
+
+		// treeGrid
 		treeGrid.addHierarchyColumn(TreeNode::getText).setHeader("Name");
 		treeGrid.addColumn(TreeNode::getStartDate).setHeader("Start");
 		treeGrid.addColumn(TreeNode::getEndDate).setHeader("End");
-		setContent(treeGrid);
+
+		// buttonbar
+		Button insertButton = new Button(VaadinIcon.PLUS.create());
+		insertButton.addClickListener(buttonClickEvent -> insert());
+		Button editButton = new Button(VaadinIcon.EDIT.create());
+		editButton.addClickListener(buttonClickEvent -> edit());
+		Button deleteButton = new Button(VaadinIcon.TRASH.create());
+		deleteButton.addClickListener(buttonClickEvent -> delete());
+		HorizontalLayout buttonbar = new HorizontalLayout(insertButton, editButton, deleteButton);
+
+		// calendarSourceDialog
+		setupDialog(calendarSourceDialog);
+
+		// calendarSourceDialog
+		setupDialog(calendarEventDialog);
+
+		// content
+		setContent(new VerticalLayout(buttonbar, treeGrid, calendarSourceDialog));
 	}
 
 	@Override
@@ -46,6 +78,36 @@ implements AfterNavigationObserver
 		List<TreeNode> treeNodes = treeNodes(calendarSources, TreeNodeCalendarSource::new);
 		treeGrid.setItems(treeNodes, this::getTreeNodeChildren);
 	}
+
+	private <T> void setupDialog(Dialog dialog) {
+		Button closeButton = new Button(new Icon("lumo", "cross"), e -> dialog.close());
+		closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+		dialog.getHeader().add(closeButton);
+	}
+
+	private void insert() {
+	}
+
+	private void edit() {
+		Set<TreeNode> selectedItems = treeGrid.getSelectedItems();
+		if (selectedItems.isEmpty() || selectedItems.size() > 1) {
+			return;
+		}
+		TreeNode treeNode = selectedItems.iterator().next();
+
+		if (treeNode instanceof TreeNodeCalendarSource treeNodeCalendarSource) {
+			calendarSourceForm.populateWith(treeNodeCalendarSource.calendarSource());
+			calendarSourceDialog.open();
+		}
+		if (treeNode instanceof TreeNodeCalendarEvent treeNodeCalendarEvent) {
+			calendarEventForm.populateWith(treeNodeCalendarEvent.calendarEvent());
+			calendarEventDialog.open();
+		}
+	}
+
+	private void delete() {
+	}
+
 
 	sealed interface TreeNode permits TreeNodeCalendarSource, TreeNodeCalendarEvent {
 		String getText();
