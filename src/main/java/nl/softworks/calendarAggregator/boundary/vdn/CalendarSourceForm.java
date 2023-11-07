@@ -47,4 +47,11 @@ public class CalendarSourceForm extends FormLayout {
 		latNumberField.setValue(calendarSource == null ? 0 : calendarSource.lat());
 		lonNumberField.setValue(calendarSource == null ? 0 : calendarSource.lon());
 	}
+
+	public void writeTo(CalendarSource calendarSource) {
+		calendarSource.name(nameTextField.getValue());
+		calendarSource.url(urlTextField.getValue());
+		calendarSource.lat(latNumberField.getValue());
+		calendarSource.lon(lonNumberField.getValue());
+	}
 }

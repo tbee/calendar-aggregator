@@ -4,7 +4,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -25,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 @Route("/")
@@ -43,6 +41,7 @@ implements AfterNavigationObserver
 	private final Dialog calendarSourceDialog = new Dialog("Source", calendarSourceForm);
 	private final CalendarEventForm calendarEventForm = new CalendarEventForm();
 	private final Dialog calendarEventDialog = new Dialog("Event", calendarEventForm);
+	private List<TreeNode> treeNodes = null;
 
 	public MainView() {
 		super("Overview");
@@ -75,14 +74,16 @@ implements AfterNavigationObserver
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
 		List<CalendarSource> calendarSources = R.calendarSource().findAll();
-		List<TreeNode> treeNodes = treeNodes(calendarSources, TreeNodeCalendarSource::new);
+		treeNodes = treeNodes(calendarSources, TreeNodeCalendarSource::new);
 		treeGrid.setItems(treeNodes, this::getTreeNodeChildren);
 	}
 
 	private <T> void setupDialog(Dialog dialog) {
-		Button closeButton = new Button(new Icon("lumo", "cross"), e -> dialog.close());
+		Button closeButton = new Button(LumoIcon.CROSS.create(), e -> dialog.close());
 		closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
 		dialog.getHeader().add(closeButton);
+		Button saveButton = new Button("Save", VaadinIcon.SAFE.create(), e -> save());
+		dialog.getFooter().add(saveButton);
 	}
 
 	private void insert() {
@@ -98,6 +99,7 @@ implements AfterNavigationObserver
 		if (treeNode instanceof TreeNodeCalendarSource treeNodeCalendarSource) {
 			calendarSourceForm.populateWith(treeNodeCalendarSource.calendarSource());
 			calendarSourceDialog.open();
+
 		}
 		if (treeNode instanceof TreeNodeCalendarEvent treeNodeCalendarEvent) {
 			calendarEventForm.populateWith(treeNodeCalendarEvent.calendarEvent());
@@ -106,6 +108,30 @@ implements AfterNavigationObserver
 	}
 
 	private void delete() {
+	}
+
+	private void save() {
+		Set<TreeNode> selectedItems = treeGrid.getSelectedItems();
+		if (selectedItems.isEmpty() || selectedItems.size() > 1) {
+			return;
+		}
+		TreeNode treeNode = selectedItems.iterator().next();
+
+		if (treeNode instanceof TreeNodeCalendarSource treeNodeCalendarSource) {
+			calendarSourceForm.writeTo(treeNodeCalendarSource.calendarSource());
+			R.calendarSource().save(treeNodeCalendarSource.calendarSource());
+			calendarSourceDialog.close();
+		}
+		if (treeNode instanceof TreeNodeCalendarEvent treeNodeCalendarEvent) {
+			calendarEventForm.writeTo(treeNodeCalendarEvent.calendarEvent());
+			R.calendarEvent().save(treeNodeCalendarEvent.calendarEvent());
+			calendarEventDialog.close();
+		}
+		treeGrid.setItems(treeNodes, this::getTreeNodeChildren);
+        if (treeNode instanceof TreeNodeCalendarEvent treeNodeCalendarEvent) {
+            treeGrid.expand(treeNodeCalendarEvent.treeNodeCalendarSource());
+        }
+		treeGrid.select(treeNode);
 	}
 
 
@@ -131,7 +157,7 @@ implements AfterNavigationObserver
 			return null;
 		}
 	}
-	record TreeNodeCalendarEvent (CalendarEvent calendarEvent) implements TreeNode {
+	record TreeNodeCalendarEvent (TreeNodeCalendarSource treeNodeCalendarSource, CalendarEvent calendarEvent) implements TreeNode {
 		@Override
 		public String getText() {
 			return calendarEvent.subject();
@@ -150,7 +176,7 @@ implements AfterNavigationObserver
 
 	public List<TreeNode> getTreeNodeChildren(TreeNode treeNode) {
 		if (treeNode instanceof TreeNodeCalendarSource treeNodeCalendarSource) {
-			return treeNodes(treeNodeCalendarSource.calendarSource().getCalendarEvents(), TreeNodeCalendarEvent::new);
+			return treeNodes(treeNodeCalendarSource.calendarSource().getCalendarEvents(), ce -> new TreeNodeCalendarEvent(treeNodeCalendarSource, ce));
 		}
 		return List.of();
 	}
