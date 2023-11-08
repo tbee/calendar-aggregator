@@ -108,7 +108,7 @@ implements HasDynamicTitle {
 //				setContent(createShiftTypeContent());
 //			}
 		});
-		addToDrawer(tabs);
+//		addToDrawer(tabs);
 
 		// Navbar
 		addToNavbar(drawerToggle, titleH1, menuBar);

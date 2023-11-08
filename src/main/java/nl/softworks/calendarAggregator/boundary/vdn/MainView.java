@@ -38,9 +38,7 @@ implements AfterNavigationObserver
 
 	private final TreeGrid<TreeNode> treeGrid = new TreeGrid<>();
 	private final CalendarSourceForm calendarSourceForm = new CalendarSourceForm();
-	private final Dialog calendarSourceDialog = new Dialog("Source", calendarSourceForm);
 	private final CalendarEventForm calendarEventForm = new CalendarEventForm();
-	private final Dialog calendarEventDialog = new Dialog("Event", calendarEventForm);
 	private List<TreeNode> treeNodes = null;
 
 	public MainView() {
@@ -61,73 +59,75 @@ implements AfterNavigationObserver
 		deleteButton.addClickListener(buttonClickEvent -> delete());
 		HorizontalLayout buttonbar = new HorizontalLayout(insertButton, editButton, deleteButton);
 
-		// calendarSourceDialog
-		setupDialog(calendarSourceDialog);
-
-		// calendarSourceDialog
-		setupDialog(calendarEventDialog);
-
 		// content
-		setContent(new VerticalLayout(buttonbar, treeGrid, calendarSourceDialog));
+		setContent(new VerticalLayout(buttonbar, treeGrid));
 	}
 
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
 		List<CalendarSource> calendarSources = R.calendarSource().findAll();
 		treeNodes = treeNodes(calendarSources, TreeNodeCalendarSource::new);
-		treeGrid.setItems(treeNodes, this::getTreeNodeChildren);
-	}
-
-	private <T> void setupDialog(Dialog dialog) {
-		Button closeButton = new Button(LumoIcon.CROSS.create(), e -> dialog.close());
-		closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-		dialog.getHeader().add(closeButton);
-		Button saveButton = new Button("Save", VaadinIcon.SAFE.create(), e -> save());
-		dialog.getFooter().add(saveButton);
+		refreshTreeGrid();
 	}
 
 	private void insert() {
 	}
 
 	private void edit() {
+		// Get the selected treenode
 		Set<TreeNode> selectedItems = treeGrid.getSelectedItems();
 		if (selectedItems.isEmpty() || selectedItems.size() > 1) {
 			return;
 		}
 		TreeNode treeNode = selectedItems.iterator().next();
 
-		if (treeNode instanceof TreeNodeCalendarSource treeNodeCalendarSource) {
-			calendarSourceForm.populateWith(treeNodeCalendarSource.calendarSource());
-			calendarSourceDialog.open();
+		// Create a dialog
+		Dialog dialog = new Dialog();
+		Button closeButton = new Button(LumoIcon.CROSS.create(), e -> dialog.close());
+		closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+		dialog.getHeader().add(closeButton);
+		Button saveButton = new Button("Save", VaadinIcon.SAFE.create());
+		dialog.getFooter().add(saveButton);
 
+		// Populate with source
+		if (treeNode instanceof TreeNodeCalendarSource treeNodeCalendarSource) {
+			CalendarSource calendarSource = treeNodeCalendarSource.calendarSource();
+			calendarSourceForm.populateWith(calendarSource);
+			dialog.setHeaderTitle("Source");
+			dialog.add(calendarSourceForm);
+			saveButton.addClickListener(e -> {
+				calendarSourceForm.writeTo(calendarSource);
+				R.calendarSource().save(calendarSource);
+				dialog.close();
+				refreshTreeGrid();
+			});
 		}
+		// Populate with event
 		if (treeNode instanceof TreeNodeCalendarEvent treeNodeCalendarEvent) {
-			calendarEventForm.populateWith(treeNodeCalendarEvent.calendarEvent());
-			calendarEventDialog.open();
+			CalendarEvent calendarEvent = treeNodeCalendarEvent.calendarEvent();
+			calendarEventForm.populateWith(calendarEvent);
+			dialog.setHeaderTitle("Event");
+			dialog.add(calendarEventForm);
+			saveButton.addClickListener(e -> {
+				calendarEventForm.writeTo(calendarEvent);
+				R.calendarEvent().save(calendarEvent);
+				dialog.close();
+				refreshTreeGrid();
+			});
 		}
+		dialog.open();
 	}
 
 	private void delete() {
 	}
 
-	private void save() {
+	private void refreshTreeGrid() {
 		Set<TreeNode> selectedItems = treeGrid.getSelectedItems();
+		treeGrid.setItems(treeNodes, this::getTreeNodeChildren);
 		if (selectedItems.isEmpty() || selectedItems.size() > 1) {
 			return;
 		}
 		TreeNode treeNode = selectedItems.iterator().next();
-
-		if (treeNode instanceof TreeNodeCalendarSource treeNodeCalendarSource) {
-			calendarSourceForm.writeTo(treeNodeCalendarSource.calendarSource());
-			R.calendarSource().save(treeNodeCalendarSource.calendarSource());
-			calendarSourceDialog.close();
-		}
-		if (treeNode instanceof TreeNodeCalendarEvent treeNodeCalendarEvent) {
-			calendarEventForm.writeTo(treeNodeCalendarEvent.calendarEvent());
-			R.calendarEvent().save(treeNodeCalendarEvent.calendarEvent());
-			calendarEventDialog.close();
-		}
-		treeGrid.setItems(treeNodes, this::getTreeNodeChildren);
         if (treeNode instanceof TreeNodeCalendarEvent treeNodeCalendarEvent) {
             treeGrid.expand(treeNodeCalendarEvent.treeNodeCalendarSource());
         }
