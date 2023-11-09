@@ -30,4 +30,10 @@ public class R {
     static public CalendarEventRepo calendarEvent() {
         return R.singleton.calendarEventRepo;
     }
+
+    @Autowired
+    TimezoneRepo timezoneRepo;
+    static public TimezoneRepo timezoneRepo() {
+        return R.singleton.timezoneRepo;
+    }
 }

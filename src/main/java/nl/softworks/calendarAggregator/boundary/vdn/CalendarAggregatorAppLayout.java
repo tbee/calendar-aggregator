@@ -23,6 +23,7 @@ import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.Person;
+import nl.softworks.calendarAggregator.domain.entity.Timezone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -186,11 +187,35 @@ implements HasDynamicTitle {
 		});
 	}
 	private void addTestdata() {
+		Timezone timezoneEUAMS = new Timezone()
+				.name("Europe/Amsterdam")
+				.content("""
+					BEGIN:VTIMEZONE
+					TZID:Europe/Amsterdam
+					BEGIN:DAYLIGHT
+					TZOFFSETFROM:+0100
+					TZOFFSETTO:+0200
+					TZNAME:CEST
+					DTSTART:19810329T020000
+					RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+					END:DAYLIGHT
+					BEGIN:STANDARD
+					TZOFFSETFROM:+0200
+					TZOFFSETTO:+0100
+					TZNAME:CET
+					DTSTART:19961027T030000
+					RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+					END:STANDARD
+					END:VTIMEZONE
+					""");
+		R.timezoneRepo().save(timezoneEUAMS);
+
 		CalendarSource calendarSourceManual = new CalendarSource()
 				.url("https://www.dansstudiovieberink.nl/kalender.html")
 				.name("Dansstudio Vieberink")
 				.lat(51.9314535)
-				.lon(6.5908473);
+				.lon(6.5908473)
+				.timezone(timezoneEUAMS);
 
 		{
 			CalendarEvent calendarEvent = new CalendarEvent()

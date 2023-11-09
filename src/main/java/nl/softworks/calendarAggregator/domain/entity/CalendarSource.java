@@ -8,6 +8,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
@@ -72,6 +74,19 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 			throw new IllegalStateException("Latidude must be [-90,90]");
 		}
 		this.lon = v;
+		return this;
+	}
+
+	@NotNull
+	@JoinColumn(name = "timezone_id", nullable = false)
+	@ManyToOne(targetEntity=Timezone.class, fetch=FetchType.LAZY)
+	private Timezone timezone;
+	static public final String TIMEZONE_PROPERTYID = "timezone";
+	public Timezone timezone() {
+		return timezone;
+	}
+	public CalendarSource timezone(Timezone v) {
+		this.timezone = v;
 		return this;
 	}
 

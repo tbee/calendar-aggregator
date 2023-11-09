@@ -37,6 +37,22 @@
             <column name="role" value="ROLE_ADMIN"/>
         </insert>
 
+
+        <createTable tableName="timezone">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lazylock" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="content" type="nvarchar(4000)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
         <createTable tableName="calendar_source">
             <column name="id" type="bigint" autoIncrement="true" startWith="1">
                 <constraints primaryKey="true" nullable="false"/>
@@ -59,7 +75,16 @@
             <column name="lat" type="double">
                 <constraints nullable="false"/>
             </column>
+            <column name="timezone_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
+        <addForeignKeyConstraint  constraintName="calendar_source__timezone"
+                                  baseTableName="calendar_source"
+                                  baseColumnNames="timezone_id"
+                                  referencedTableName="timezone"
+                                  referencedColumnNames="id"/>
+
 
         <createTable tableName="calendar_event">
             <column name="id" type="bigint" autoIncrement="true" startWith="1">
