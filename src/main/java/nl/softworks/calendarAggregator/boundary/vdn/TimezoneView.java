@@ -17,6 +17,7 @@ import nl.softworks.calendarAggregator.domain.entity.Timezone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -90,6 +91,7 @@ implements AfterNavigationObserver {
 		Timezone selectedTimezone = getSelectedTimezone();
 
 		List<Timezone> timezones = R.timezoneRepo().findAll();
+		timezones.sort((timezone1, timezone2) -> timezone1.name().compareTo(timezone2.name()));
 		timezoneTreeGrid.setItems(timezones);
 
 		if (selectedTimezone != null) {
