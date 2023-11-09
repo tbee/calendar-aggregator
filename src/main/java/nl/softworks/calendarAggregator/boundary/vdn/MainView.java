@@ -36,7 +36,7 @@ implements AfterNavigationObserver
 	private static final Logger LOG = LoggerFactory.getLogger(MainView.class);
 	private static final DateTimeFormatter YYYYMMDDHHMM = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-	private final TreeGrid<TreeNode> treeGrid = new TreeGrid<>();
+	private final TreeGrid<TreeNode> calendarSourceAndEventTreeGrid = new TreeGrid<>();
 	private final CalendarSourceForm calendarSourceForm = new CalendarSourceForm();
 	private final CalendarEventForm calendarEventForm = new CalendarEventForm();
 	private List<TreeNode> treeNodes = null;
@@ -45,22 +45,19 @@ implements AfterNavigationObserver
 		super("Overview");
 		tabs.setSelectedTab(overviewTab);
 
-		// treeGrid
-		treeGrid.addHierarchyColumn(TreeNode::getText).setHeader("Name");
-		treeGrid.addColumn(TreeNode::getStartDate).setHeader("Start");
-		treeGrid.addColumn(TreeNode::getEndDate).setHeader("End");
+		// calendarSourceAndEventTreeGrid
+		calendarSourceAndEventTreeGrid.addHierarchyColumn(TreeNode::getText).setHeader("Name");
+		calendarSourceAndEventTreeGrid.addColumn(TreeNode::getStartDate).setHeader("Start");
+		calendarSourceAndEventTreeGrid.addColumn(TreeNode::getEndDate).setHeader("End");
 
 		// buttonbar
-		Button insertButton = new Button(VaadinIcon.PLUS.create());
-		insertButton.addClickListener(buttonClickEvent -> insert());
-		Button editButton = new Button(VaadinIcon.EDIT.create());
-		editButton.addClickListener(buttonClickEvent -> edit());
-		Button deleteButton = new Button(VaadinIcon.TRASH.create());
-		deleteButton.addClickListener(buttonClickEvent -> delete());
-		HorizontalLayout buttonbar = new HorizontalLayout(insertButton, editButton, deleteButton);
+		CrudButtonbar crudButtonbar = new CrudButtonbar()
+				.onInsert(this::insert)
+				.onEdit(this::edit)
+				.onDelete(this::delete);
 
 		// content
-		setContent(new VerticalLayout(buttonbar, treeGrid));
+		setContent(new VerticalLayout(crudButtonbar, calendarSourceAndEventTreeGrid));
 	}
 
 	@Override
@@ -75,7 +72,7 @@ implements AfterNavigationObserver
 
 	private void edit() {
 		// Get the selected treenode
-		Set<TreeNode> selectedItems = treeGrid.getSelectedItems();
+		Set<TreeNode> selectedItems = calendarSourceAndEventTreeGrid.getSelectedItems();
 		if (selectedItems.isEmpty() || selectedItems.size() > 1) {
 			return;
 		}
@@ -122,16 +119,16 @@ implements AfterNavigationObserver
 	}
 
 	private void refreshTreeGrid() {
-		Set<TreeNode> selectedItems = treeGrid.getSelectedItems();
-		treeGrid.setItems(treeNodes, this::getTreeNodeChildren);
+		Set<TreeNode> selectedItems = calendarSourceAndEventTreeGrid.getSelectedItems();
+		calendarSourceAndEventTreeGrid.setItems(treeNodes, this::getTreeNodeChildren);
 		if (selectedItems.isEmpty() || selectedItems.size() > 1) {
 			return;
 		}
 		TreeNode treeNode = selectedItems.iterator().next();
         if (treeNode instanceof TreeNodeCalendarEvent treeNodeCalendarEvent) {
-            treeGrid.expand(treeNodeCalendarEvent.treeNodeCalendarSource());
+            calendarSourceAndEventTreeGrid.expand(treeNodeCalendarEvent.treeNodeCalendarSource());
         }
-		treeGrid.select(treeNode);
+		calendarSourceAndEventTreeGrid.select(treeNode);
 	}
 
 

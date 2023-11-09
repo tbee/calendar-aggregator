@@ -44,11 +44,9 @@ implements HasDynamicTitle {
 	@Autowired
 	private PlatformTransactionManager transactionManager;
 
-	final protected Tab overviewTab = new Tab(VaadinIcon.TABLE.create(), new Span("Overview") );
-	final protected Tab manualTab = new Tab(VaadinIcon.USER.create(), new Span("Manual") );
-	final protected Tab scraperTab = new Tab(VaadinIcon.SCISSORS.create(), new Span("Scraper"));
-	final protected Tab icalTab = new Tab(VaadinIcon.CALENDAR.create(), new Span("iCal"));
-	final protected Tabs tabs = new Tabs(overviewTab, manualTab, scraperTab, icalTab);
+	final protected Tab overviewTab = new Tab(VaadinIcon.TABLE.create(), new Span("Sources") );
+	final protected Tab timezoneTab = new Tab(VaadinIcon.CLOCK.create(), new Span("Timezones") );
+	final protected Tabs tabs = new Tabs(overviewTab, timezoneTab);
 
 	@Override
 	public String getPageTitle() {
@@ -99,17 +97,11 @@ implements HasDynamicTitle {
 			if (event.getSelectedTab().equals(overviewTab)) {
 				UI.getCurrent().navigate(MainView.class);
 			}
-			if (event.getSelectedTab().equals(manualTab)) {
-				UI.getCurrent().navigate(ManualView.class);
+			if (event.getSelectedTab().equals(timezoneTab)) {
+				UI.getCurrent().navigate(TimezoneView.class);
 			}
-//			if (event.getSelectedTab().equals(scraperTab)) {
-//				setContent(createPersonContent());
-//			}
-//			if (event.getSelectedTab().equals(icalTab)) {
-//				setContent(createShiftTypeContent());
-//			}
 		});
-//		addToDrawer(tabs);
+		addToDrawer(tabs);
 
 		// Navbar
 		addToNavbar(drawerToggle, titleH1, menuBar);
