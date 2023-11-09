@@ -5,7 +5,6 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.router.AfterNavigationEvent;
@@ -30,10 +29,10 @@ import java.util.function.Function;
 @StyleSheet("context://../vaadin.css")
 //@RolesAllowed("ROLE_PLANNER")
 @PermitAll
-public class MainView extends CalendarAggregatorAppLayout
+public class CalendarSourceAndEventView extends CalendarAggregatorAppLayout
 implements AfterNavigationObserver
 {
-	private static final Logger LOG = LoggerFactory.getLogger(MainView.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CalendarSourceAndEventView.class);
 	private static final DateTimeFormatter YYYYMMDDHHMM = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
 	private final TreeGrid<TreeNode> calendarSourceAndEventTreeGrid = new TreeGrid<>();
@@ -41,7 +40,7 @@ implements AfterNavigationObserver
 	private final CalendarEventForm calendarEventForm = new CalendarEventForm();
 	private List<TreeNode> treeNodes = null;
 
-	public MainView() {
+	public CalendarSourceAndEventView() {
 		super("Overview");
 		tabs.setSelectedTab(overviewTab);
 

@@ -17,10 +17,10 @@ abstract public class EntityBase<T> {
 
 	@Id @GeneratedValue(strategy=GenerationType.IDENTITY)
 	protected long id;
-	public long getId() {
+	static public final String ID_PROPERTYID = "id";
+	public long id() {
 		return id;
 	}
-	static public final String ID_PROPERTYID = "id";
 
 	@Version
 	protected long lazylock = 0;

@@ -95,7 +95,7 @@ implements HasDynamicTitle {
 		tabs.setOrientation(Tabs.Orientation.VERTICAL);
 		tabs.addSelectedChangeListener(event -> {
 			if (event.getSelectedTab().equals(overviewTab)) {
-				UI.getCurrent().navigate(MainView.class);
+				UI.getCurrent().navigate(CalendarSourceAndEventView.class);
 			}
 			if (event.getSelectedTab().equals(timezoneTab)) {
 				UI.getCurrent().navigate(TimezoneView.class);
