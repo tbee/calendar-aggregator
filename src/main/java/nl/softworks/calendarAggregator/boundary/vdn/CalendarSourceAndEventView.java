@@ -1,11 +1,15 @@
 package nl.softworks.calendarAggregator.boundary.vdn;
 
 import com.vaadin.flow.component.dependency.StyleSheet;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
+import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.theme.lumo.LumoIcon;
 import jakarta.annotation.security.PermitAll;
 import nl.softworks.calendarAggregator.boundary.vdn.component.CrudButtonbar;
 import nl.softworks.calendarAggregator.boundary.vdn.component.OkCancelDialog;
@@ -40,9 +44,10 @@ implements AfterNavigationObserver
 		tabs.setSelectedTab(overviewTab);
 
 		// calendarSourceAndEventTreeGrid
-		calendarSourceAndEventTreeGrid.addHierarchyColumn(TreeNode::getText).setHeader("Name");
-		calendarSourceAndEventTreeGrid.addColumn(TreeNode::getStartDate).setHeader("Start");
-		calendarSourceAndEventTreeGrid.addColumn(TreeNode::getEndDate).setHeader("End");
+		calendarSourceAndEventTreeGrid.addComponentHierarchyColumn((ValueProvider<TreeNode, Icon>) TreeNode::icon);
+		calendarSourceAndEventTreeGrid.addColumn(TreeNode::text).setHeader("Name");
+		calendarSourceAndEventTreeGrid.addColumn(TreeNode::startDate).setHeader("Start");
+		calendarSourceAndEventTreeGrid.addColumn(TreeNode::endDate).setHeader("End");
 
 		// buttonbar
 		CrudButtonbar crudButtonbar = new CrudButtonbar()
@@ -119,41 +124,52 @@ implements AfterNavigationObserver
 
 
 	sealed interface TreeNode permits TreeNodeCalendarSource, TreeNodeCalendarEvent {
-		String getText();
-		String getStartDate();
-		String getEndDate();
+		String text();
+		String startDate();
+		String endDate();
+		Icon icon();
 	}
 
 	record TreeNodeCalendarSource(CalendarSource calendarSource) implements TreeNode {
 		@Override
-		public String getText() {
+		public String text() {
 			return calendarSource().name();
 		}
 
 		@Override
-		public String getStartDate() {
+		public String startDate() {
 			return null;
 		}
 
 		@Override
-		public String getEndDate() {
+		public String endDate() {
 			return null;
+		}
+
+		@Override
+		public Icon icon() {
+			return VaadinIcon.DATABASE.create();
 		}
 	}
 	record TreeNodeCalendarEvent (TreeNodeCalendarSource treeNodeCalendarSource, CalendarEvent calendarEvent) implements TreeNode {
 		@Override
-		public String getText() {
+		public String text() {
 			return calendarEvent.subject();
 		}
 
 		@Override
-		public String getStartDate() {
+		public String startDate() {
 			return calendarEvent.startDateTime().format(YYYYMMDDHHMM);
 		}
 
 		@Override
-		public String getEndDate() {
+		public String endDate() {
 			return calendarEvent.endDateTime().format(YYYYMMDDHHMM);
+		}
+
+		@Override
+		public Icon icon() {
+			return calendarEvent.getClass().equals(CalendarEvent.class) ? LumoIcon.EDIT.create() : null;
 		}
 	}
 

@@ -19,8 +19,8 @@ public class OkCancelDialog extends Dialog {
     public OkCancelDialog(String title, Component component) {
         setHeaderTitle(title);
 
-        // close
-        Button closeButton = new Button(LumoIcon.CROSS.create(), e -> cancel());
+        // Close
+        Button closeButton = new Button(LumoIcon.CROSS.create(), e -> close());
         closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         getHeader().add(closeButton);
 
@@ -28,13 +28,10 @@ public class OkCancelDialog extends Dialog {
         okButton.addClickListener(e -> ok());
         getFooter().add(okButton);
 
+        // Content
         if (component != null) {
             add(component);
         }
-    }
-
-    private void cancel() {
-        close();
     }
 
     private void ok() {
