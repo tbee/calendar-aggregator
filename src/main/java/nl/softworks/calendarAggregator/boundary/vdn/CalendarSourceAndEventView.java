@@ -1,17 +1,14 @@
 package nl.softworks.calendarAggregator.boundary.vdn;
 
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.StyleSheet;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.lumo.LumoIcon;
 import jakarta.annotation.security.PermitAll;
+import nl.softworks.calendarAggregator.boundary.vdn.component.CrudButtonbar;
+import nl.softworks.calendarAggregator.boundary.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
@@ -36,8 +33,6 @@ implements AfterNavigationObserver
 	private static final DateTimeFormatter YYYYMMDDHHMM = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
 	private final TreeGrid<TreeNode> calendarSourceAndEventTreeGrid = new TreeGrid<>();
-	private final CalendarSourceForm calendarSourceForm = new CalendarSourceForm();
-	private final CalendarEventForm calendarEventForm = new CalendarEventForm();
 	private List<TreeNode> treeNodes = null;
 
 	public CalendarSourceAndEventView() {
@@ -77,41 +72,33 @@ implements AfterNavigationObserver
 		}
 		TreeNode treeNode = selectedItems.iterator().next();
 
-		// Create a dialog
-		Dialog dialog = new Dialog();
-		Button closeButton = new Button(LumoIcon.CROSS.create(), e -> dialog.close());
-		closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-		dialog.getHeader().add(closeButton);
-		Button saveButton = new Button("Save", VaadinIcon.SAFE.create());
-		dialog.getFooter().add(saveButton);
-
-		// Populate with source
+		// Dialog with source
 		if (treeNode instanceof TreeNodeCalendarSource treeNodeCalendarSource) {
 			CalendarSource calendarSource = treeNodeCalendarSource.calendarSource();
-			calendarSourceForm.populateWith(calendarSource);
-			dialog.setHeaderTitle("Source");
-			dialog.add(calendarSourceForm);
-			saveButton.addClickListener(e -> {
-				calendarSourceForm.writeTo(calendarSource);
-				R.calendarSource().save(calendarSource);
-				dialog.close();
-				refreshTreeGrid();
-			});
+			CalendarSourceForm calendarSourceForm = new CalendarSourceForm().populateWith(calendarSource);
+			new OkCancelDialog("Source", calendarSourceForm)
+					.okLabel("Save")
+					.onOk(() -> {
+						calendarSourceForm.writeTo(calendarSource);
+						R.calendarSource().save(calendarSource);
+						refreshTreeGrid();
+					})
+					.open();
 		}
-		// Populate with event
+
+		// Dialog with event
 		if (treeNode instanceof TreeNodeCalendarEvent treeNodeCalendarEvent) {
 			CalendarEvent calendarEvent = treeNodeCalendarEvent.calendarEvent();
-			calendarEventForm.populateWith(calendarEvent);
-			dialog.setHeaderTitle("Event");
-			dialog.add(calendarEventForm);
-			saveButton.addClickListener(e -> {
-				calendarEventForm.writeTo(calendarEvent);
-				R.calendarEvent().save(calendarEvent);
-				dialog.close();
-				refreshTreeGrid();
-			});
+			CalendarEventForm calendarEventForm = new CalendarEventForm().populateWith(calendarEvent);
+			new OkCancelDialog("Event", calendarEventForm)
+					.okLabel("Save")
+					.onOk(() -> {
+						calendarEventForm.writeTo(calendarEvent);
+						R.calendarEvent().save(calendarEvent);
+						refreshTreeGrid();
+					})
+					.open();
 		}
-		dialog.open();
 	}
 
 	private void delete() {

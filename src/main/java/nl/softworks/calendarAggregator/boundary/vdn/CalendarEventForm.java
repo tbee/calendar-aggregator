@@ -31,7 +31,7 @@ public class CalendarEventForm extends FormLayout {
 		setColspan(subjectTextField, 2);
 	}
 
-	public void populateWith(CalendarEvent calendarEvent) {
+	public CalendarEventForm populateWith(CalendarEvent calendarEvent) {
 		LocalDateTime startDateTime = calendarEvent.startDateTime();
 		LocalDateTime endDateTime = calendarEvent.endDateTime();
 		String subject = calendarEvent.subject();
@@ -41,14 +41,18 @@ public class CalendarEventForm extends FormLayout {
 		endDatePicker.setValue(endDateTime == null ? null : endDateTime.toLocalDate());
 		endTimePicker.setValue(endDateTime == null ? null : calendarEvent.endDateTime().toLocalTime());
 		subjectTextField.setValue(subject);
+
+		return this;
 	}
 
-	public void writeTo(CalendarEvent calendarEvent) {
+	public CalendarEventForm writeTo(CalendarEvent calendarEvent) {
 		LocalDateTime startDateTime = LocalDateTime.of(startDatePicker.getValue(), startTimePicker.getValue());
 		LocalDateTime endDateTime = LocalDateTime.of(endDatePicker.getValue(), endTimePicker.getValue());
 
 		calendarEvent.startDateTime(startDateTime)
 					.endDateTime(endDateTime)
 					.subject(subjectTextField.getValue());
+
+		return this;
 	}
 }

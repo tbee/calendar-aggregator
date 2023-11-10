@@ -1,4 +1,4 @@
-package nl.softworks.calendarAggregator.boundary.vdn;
+package nl.softworks.calendarAggregator.boundary.vdn.component;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.icon.VaadinIcon;

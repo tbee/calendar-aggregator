@@ -19,13 +19,15 @@ public class TimezoneForm extends FormLayout {
 		setColspan(contentTextField, 2);
 	}
 
-	public void populateWith(Timezone timezone) {
+	public TimezoneForm populateWith(Timezone timezone) {
 		nameTextField.setValue(timezone == null ? "" : timezone.name());
 		contentTextField.setValue(timezone == null ? "" : timezone.content());
+		return this;
 	}
 
-	public void writeTo(Timezone timezone) {
+	public TimezoneForm writeTo(Timezone timezone) {
 		timezone.name(nameTextField.getValue());
 		timezone.content(contentTextField.getValue());
+		return this;
 	}
 }

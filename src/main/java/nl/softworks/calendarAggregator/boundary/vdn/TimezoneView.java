@@ -12,12 +12,13 @@ import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import jakarta.annotation.security.PermitAll;
+import nl.softworks.calendarAggregator.boundary.vdn.component.CrudButtonbar;
+import nl.softworks.calendarAggregator.boundary.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.Timezone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -58,33 +59,23 @@ implements AfterNavigationObserver {
 	}
 
 	private void edit() {
+
 		// Get the selected treenode
 		Timezone timezone = getSelectedTimezone();
 		if (timezone == null) {
 			return;
 		}
 
-		// Create a dialog
-		Dialog dialog = new Dialog();
-		Button closeButton = new Button(LumoIcon.CROSS.create(), e -> dialog.close());
-		closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-		dialog.getHeader().add(closeButton);
-		Button saveButton = new Button("Save", VaadinIcon.SAFE.create());
-		dialog.getFooter().add(saveButton);
-
-		// Populate with source
-		TimezoneForm timezoneForm = new TimezoneForm();
-		timezoneForm.populateWith(timezone);
-		dialog.setHeaderTitle("Timezone");
-		dialog.add(timezoneForm);
-		saveButton.addClickListener(e -> {
-			timezoneForm.writeTo(timezone);
-			R.timezoneRepo().save(timezone);
-			dialog.close();
-			loadGrid();
-		});
-
-		dialog.open();
+		// Dialog
+		TimezoneForm timezoneForm = new TimezoneForm().populateWith(timezone);
+		new OkCancelDialog("Timezone", timezoneForm)
+				.okLabel("Save")
+				.onOk(() -> {
+					timezoneForm.writeTo(timezone);
+					R.timezoneRepo().save(timezone);
+					loadGrid();
+				})
+				.open();
 	}
 
 	private void loadGrid() {
