@@ -79,17 +79,17 @@ implements AfterNavigationObserver {
 	}
 
 	private void loadGrid() {
+		// Remember selection
 		Timezone selectedTimezone = getSelectedTimezone();
 
+		// Reload timezones
 		List<Timezone> timezones = R.timezoneRepo().findAll();
 		timezones.sort((timezone1, timezone2) -> timezone1.name().compareTo(timezone2.name()));
 		timezoneTreeGrid.setItems(timezones);
 
+		// Reselect
 		if (selectedTimezone != null) {
-			Timezone timezone = timezones.stream().filter(tz -> tz.id() == selectedTimezone.id()).findFirst().orElse(null);
-			if (timezone != null) {
-				timezoneTreeGrid.select(timezone);
-			}
+			timezoneTreeGrid.select(selectedTimezone);
 		}
 	}
 
@@ -98,7 +98,6 @@ implements AfterNavigationObserver {
 	}
 
 	private Timezone getSelectedTimezone() {
-		// Get the selected treenode
 		Set<Timezone> selectedItems = timezoneTreeGrid.getSelectedItems();
 		if (selectedItems.isEmpty() || selectedItems.size() > 1) {
 			return null;

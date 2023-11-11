@@ -49,6 +49,7 @@ abstract public class EntityBase<T> {
 			return super.equals(obj);
 		}
 		return id == other.id //
-				&& lazylock == other.lazylock;
+//				&& lazylock == other.lazylock
+				;
 	}
 }

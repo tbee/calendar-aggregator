@@ -1,6 +1,8 @@
 package nl.softworks.calendarAggregator.boundary.vdn;
 
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.StyleSheet;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -11,6 +13,7 @@ import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import jakarta.annotation.security.PermitAll;
+import nl.softworks.calendarAggregator.boundary.vdn.component.CancelDialog;
 import nl.softworks.calendarAggregator.boundary.vdn.component.CrudButtonbar;
 import nl.softworks.calendarAggregator.boundary.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.domain.boundary.R;
@@ -37,7 +40,6 @@ implements AfterNavigationObserver
 	private static final DateTimeFormatter YYYYMMDDHHMM = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
 	private final TreeGrid<TreeNode> calendarSourceAndEventTreeGrid = new TreeGrid<>();
-	private List<TreeNode> treeNodes = null;
 
 	public CalendarSourceAndEventView() {
 		super("Overview");
@@ -61,73 +63,93 @@ implements AfterNavigationObserver
 
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
-		List<CalendarSource> calendarSources = R.calendarSource().findAll();
-		treeNodes = treeNodes(calendarSources, TreeNodeCalendarSource::new);
-		refreshTreeGrid();
+		reloadTreeGrid();
 	}
 
 	private void insert() {
+		TreeNode treeNode = getSelectedTreeNode();
+
+		VerticalLayout verticalLayout = new VerticalLayout();
+		CancelDialog dialog = new CancelDialog("Add", verticalLayout);
+
+		// Manual Source
+		verticalLayout.add(new Button("Manual Source", e -> {
+			dialog.close();
+			CalendarSourceForm.showInsertDialog(() -> reloadTreeGrid());
+		}));
+
+		// Manual Event
+		if (treeNode instanceof TreeNodeCalendarSource treeNodeCalendarSource) {
+			verticalLayout.add(new Button("Manual Event", e -> {
+				dialog.close();
+				CalendarEventForm.showInsertDialog(treeNodeCalendarSource.calendarSource(), () -> reloadTreeGrid());
+			}));
+		}
+
+		dialog.open();
 	}
+
 
 	private void edit() {
 		// Get the selected treenode
-		Set<TreeNode> selectedItems = calendarSourceAndEventTreeGrid.getSelectedItems();
-		if (selectedItems.isEmpty() || selectedItems.size() > 1) {
+		TreeNode selectedTreeNode = getSelectedTreeNode();
+		if (selectedTreeNode == null) {
 			return;
 		}
-		TreeNode treeNode = selectedItems.iterator().next();
 
 		// Dialog with source
-		if (treeNode instanceof TreeNodeCalendarSource treeNodeCalendarSource) {
-			CalendarSource calendarSource = treeNodeCalendarSource.calendarSource();
-			CalendarSourceForm calendarSourceForm = new CalendarSourceForm().populateWith(calendarSource);
-			new OkCancelDialog("Source", calendarSourceForm)
-					.okLabel("Save")
-					.onOk(() -> {
-						calendarSourceForm.writeTo(calendarSource);
-						R.calendarSource().save(calendarSource);
-						refreshTreeGrid();
-					})
-					.open();
-		}
-
-		// Dialog with event
-		if (treeNode instanceof TreeNodeCalendarEvent treeNodeCalendarEvent) {
-			CalendarEvent calendarEvent = treeNodeCalendarEvent.calendarEvent();
-			CalendarEventForm calendarEventForm = new CalendarEventForm().populateWith(calendarEvent);
-			new OkCancelDialog("Event", calendarEventForm)
-					.okLabel("Save")
-					.onOk(() -> {
-						calendarEventForm.writeTo(calendarEvent);
-						R.calendarEvent().save(calendarEvent);
-						refreshTreeGrid();
-					})
-					.open();
-		}
+		selectedTreeNode.edit(() -> reloadTreeGrid());
 	}
 
 	private void delete() {
-	}
-
-	private void refreshTreeGrid() {
-		Set<TreeNode> selectedItems = calendarSourceAndEventTreeGrid.getSelectedItems();
-		calendarSourceAndEventTreeGrid.setItems(treeNodes, this::getTreeNodeChildren);
-		if (selectedItems.isEmpty() || selectedItems.size() > 1) {
+		TreeNode selectedTreeNode = getSelectedTreeNode();
+		if (selectedTreeNode == null) {
 			return;
 		}
-		TreeNode treeNode = selectedItems.iterator().next();
-        if (treeNode instanceof TreeNodeCalendarEvent treeNodeCalendarEvent) {
-            calendarSourceAndEventTreeGrid.expand(treeNodeCalendarEvent.treeNodeCalendarSource());
-        }
-		calendarSourceAndEventTreeGrid.select(treeNode);
+
+		new OkCancelDialog("Remove", new NativeLabel("Are you sure?"))
+				.okLabel("Yes")
+				.onOk(() -> {
+					selectedTreeNode.delete(() -> reloadTreeGrid());
+				})
+				.open();
 	}
 
+
+	private TreeNode getSelectedTreeNode() {
+		Set<TreeNode> selectedItems = calendarSourceAndEventTreeGrid.getSelectedItems();
+		if (selectedItems.isEmpty() || selectedItems.size() > 1) {
+			return null;
+		}
+		TreeNode treeNode = selectedItems.iterator().next();
+		return treeNode;
+	}
+
+	private void reloadTreeGrid() {
+		// Remember selection
+		TreeNode selectedTreeNode = getSelectedTreeNode();
+
+		// Refresh data
+		List<CalendarSource> calendarSources = R.calendarSource().findAll();
+		List<TreeNode> treeNodes = treeNodes(calendarSources, TreeNodeCalendarSource::new);
+		calendarSourceAndEventTreeGrid.setItems(treeNodes, this::getTreeNodeChildren);
+
+		// Reselect NODE
+		if (selectedTreeNode != null) {
+			if (selectedTreeNode instanceof TreeNodeCalendarEvent treeNodeCalendarEvent) {
+				calendarSourceAndEventTreeGrid.expand(treeNodeCalendarEvent.treeNodeCalendarSource());
+			}
+			calendarSourceAndEventTreeGrid.select(selectedTreeNode);
+		}
+	}
 
 	sealed interface TreeNode permits TreeNodeCalendarSource, TreeNodeCalendarEvent {
 		String text();
 		String startDate();
 		String endDate();
 		Icon icon();
+		void edit(Runnable onOk);
+		void delete(Runnable onOk);
 	}
 
 	record TreeNodeCalendarSource(CalendarSource calendarSource) implements TreeNode {
@@ -150,6 +172,25 @@ implements AfterNavigationObserver
 		public Icon icon() {
 			return VaadinIcon.DATABASE.create();
 		}
+
+		@Override
+		public void edit(Runnable onOk) {
+			CalendarSourceForm calendarSourceForm = new CalendarSourceForm().populateWith(calendarSource);
+			new OkCancelDialog("Source", calendarSourceForm)
+					.okLabel("Save")
+					.onOk(() -> {
+						calendarSourceForm.writeTo(calendarSource);
+						R.calendarSource().save(calendarSource);
+						onOk.run();
+					})
+					.open();
+		}
+
+		@Override
+		public void delete(Runnable onOk) {
+			R.calendarSource().delete(calendarSource);
+			onOk.run();
+		}
 	}
 	record TreeNodeCalendarEvent (TreeNodeCalendarSource treeNodeCalendarSource, CalendarEvent calendarEvent) implements TreeNode {
 		@Override
@@ -170,6 +211,25 @@ implements AfterNavigationObserver
 		@Override
 		public Icon icon() {
 			return calendarEvent.getClass().equals(CalendarEvent.class) ? LumoIcon.EDIT.create() : null;
+		}
+
+		@Override
+		public void edit(Runnable onOk) {
+			CalendarEventForm calendarEventForm = new CalendarEventForm().populateWith(calendarEvent);
+			new OkCancelDialog("Event", calendarEventForm)
+					.okLabel("Save")
+					.onOk(() -> {
+						calendarEventForm.writeTo(calendarEvent);
+						R.calendarEvent().save(calendarEvent);
+						onOk.run();
+					})
+					.open();
+		}
+
+		@Override
+		public void delete(Runnable onOk) {
+			R.calendarEvent().delete(calendarEvent);
+			onOk.run();
 		}
 	}
 

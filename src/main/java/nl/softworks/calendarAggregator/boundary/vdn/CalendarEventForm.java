@@ -4,7 +4,10 @@ import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.timepicker.TimePicker;
+import nl.softworks.calendarAggregator.boundary.vdn.component.OkCancelDialog;
+import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
+import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +43,7 @@ public class CalendarEventForm extends FormLayout {
 		startTimePicker.setValue(startDateTime == null ? null : startDateTime.toLocalTime());
 		endDatePicker.setValue(endDateTime == null ? null : endDateTime.toLocalDate());
 		endTimePicker.setValue(endDateTime == null ? null : calendarEvent.endDateTime().toLocalTime());
-		subjectTextField.setValue(subject);
+		subjectTextField.setValue(subject == null ? "" : subject);
 
 		return this;
 	}
@@ -54,5 +57,19 @@ public class CalendarEventForm extends FormLayout {
 					.subject(subjectTextField.getValue());
 
 		return this;
+	}
+
+	public static void showInsertDialog(CalendarSource calendarSource, Runnable onInsert) {
+		CalendarEvent calendarEvent = new CalendarEvent();
+		CalendarEventForm calendarEventForm = new CalendarEventForm().populateWith(calendarEvent);
+		new OkCancelDialog("Event", calendarEventForm)
+				.okLabel("Save")
+				.onOk(() -> {
+					calendarEventForm.writeTo(calendarEvent);
+					calendarSource.addCalendarEvent(calendarEvent);
+					R.calendarEvent().save(calendarEvent);
+					onInsert.run();
+				})
+				.open();
 	}
 }

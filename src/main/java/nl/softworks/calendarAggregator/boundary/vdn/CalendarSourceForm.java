@@ -6,6 +6,7 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import nl.softworks.calendarAggregator.boundary.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.Timezone;
@@ -33,11 +34,11 @@ public class CalendarSourceForm extends FormLayout {
 	public CalendarSourceForm populateWith(CalendarSource calendarSource) {
 		timezoneComboBox.setItems(R.timezoneRepo().findAll());
 
-		nameTextField.setValue(calendarSource == null ? "" : calendarSource.name());
-		urlTextField.setValue(calendarSource == null ? "" : calendarSource.url());
-		latNumberField.setValue(calendarSource == null ? 0 : calendarSource.lat());
-		lonNumberField.setValue(calendarSource == null ? 0 : calendarSource.lon());
-		timezoneComboBox.setValue(calendarSource == null ? null : calendarSource.timezone());
+		nameTextField.setValue(calendarSource.name() == null ? "" : calendarSource.name());
+		urlTextField.setValue(calendarSource.url() == null ? "" : calendarSource.url());
+		latNumberField.setValue(calendarSource.lat());
+		lonNumberField.setValue(calendarSource.lon());
+		timezoneComboBox.setValue(calendarSource.timezone() == null ? R.timezoneRepo().findAll().get(0) : calendarSource.timezone());
 
 		return this;
 	}
@@ -50,5 +51,18 @@ public class CalendarSourceForm extends FormLayout {
 		calendarSource.timezone(timezoneComboBox.getValue());
 
 		return this;
+	}
+
+	public static void showInsertDialog(Runnable onInsert) {
+		CalendarSource calendarSource = new CalendarSource();
+		CalendarSourceForm calendarSourceForm = new CalendarSourceForm().populateWith(calendarSource);
+		new OkCancelDialog("Source", calendarSourceForm)
+				.okLabel("Save")
+				.onOk(() -> {
+					calendarSourceForm.writeTo(calendarSource);
+					R.calendarSource().save(calendarSource);
+					onInsert.run();
+				})
+				.open();
 	}
 }
