@@ -27,7 +27,7 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 
 	@Column(unique=true) // prevent the same name to occur
 	@NotNull
-	private String name;
+	protected String name;
 	static public final String NAME_PROPERTYID = "name";
 	public String name() {
 		return name;
@@ -38,7 +38,7 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 
 	@NotNull
-	private String url;
+	protected String url;
 	static public final String URL_PROPERTYID = "url";
 	public String url() {
 		return url;
@@ -49,7 +49,7 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 
 	@NotNull
-	private double lat;
+	protected double lat;
 	static public final String LAT_PROPERTYID = "lat";
 	public double lat() {
 		return lat;
@@ -64,7 +64,7 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 
 	@NotNull
-	private double lon;
+	protected double lon;
 	static public final String LON_PROPERTYID = "lon";
 	public double lon() {
 		return lon;
@@ -80,7 +80,7 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 	@NotNull
 	@JoinColumn(name = "timezone_id", nullable = false)
 	@ManyToOne(targetEntity=Timezone.class, fetch=FetchType.LAZY)
-	private Timezone timezone;
+	protected Timezone timezone;
 	static public final String TIMEZONE_PROPERTYID = "timezone";
 	public Timezone timezone() {
 		return timezone;
@@ -91,13 +91,18 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.EAGER)
-    private final Set<CalendarEvent> calendarEvents = new HashSet<>();
-	public Set<CalendarEvent> getCalendarEvents() {
+    protected final Set<CalendarEvent> calendarEvents = new HashSet<>();
+	public Set<CalendarEvent> calendarEvents() {
 		return Collections.unmodifiableSet(calendarEvents);
 	}
 	public void addCalendarEvent(CalendarEvent rosterDate) {
 		calendarEvents.add(rosterDate);
 		rosterDate.calendarSource = this;
+	}
+
+	public Set<CalendarEvent> generateEvents() {
+		// These events are manually created
+		return null;
 	}
 
 	public String toString() {
