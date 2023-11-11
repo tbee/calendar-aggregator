@@ -179,11 +179,11 @@ implements HasDynamicTitle {
 		});
 	}
 	private void addTestdata() {
+		// BEGIN:VTIMEZONE
+		// TZID:Europe/Amsterdam
 		Timezone timezoneEUAMS = new Timezone()
 				.name("Europe/Amsterdam")
 				.content("""
-					BEGIN:VTIMEZONE
-					TZID:Europe/Amsterdam
 					BEGIN:DAYLIGHT
 					TZOFFSETFROM:+0100
 					TZOFFSETTO:+0200
@@ -198,8 +198,8 @@ implements HasDynamicTitle {
 					DTSTART:19961027T030000
 					RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
 					END:STANDARD
-					END:VTIMEZONE
 					""");
+		// END:VTIMEZONE
 		R.timezoneRepo().save(timezoneEUAMS);
 
 		CalendarSource calendarSourceManual = new CalendarSource()

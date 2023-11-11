@@ -25,8 +25,19 @@ public class Timezone extends EntityBase<Timezone> {
 		return content;
 	}
 	public Timezone content(String v) {
+		if (v != null) {
+			v = v.trim();
+			v = v + (v.endsWith("\n") ? "" : "\n");
+		}
 		this.content = v;
 		return this;
+	}
+
+	public String ical() {
+		return "BEGIN:VTIMEZONE\n"
+				+ "TZID:" + name + "\n"
+				+ content
+				+ "END:VTIMEZONE\n";
 	}
 
 	@Override
