@@ -13,9 +13,12 @@ import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import nl.softworks.calendarAggregator.boundary.vdn.component.CancelDialog;
 import nl.softworks.calendarAggregator.boundary.vdn.component.CrudButtonbar;
 import nl.softworks.calendarAggregator.boundary.vdn.component.OkCancelDialog;
+import nl.softworks.calendarAggregator.boundary.vdn.form.CalendarEventForm;
+import nl.softworks.calendarAggregator.boundary.vdn.form.CalendarSourceForm;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
@@ -31,7 +34,7 @@ import java.util.function.Function;
 
 @Route("/")
 @StyleSheet("context://../vaadin.css")
-//@RolesAllowed("ROLE_PLANNER")
+@RolesAllowed({"ROLE_ADMIN", "ROLE_MAINTAIN"})
 @PermitAll
 public class CalendarSourceAndEventView extends CalendarAggregatorAppLayout
 implements AfterNavigationObserver

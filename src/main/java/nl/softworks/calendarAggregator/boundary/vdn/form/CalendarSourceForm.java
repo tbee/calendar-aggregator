@@ -1,4 +1,4 @@
-package nl.softworks.calendarAggregator.boundary.vdn;
+package nl.softworks.calendarAggregator.boundary.vdn.form;
 
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;

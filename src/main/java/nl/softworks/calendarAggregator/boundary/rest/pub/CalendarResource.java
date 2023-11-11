@@ -21,7 +21,7 @@ public class CalendarResource {
         String events = R.calendarEvent().findAll().stream()
                 .map(ce -> ce.ical())
                 .collect(Collectors.joining());
-        return  crlf(
+        return crlf(
                 """
                 BEGIN:VCALENDAR
                 VERSION:2.0
@@ -36,7 +36,8 @@ public class CalendarResource {
                 END:VCALENDAR
                 """
                 .replace("%timezones%", stripClosingNewline(timezones))
-                .replace("%events%", stripClosingNewline(events)));
+                .replace("%events%", stripClosingNewline(events))
+        );
     }
 
     private String stripClosingNewline(String s) {

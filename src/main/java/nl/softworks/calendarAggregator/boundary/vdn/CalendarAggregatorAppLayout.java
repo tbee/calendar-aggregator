@@ -37,7 +37,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import java.time.LocalDateTime;
 import java.util.concurrent.Callable;
 
-class CalendarAggregatorAppLayout extends AppLayout // https://vaadin.com/docs/latest/components/app-layout
+abstract class CalendarAggregatorAppLayout extends AppLayout // https://vaadin.com/docs/latest/components/app-layout
 implements HasDynamicTitle {
 	private static final Logger LOG = LoggerFactory.getLogger(CalendarAggregatorAppLayout.class);
 
@@ -179,8 +179,6 @@ implements HasDynamicTitle {
 		});
 	}
 	private void addTestdata() {
-		// BEGIN:VTIMEZONE
-		// TZID:Europe/Amsterdam
 		Timezone timezoneEUAMS = new Timezone()
 				.name("Europe/Amsterdam")
 				.content("""
@@ -199,7 +197,6 @@ implements HasDynamicTitle {
 					RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
 					END:STANDARD
 					""");
-		// END:VTIMEZONE
 		R.timezoneRepo().save(timezoneEUAMS);
 
 		CalendarSource calendarSourceManual = new CalendarSource()

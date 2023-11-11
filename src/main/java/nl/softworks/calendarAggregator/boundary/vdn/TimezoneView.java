@@ -1,19 +1,17 @@
 package nl.softworks.calendarAggregator.boundary.vdn;
 
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.StyleSheet;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.theme.lumo.LumoIcon;
 import jakarta.annotation.security.PermitAll;
+import jakarta.annotation.security.RolesAllowed;
 import nl.softworks.calendarAggregator.boundary.vdn.component.CrudButtonbar;
 import nl.softworks.calendarAggregator.boundary.vdn.component.OkCancelDialog;
+import nl.softworks.calendarAggregator.boundary.vdn.form.TimezoneForm;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.Timezone;
 import org.slf4j.Logger;
@@ -24,7 +22,7 @@ import java.util.Set;
 
 @Route("/timezone")
 @StyleSheet("context://../vaadin.css")
-//@RolesAllowed("ROLE_PLANNER")
+@RolesAllowed("ROLE_ADMIN")
 @PermitAll
 public class TimezoneView extends CalendarAggregatorAppLayout
 implements AfterNavigationObserver {
@@ -41,7 +39,7 @@ implements AfterNavigationObserver {
 
 		// crudButtonbar
 		CrudButtonbar crudButtonbar = new CrudButtonbar()
-				.onInsert(this::insert)
+				.onInsert(() -> TimezoneForm.showInsertDialog(this::reloadGrid))
 				.onEdit(this::edit)
 				.onDelete(this::delete);
 
@@ -51,11 +49,7 @@ implements AfterNavigationObserver {
 
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
-		loadGrid();
-	}
-
-	private void insert() {
-
+		reloadGrid();
 	}
 
 	private void edit() {
@@ -73,12 +67,28 @@ implements AfterNavigationObserver {
 				.onOk(() -> {
 					timezoneForm.writeTo(timezone);
 					R.timezoneRepo().save(timezone);
-					loadGrid();
+					reloadGrid();
 				})
 				.open();
 	}
 
-	private void loadGrid() {
+	private void delete() {
+		Timezone timezone = getSelectedTimezone();
+		if (timezone == null) {
+			return;
+		}
+
+		new OkCancelDialog("Remove " + timezone.name(), new NativeLabel("Are you sure?"))
+				.okLabel("Yes")
+				.onOk(() -> {
+					R.timezoneRepo().delete(timezone);
+					reloadGrid();
+				})
+				.open();
+
+	}
+
+	private void reloadGrid() {
 		// Remember selection
 		Timezone selectedTimezone = getSelectedTimezone();
 
@@ -91,10 +101,6 @@ implements AfterNavigationObserver {
 		if (selectedTimezone != null) {
 			timezoneTreeGrid.select(selectedTimezone);
 		}
-	}
-
-	private void delete() {
-
 	}
 
 	private Timezone getSelectedTimezone() {
