@@ -9,6 +9,7 @@ public class CalendarSourceRegexScraperTest {
 
     @Test
     public void test() {
+        StringBuilder stringBuilder = new StringBuilder();
         Set<CalendarEvent> calendarEvents = new CalendarSourceRegexScraper()
                 .content("""
                         DANSAVOND
@@ -58,8 +59,9 @@ public class CalendarSourceRegexScraperTest {
                               
                         Deuren zijn open vanaf 20.00 uur\s
                         """)
-                .regex("([a-zA-Z]*) +[a-z]{2}\\. ([0-9][0-9]? +(november|december) +[0-9]{4})")
-                .generateEvents();
+                .regex("([a-zA-Z]*) +[a-z]{2}\\. ([0-9][0-9]? +(november|december) +[0-9]{4}) +van ([0-9]+:[0-9]+) tot ([0-9]+:[0-9]+)")
+                .generateEvents(stringBuilder);
+        System.out.println(stringBuilder);
         System.out.println(calendarEvents);
     }
 }

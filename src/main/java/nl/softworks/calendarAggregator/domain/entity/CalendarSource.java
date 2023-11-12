@@ -100,9 +100,8 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 		rosterDate.calendarSource = this;
 	}
 
-	public Set<CalendarEvent> generateEvents() {
-		// These events are manually created
-		return null;
+	public Set<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
+		return calendarEvents();
 	}
 
 	public String toString() {

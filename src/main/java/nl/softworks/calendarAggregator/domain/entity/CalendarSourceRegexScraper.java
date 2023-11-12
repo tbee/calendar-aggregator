@@ -44,13 +44,24 @@ public class CalendarSourceRegexScraper extends CalendarSource {
     }
 
     @NotNull
-    private int dateGroupIdx;
-    static public final String DATEGROUPIDX_PROPERTYID = "dateGroupIdx";
+    private int startDateGroupIdx;
+    static public final String STARTDATEGROUPIDX_PROPERTYID = "startDateGroupIdx";
     public int dateGroupIdx() {
-        return dateGroupIdx;
+        return startDateGroupIdx;
     }
-    public CalendarSourceRegexScraper dateGroupIdx(int v) {
-        this.dateGroupIdx = v;
+    public CalendarSourceRegexScraper startDateGroupIdx(int v) {
+        this.startDateGroupIdx = v;
+        return this;
+    }
+
+    @NotNull
+    private int endDateGroupIdx;
+    static public final String ENDDATEGROUPIDX_PROPERTYID = "endDateGroupIdx";
+    public int endDateGroupIdx() {
+        return startDateGroupIdx;
+    }
+    public CalendarSourceRegexScraper endDateGroupIdx(int v) {
+        this.endDateGroupIdx = v;
         return this;
     }
 
@@ -77,21 +88,21 @@ public class CalendarSourceRegexScraper extends CalendarSource {
     }
 
     @Override
-    public Set<CalendarEvent> generateEvents() {
+    public Set<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
         calendarEvents.clear();
 
         String content = this.content.replace("\n", " ");
-        System.out.println(content);
+        stringBuilder.append(content + "\n");
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
-            System.out.println("Start index: " + matcher.start());
-            System.out.println(" End index: " + matcher.end());
-            for (int i = 0; i < matcher.groupCount(); i++) {
-                System.out.println(i + " " + matcher.group(i));
+            stringBuilder.append("---\n");
+            stringBuilder.append("Start index: " + matcher.start() + "\n");
+            stringBuilder.append("End index: " + matcher.end() + "\n");
+            for (int i = 0; i < matcher.groupCount() + 1; i++) {
+                stringBuilder.append(i + " " + matcher.group(i) + "\n");
             }
         }
         return calendarEvents();
     }
-
 }
