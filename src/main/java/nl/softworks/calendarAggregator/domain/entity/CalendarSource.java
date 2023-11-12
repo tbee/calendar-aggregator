@@ -51,6 +51,17 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 
 	@NotNull
+	protected String status = "";
+	static public final String STATUS_PROPERTYID = "status";
+	public String status() {
+		return status;
+	}
+	public CalendarSource status(String v) {
+		this.status = v;
+		return this;
+	}
+
+	@NotNull
 	protected double lat;
 	static public final String LAT_PROPERTYID = "lat";
 	public double lat() {

@@ -22,6 +22,7 @@ import nl.softworks.calendarAggregator.boundary.vdn.form.CalendarSourceForm;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
+import nl.softworks.calendarAggregator.domain.entity.CalendarSourceRegexScraper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,9 +54,12 @@ implements AfterNavigationObserver
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::text).setHeader("Name");
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::startDate).setHeader("Start");
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::endDate).setHeader("End");
+		calendarSourceAndEventTreeGrid.addColumn(TreeNode::status).setHeader("Status");
+		calendarSourceAndEventTreeGrid.addColumn(TreeNode::eventCount).setHeader("Events");
 
 		// buttonbar
 		CrudButtonbar crudButtonbar = new CrudButtonbar()
+				.onReload(this::reloadTreeGrid)
 				.onInsert(this::insert)
 				.onEdit(this::edit)
 				.onDelete(this::delete);
@@ -153,6 +157,10 @@ implements AfterNavigationObserver
 		Icon icon();
 		void edit(Runnable onOk);
 		void delete(Runnable onOk);
+
+		String status();
+
+		int eventCount();
 	}
 
 	record TreeNodeCalendarSource(CalendarSource calendarSource) implements TreeNode {
@@ -173,6 +181,9 @@ implements AfterNavigationObserver
 
 		@Override
 		public Icon icon() {
+			if (calendarSource instanceof CalendarSourceRegexScraper) {
+				return VaadinIcon.CLOCK.create();
+			}
 			return VaadinIcon.DATABASE.create();
 		}
 
@@ -193,6 +204,16 @@ implements AfterNavigationObserver
 		public void delete(Runnable onOk) {
 			R.calendarSource().delete(calendarSource);
 			onOk.run();
+		}
+
+		@Override
+		public String status() {
+			return calendarSource.status();
+		}
+
+		@Override
+		public int eventCount() {
+			return calendarSource.calendarEvents().size();
 		}
 	}
 	record TreeNodeCalendarEvent (TreeNodeCalendarSource treeNodeCalendarSource, CalendarEvent calendarEvent) implements TreeNode {
@@ -233,6 +254,16 @@ implements AfterNavigationObserver
 		public void delete(Runnable onOk) {
 			R.calendarEvent().delete(calendarEvent);
 			onOk.run();
+		}
+
+		@Override
+		public String status() {
+			return "";
+		}
+
+		@Override
+		public int eventCount() {
+			return 0;
 		}
 	}
 

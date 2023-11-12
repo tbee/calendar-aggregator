@@ -134,15 +134,15 @@ public class CalendarSourceRegexScraper extends CalendarSource {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(timePattern, locale);
 
         String content = this.content.replace("\n", " ");
-        stringBuilder.append(content + "\n");
+        if (stringBuilder != null) stringBuilder.append(content + "\n");
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
-            stringBuilder.append("---\n");
-            stringBuilder.append("Start index: " + matcher.start() + "\n");
-            stringBuilder.append("End index: " + matcher.end() + "\n");
+            if (stringBuilder != null) stringBuilder.append("---\n");
+            if (stringBuilder != null) stringBuilder.append("Start index: " + matcher.start() + "\n");
+            if (stringBuilder != null) stringBuilder.append("End index: " + matcher.end() + "\n");
             for (int i = 0; i < matcher.groupCount() + 1; i++) {
-                stringBuilder.append(i + " " + matcher.group(i) + "\n");
+                if (stringBuilder != null) stringBuilder.append(i + " " + matcher.group(i) + "\n");
             }
 
             String subject = matcher.group(subjectGroupIdx);

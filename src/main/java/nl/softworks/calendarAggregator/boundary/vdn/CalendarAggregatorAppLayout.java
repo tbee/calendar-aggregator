@@ -222,7 +222,7 @@ implements HasDynamicTitle {
 		}
 		R.calendarSource().save(calendarSourceManual);
 
-		R.calendarSource().save(new CalendarSourceRegexScraper()
+		CalendarSource calendarSourceRegexScraper = new CalendarSourceRegexScraper()
 				.content("""
 						DANSAVOND
 						 za. 18 november 2023
@@ -271,12 +271,23 @@ implements HasDynamicTitle {
 						      
 						Deuren zijn open vanaf 20.00 uur\s
 						""")
-				.regex("([^a-zA-Z]*).*[0-9][0-9].(november|december).[0-9][0-9][0-9][0-9]")
+				.regex("([a-zA-Z]*) +[a-z]{2}\\. ([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december) +[0-9]{4}) +van ([0-9]+:[0-9]+) tot ([0-9]+:[0-9]+)")
+				.subjectGroupIdx(1)
+				.startDateGroupIdx(2)
+				.endDateGroupIdx(2)
+				.datePattern("dd MMMM yyyy")
+				.startTimeGroupIdx(4)
+				.endTimeGroupIdx(5)
+				.timePattern("HH:mm")
+				.dateTimeLocale("NL")
+				//
 				.url("https://www.dansstudiovieberink.nl/kalender.html")
 				.name("Dansstudio Vieberink")
 				.lat(51.9314535)
 				.lon(6.5908473)
-				.timezone(timezoneEUAMS));
+				.timezone(timezoneEUAMS);
+		calendarSourceRegexScraper.generateEvents(null);
+		R.calendarSource().save(calendarSourceRegexScraper);
 
 		showSuccessNotification("Test data added");
 	}

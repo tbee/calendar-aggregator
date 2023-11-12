@@ -39,6 +39,7 @@ implements AfterNavigationObserver {
 
 		// crudButtonbar
 		CrudButtonbar crudButtonbar = new CrudButtonbar()
+				.onReload(this::reloadGrid)
 				.onInsert(() -> TimezoneForm.showInsertDialog(this::reloadGrid))
 				.onEdit(this::edit)
 				.onDelete(this::delete);
