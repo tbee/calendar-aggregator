@@ -3,6 +3,12 @@ package nl.softworks.calendarAggregator.domain.entity;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,7 +52,7 @@ public class CalendarSourceRegexScraper extends CalendarSource {
     @NotNull
     private int startDateGroupIdx;
     static public final String STARTDATEGROUPIDX_PROPERTYID = "startDateGroupIdx";
-    public int dateGroupIdx() {
+    public int startDateGroupIdx() {
         return startDateGroupIdx;
     }
     public CalendarSourceRegexScraper startDateGroupIdx(int v) {
@@ -77,19 +83,55 @@ public class CalendarSourceRegexScraper extends CalendarSource {
     }
 
     @NotNull
-    private String dateLocale;
-    static public final String DATELOCALE_PROPERTYID = "dateLocale";
-    public String dateLocale() {
-        return dateLocale;
+    private int startTimeGroupIdx;
+    static public final String STARTTIMEGROUPIDX_PROPERTYID = "startTimeGroupIdx";
+    public int startTimeGroupIdx() {
+        return startTimeGroupIdx;
     }
-    public CalendarSourceRegexScraper dateLocale(String v) {
-        this.dateLocale = v;
+    public CalendarSourceRegexScraper startTimeGroupIdx(int v) {
+        this.startTimeGroupIdx = v;
+        return this;
+    }
+
+    @NotNull
+    private int endTimeGroupIdx;
+    static public final String ENDTIMEGROUPIDX_PROPERTYID = "endTimeGroupIdx";
+    public int endTimeGroupIdx() {
+        return startTimeGroupIdx;
+    }
+    public CalendarSourceRegexScraper endTimeGroupIdx(int v) {
+        this.endTimeGroupIdx = v;
+        return this;
+    }
+
+    @NotNull
+    private String timePattern;
+    static public final String TIMEPATTERN_PROPERTYID = "timePattern";
+    public String timePattern() {
+        return timePattern;
+    }
+    public CalendarSourceRegexScraper timePattern(String v) {
+        this.timePattern = v;
+        return this;
+    }
+
+    @NotNull
+    private String dateTimeLocale;
+    static public final String DATETIMELOCALE_PROPERTYID = "dateTimeLocale";
+    public String dateTimeLocale() {
+        return dateTimeLocale;
+    }
+    public CalendarSourceRegexScraper dateTimeLocale(String v) {
+        this.dateTimeLocale = v;
         return this;
     }
 
     @Override
-    public Set<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
+    public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
         calendarEvents.clear();
+        Locale locale = new Locale(dateTimeLocale);
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(datePattern, locale);
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(timePattern, locale);
 
         String content = this.content.replace("\n", " ");
         stringBuilder.append(content + "\n");
@@ -102,6 +144,23 @@ public class CalendarSourceRegexScraper extends CalendarSource {
             for (int i = 0; i < matcher.groupCount() + 1; i++) {
                 stringBuilder.append(i + " " + matcher.group(i) + "\n");
             }
+
+            String subject = matcher.group(subjectGroupIdx);
+            String startDateString = matcher.group(startDateGroupIdx);
+            String endDateString = matcher.group(endDateGroupIdx);
+            String startTimeString = matcher.group(startTimeGroupIdx);
+            String endTimeString = matcher.group(endTimeGroupIdx);
+
+            LocalDate startLocalDate = LocalDate.parse(startDateString, dateFormatter);
+            LocalDate endLocalDate = LocalDate.parse(endDateString, dateFormatter);
+            LocalTime startLocalTime = LocalTime.parse(startTimeString, timeFormatter);
+            LocalTime endLocalTime = LocalTime.parse(endTimeString, timeFormatter);
+
+            CalendarEvent calendarEvent = new CalendarEvent()
+                    .subject(subject)
+                    .startDateTime(LocalDateTime.of(startLocalDate, startLocalTime))
+                    .endDateTime(LocalDateTime.of(endLocalDate, endLocalTime));
+            addCalendarEvent(calendarEvent);
         }
         return calendarEvents();
     }

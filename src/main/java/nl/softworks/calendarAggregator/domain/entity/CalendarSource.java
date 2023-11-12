@@ -15,8 +15,10 @@ import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -91,16 +93,16 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.EAGER)
-    protected final Set<CalendarEvent> calendarEvents = new HashSet<>();
-	public Set<CalendarEvent> calendarEvents() {
-		return Collections.unmodifiableSet(calendarEvents);
+    protected final List<CalendarEvent> calendarEvents = new ArrayList<>();
+	public List<CalendarEvent> calendarEvents() {
+		return Collections.unmodifiableList(calendarEvents);
 	}
 	public void addCalendarEvent(CalendarEvent rosterDate) {
 		calendarEvents.add(rosterDate);
 		rosterDate.calendarSource = this;
 	}
 
-	public Set<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
+	public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
 		return calendarEvents();
 	}
 
