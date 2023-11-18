@@ -1,5 +1,6 @@
 package nl.softworks.calendarAggregator.domain.entity;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
 
@@ -9,12 +10,12 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Entity
-public class CalendarSourceRegexScraper extends CalendarSource {
+@DiscriminatorValue("regex")
+public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
 
     @NotNull
     private String content;

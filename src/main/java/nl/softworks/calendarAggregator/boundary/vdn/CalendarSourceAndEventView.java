@@ -19,6 +19,7 @@ import nl.softworks.calendarAggregator.boundary.vdn.component.CrudButtonbar;
 import nl.softworks.calendarAggregator.boundary.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.boundary.vdn.form.CalendarEventForm;
 import nl.softworks.calendarAggregator.boundary.vdn.form.CalendarSourceForm;
+import nl.softworks.calendarAggregator.boundary.vdn.form.CalendarSourceRegexScraperForm;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
@@ -77,23 +78,29 @@ implements AfterNavigationObserver
 		TreeNode treeNode = getSelectedTreeNode();
 
 		VerticalLayout verticalLayout = new VerticalLayout();
-		CancelDialog dialog = new CancelDialog("Add", verticalLayout);
+		CancelDialog addSelectionDialog = new CancelDialog("Add", verticalLayout);
 
 		// Manual Source
 		verticalLayout.add(new Button("Manual Source", e -> {
-			dialog.close();
+			addSelectionDialog.close();
 			CalendarSourceForm.showInsertDialog(() -> reloadTreeGrid());
 		}));
 
 		// Manual Event
 		if (treeNode instanceof TreeNodeCalendarSource treeNodeCalendarSource) {
 			verticalLayout.add(new Button("Manual Event", e -> {
-				dialog.close();
+				addSelectionDialog.close();
 				CalendarEventForm.showInsertDialog(treeNodeCalendarSource.calendarSource(), () -> reloadTreeGrid());
 			}));
 		}
 
-		dialog.open();
+		// Manual Source
+		verticalLayout.add(new Button("Regex Source", e -> {
+			addSelectionDialog.close();
+			CalendarSourceRegexScraperForm.showInsertDialog(() -> reloadTreeGrid());
+		}));
+
+		addSelectionDialog.open();
 	}
 
 
@@ -182,15 +189,24 @@ implements AfterNavigationObserver
 		@Override
 		public Icon icon() {
 			if (calendarSource instanceof CalendarSourceRegexScraper) {
-				return VaadinIcon.CLOCK.create();
+				return VaadinIcon.RECORDS.create();
 			}
 			return VaadinIcon.DATABASE.create();
 		}
 
 		@Override
 		public void edit(Runnable onOk) {
-			CalendarSourceForm calendarSourceForm = new CalendarSourceForm().populateWith(calendarSource);
-			new OkCancelDialog("Source", calendarSourceForm)
+			final CalendarSourceForm calendarSourceForm;
+			final String title;
+			if (calendarSource instanceof CalendarSourceRegexScraper) {
+				calendarSourceForm = new CalendarSourceRegexScraperForm().populateWith(calendarSource);
+				title = "Regexp source";
+			}
+			else {
+				calendarSourceForm = new CalendarSourceForm().populateWith(calendarSource);
+				title = "Manual source";
+			}
+			new OkCancelDialog(title, calendarSourceForm)
 					.okLabel("Save")
 					.onOk(() -> {
 						calendarSourceForm.writeTo(calendarSource);
@@ -216,7 +232,8 @@ implements AfterNavigationObserver
 			return calendarSource.calendarEvents().size();
 		}
 	}
-	record TreeNodeCalendarEvent (TreeNodeCalendarSource treeNodeCalendarSource, CalendarEvent calendarEvent) implements TreeNode {
+
+	record TreeNodeCalendarEvent(TreeNodeCalendarSource treeNodeCalendarSource, CalendarEvent calendarEvent) implements TreeNode {
 		@Override
 		public String text() {
 			return calendarEvent.subject();
