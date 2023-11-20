@@ -111,7 +111,13 @@
             <column name="start_time_group_idx" type="integer">
                 <constraints nullable="true"/>
             </column>
+            <column name="start_time_default" type="varchar(10)">
+                <constraints nullable="true"/>
+            </column>
             <column name="end_time_group_idx" type="integer">
+                <constraints nullable="true"/>
+            </column>
+            <column name="end_time_default" type="varchar(10)">
                 <constraints nullable="true"/>
             </column>
             <column name="time_pattern" type="varchar(255)">
@@ -145,7 +151,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="subject" type="varchar(255)">
-                <constraints nullable="false" unique="true"/>
+                <constraints nullable="false"/>
             </column>
         </createTable>
         <addForeignKeyConstraint  constraintName="calendar_event__calendar_source"

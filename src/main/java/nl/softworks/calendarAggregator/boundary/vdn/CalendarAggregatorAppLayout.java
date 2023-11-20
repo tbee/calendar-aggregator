@@ -77,7 +77,7 @@ implements HasDynamicTitle {
 				t = t.getCause();
 			}
 			showErrorNotification(last.getMessage());
-			if (LOG.isInfoEnabled()) LOG.info(t.getMessage(), event.getThrowable());
+			if (LOG.isInfoEnabled()) LOG.info(last.getMessage(), event.getThrowable());
 		});
 
 		// The drawer toggle icon
@@ -232,7 +232,7 @@ implements HasDynamicTitle {
 		}
 		R.calendarSource().save(calendarSourceManual);
 
-		CalendarSource calendarSourceRegexScraper = new CalendarSourceRegexScraper()
+		CalendarSource cityDance = new CalendarSourceRegexScraper()
 				.regex("([a-zA-Z]*) +[a-z]{2}\\. ([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december) +[0-9]{4}) +van ([0-9]+:[0-9]+) tot ([0-9]+:[0-9]+)")
 				.subjectGroupIdx(1)
 				.startDateGroupIdx(2)
@@ -250,8 +250,28 @@ implements HasDynamicTitle {
 				.lat(51.9314535)
 				.lon(6.5908473)
 				.timezone(timezoneEUAMS);
-		calendarSourceRegexScraper.generateEvents(null);
-		R.calendarSource().save(calendarSourceRegexScraper);
+		cityDance.generateEvents(null);
+		R.calendarSource().save(cityDance);
+
+		CalendarSource danssalonNieuwendijk = new CalendarSourceRegexScraper()
+				.regex("([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december) +[0-9]{4})")
+				.startDateGroupIdx(1)
+				.endDateGroupIdx(1)
+				.datePattern("dd MMMM yyyy")
+				.startTimeDefault("14:30")
+				.endTimeDefault("18:00")
+				.timePattern("HH:mm")
+				.dateTimeLocale("NL")
+				.scrapeUrl("https://de-danssalon.nl/agenda/")
+				.scrapeBlockStart("Locatie Nieuwendijk")
+				.scrapeBlockEnd("Entree:")
+				.url("https://de-danssalon.nl/agenda/")
+				.name("Danssalon in Nieuwendijk")
+				.lat(51.9314535)
+				.lon(6.5908473)
+				.timezone(timezoneEUAMS);
+		danssalonNieuwendijk.generateEvents(null);
+		R.calendarSource().save(danssalonNieuwendijk);
 
 		showSuccessNotification("Test data added");
 	}

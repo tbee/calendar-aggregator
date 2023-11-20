@@ -83,7 +83,6 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
         return this;
     }
 
-    @NotNull
     private int startTimeGroupIdx;
     static public final String STARTTIMEGROUPIDX_PROPERTYID = "startTimeGroupIdx";
     public int startTimeGroupIdx() {
@@ -94,7 +93,16 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
         return this;
     }
 
-    @NotNull
+    private String startTimeDefault;
+    static public final String STARTTIMEDEFAULT_PROPERTYID = "startTimeDefault";
+    public String startTimeDefault() {
+        return startTimeDefault;
+    }
+    public CalendarSourceRegexScraper startTimeDefault(String v) {
+        this.startTimeDefault = v;
+        return this;
+    }
+
     private int endTimeGroupIdx;
     static public final String ENDTIMEGROUPIDX_PROPERTYID = "endTimeGroupIdx";
     public int endTimeGroupIdx() {
@@ -102,6 +110,16 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
     }
     public CalendarSourceRegexScraper endTimeGroupIdx(int v) {
         this.endTimeGroupIdx = v;
+        return this;
+    }
+
+    private String endTimeDefault;
+    static public final String ENDTIMEDEFAULT_PROPERTYID = "endTimeDefault";
+    public String endTimeDefault() {
+        return endTimeDefault;
+    }
+    public CalendarSourceRegexScraper endTimeDefault(String v) {
+        this.endTimeDefault = v;
         return this;
     }
 
@@ -153,11 +171,11 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
                 if (stringBuilder != null) stringBuilder.append(i + " " + matcher.group(i) + "\n");
             }
 
-            String subject = matcher.group(subjectGroupIdx);
+            String subject = subjectGroupIdx < 1 ? "?" : matcher.group(subjectGroupIdx);
             String startDateString = matcher.group(startDateGroupIdx);
             String endDateString = matcher.group(endDateGroupIdx);
-            String startTimeString = matcher.group(startTimeGroupIdx);
-            String endTimeString = matcher.group(endTimeGroupIdx);
+            String startTimeString = startTimeGroupIdx < 1 ? startTimeDefault : matcher.group(startTimeGroupIdx);
+            String endTimeString = endTimeGroupIdx < 1 ? endTimeDefault : matcher.group(endTimeGroupIdx);
 
             LocalDate startLocalDate = LocalDate.parse(startDateString, dateFormatter);
             LocalDate endLocalDate = LocalDate.parse(endDateString, dateFormatter);
