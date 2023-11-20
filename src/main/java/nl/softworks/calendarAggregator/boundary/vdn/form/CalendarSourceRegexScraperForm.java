@@ -72,7 +72,7 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 
 			TextArea textArea = new TextArea("Result", stringBuilder.toString() + "\n\n" + calendarEventsString, "");
 			textArea.setSizeFull();
-			
+
 			CancelDialog cancelDialog = new CancelDialog("Regexp", textArea);
 			cancelDialog.setSizeFull();
 			cancelDialog.open();

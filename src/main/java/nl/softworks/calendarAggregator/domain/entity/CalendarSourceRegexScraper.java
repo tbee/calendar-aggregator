@@ -134,6 +134,13 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(datePattern, locale);
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(timePattern, locale);
 
+        if (scrapeUrl != null && !scrapeUrl.isBlank()) {
+            if (stringBuilder != null) stringBuilder.append("Reading: " + scrapeUrl + "\n");
+            String content = readScrapeUrl();
+            if (stringBuilder != null) stringBuilder.append("Read content of length " + content.length() + "\n\n");
+            content(content);
+        }
+
         String content = this.content.replace("\n", " ");
         if (stringBuilder != null) stringBuilder.append(content + "\n");
         Pattern pattern = Pattern.compile(regex);
