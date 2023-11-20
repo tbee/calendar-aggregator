@@ -17,6 +17,8 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.server.VaadinSession;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import nl.softworks.calendarAggregator.boundary.SpringUtils;
 import nl.softworks.calendarAggregator.domain.ValidationException;
 import nl.softworks.calendarAggregator.domain.boundary.R;
@@ -36,6 +38,7 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 abstract class CalendarAggregatorAppLayout extends AppLayout // https://vaadin.com/docs/latest/components/app-layout
@@ -60,9 +63,14 @@ implements HasDynamicTitle {
 		// Show exceptions as toasts: this is needed to display exceptions thrown by the domain when called through binding from e.g. GridUI
 		VaadinSession.getCurrent().setErrorHandler(event -> {
 			Throwable t = event.getThrowable();
-			while (t.getCause() != null) {
+			while (t != null) {
 				if (t instanceof AlreadyDisplayedException) {
 					return;
+				}
+				if (t instanceof ConstraintViolationException constraintViolationException) {
+					for (ConstraintViolation<?> constraintViolation : constraintViolationException.getConstraintViolations()) {
+						showErrorNotification(constraintViolation.getPropertyPath() + ": " + constraintViolation.getMessage()); // TODO use text label instead of propertyPath
+					}
 				}
 				t = t.getCause();
 			}

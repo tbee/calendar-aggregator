@@ -84,6 +84,12 @@
             <column name="scrape_url" type="nvarchar(1000)">
                 <constraints nullable="true"/>
             </column>
+            <column name="scrape_block_start" type="nvarchar(200)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="scrape_block_end" type="nvarchar(200)">
+                <constraints nullable="true"/>
+            </column>
             <column name="content" type="nvarchar(4000)">
                 <constraints nullable="true"/>
             </column>

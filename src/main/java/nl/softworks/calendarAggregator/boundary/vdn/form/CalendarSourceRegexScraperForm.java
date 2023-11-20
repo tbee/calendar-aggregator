@@ -3,13 +3,18 @@ package nl.softworks.calendarAggregator.boundary.vdn.form;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import nl.softworks.calendarAggregator.boundary.vdn.component.CancelDialog;
 import nl.softworks.calendarAggregator.boundary.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.domain.boundary.R;
+import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceRegexScraper;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceScraperBase;
@@ -17,8 +22,13 @@ import nl.softworks.calendarAggregator.domain.entity.Timezone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseForm {
 	private static final Logger LOG = LoggerFactory.getLogger(CalendarSourceRegexScraperForm.class);
+
+	private final Binder<CalendarSourceRegexScraper> binder = new Binder<>();
 
 	private final TextArea contentTextField = new TextArea("Content");
 	private final TextField regexTextField = new TextField("Regex");
@@ -35,40 +45,53 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 	public CalendarSourceRegexScraperForm() {
 		setColspan(contentTextField, 2);
 		setColspan(regexTextField, 2);
-		add(contentTextField, regexTextField, subjectGroupIdxIntegerField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, datePatternTextField, startTimeGroupIdxIntegerField, endTimeGroupIdxIntegerField, timePatternTextField,dateTimeLocaleTextField);
+		add(contentTextField, regexTextField, subjectGroupIdxIntegerField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, datePatternTextField, startTimeGroupIdxIntegerField, endTimeGroupIdxIntegerField, timePatternTextField, dateTimeLocaleTextField);
+
+		binder.forField(contentTextField).bind(CalendarSourceRegexScraper::content, CalendarSourceRegexScraper::content);
+		binder.forField(regexTextField).bind(CalendarSourceRegexScraper::regex, CalendarSourceRegexScraper::regex);
+		binder.forField(subjectGroupIdxIntegerField).bind(CalendarSourceRegexScraper::subjectGroupIdx, CalendarSourceRegexScraper::subjectGroupIdx);
+		binder.forField(startDateGroupIdxIntegerField).bind(CalendarSourceRegexScraper::startDateGroupIdx, CalendarSourceRegexScraper::startDateGroupIdx);
+		binder.forField(endDateGroupIdxIntegerField).bind(CalendarSourceRegexScraper::endDateGroupIdx, CalendarSourceRegexScraper::endDateGroupIdx);
+		binder.forField(datePatternTextField).bind(CalendarSourceRegexScraper::datePattern, CalendarSourceRegexScraper::datePattern);
+		binder.forField(startTimeGroupIdxIntegerField).bind(CalendarSourceRegexScraper::startTimeGroupIdx, CalendarSourceRegexScraper::startTimeGroupIdx);
+		binder.forField(endTimeGroupIdxIntegerField).bind(CalendarSourceRegexScraper::endTimeGroupIdx, CalendarSourceRegexScraper::endTimeGroupIdx);
+		binder.forField(timePatternTextField).bind(CalendarSourceRegexScraper::timePattern, CalendarSourceRegexScraper::timePattern);
+		binder.forField(dateTimeLocaleTextField).bind(CalendarSourceRegexScraper::dateTimeLocale, CalendarSourceRegexScraper::dateTimeLocale);
+
+		regexTextField.getElement().addEventListener("dblclick", e -> testRegex());
+	}
+
+	private void testRegex() {
+		try {
+			CalendarSourceRegexScraper calendarSourceRegexScraper = new CalendarSourceRegexScraper();
+			binder.writeBean(calendarSourceRegexScraper);
+
+			StringBuilder stringBuilder = new StringBuilder();
+			List<CalendarEvent> calendarEvents = calendarSourceRegexScraper.generateEvents(stringBuilder);
+			String calendarEventsString = calendarEvents.stream().map(s -> s + "\n").collect(Collectors.joining());
+
+			TextArea textArea = new TextArea("Result", stringBuilder.toString() + "\n\n" + calendarEventsString, "");
+			textArea.setSizeFull();
+			
+			CancelDialog cancelDialog = new CancelDialog("Regexp", textArea);
+			cancelDialog.setSizeFull();
+			cancelDialog.open();
+		} catch (ValidationException e) {
+			Notification.show(e.toString(), 5000, Notification.Position.BOTTOM_CENTER);
+		}
 	}
 
 	@Override
 	public CalendarSourceRegexScraperForm populateWith(CalendarSource calendarSource) {
-		CalendarSourceRegexScraper calendarSourceRegexScraper = (CalendarSourceRegexScraper)calendarSource;
-		super.populateWith(calendarSourceRegexScraper);
-		contentTextField.setValue(calendarSourceRegexScraper.content() == null ? "" : calendarSourceRegexScraper.content());
-		regexTextField.setValue(calendarSourceRegexScraper.regex() == null ? "" : calendarSourceRegexScraper.regex());
-		subjectGroupIdxIntegerField.setValue(calendarSourceRegexScraper.subjectGroupIdx());
-		startDateGroupIdxIntegerField.setValue(calendarSourceRegexScraper.startDateGroupIdx());
-		endDateGroupIdxIntegerField.setValue(calendarSourceRegexScraper.endDateGroupIdx());
-		datePatternTextField.setValue(calendarSourceRegexScraper.datePattern() == null ? "" : calendarSourceRegexScraper.datePattern());
-		startTimeGroupIdxIntegerField.setValue(calendarSourceRegexScraper.startTimeGroupIdx());
-		endTimeGroupIdxIntegerField.setValue(calendarSourceRegexScraper.endTimeGroupIdx());
-		timePatternTextField.setValue(calendarSourceRegexScraper.timePattern() == null ? "" : calendarSourceRegexScraper.timePattern());
-		dateTimeLocaleTextField.setValue(calendarSourceRegexScraper.dateTimeLocale() == null ? "" : calendarSourceRegexScraper.dateTimeLocale());
+		super.populateWith(calendarSource);
+		binder.readBean((CalendarSourceRegexScraper)calendarSource);
 		return this;
 	}
 
 	@Override
-	public CalendarSourceRegexScraperForm writeTo(CalendarSource calendarSource) {
-		CalendarSourceRegexScraper calendarSourceRegexScraper = (CalendarSourceRegexScraper)calendarSource;
-		super.writeTo(calendarSourceRegexScraper);
-		calendarSourceRegexScraper.content(contentTextField.getValue());
-		calendarSourceRegexScraper.regex(regexTextField.getValue());
-		calendarSourceRegexScraper.subjectGroupIdx(subjectGroupIdxIntegerField.getValue());
-		calendarSourceRegexScraper.startDateGroupIdx(startDateGroupIdxIntegerField.getValue());
-		calendarSourceRegexScraper.endDateGroupIdx(endDateGroupIdxIntegerField.getValue());
-		calendarSourceRegexScraper.datePattern(datePatternTextField.getValue());
-		calendarSourceRegexScraper.startTimeGroupIdx(startTimeGroupIdxIntegerField.getValue());
-		calendarSourceRegexScraper.endTimeGroupIdx(endTimeGroupIdxIntegerField.getValue());
-		calendarSourceRegexScraper.timePattern(timePatternTextField.getValue());
-		calendarSourceRegexScraper.datePattern(dateTimeLocaleTextField.getValue());
+	public CalendarSourceRegexScraperForm writeTo(CalendarSource calendarSource) throws ValidationException {
+		super.writeTo(calendarSource);
+		binder.writeBean((CalendarSourceRegexScraper)calendarSource);
 		return this;
 	}
 
@@ -78,9 +101,13 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 		new OkCancelDialog("Source", calendarSourceForm)
 				.okLabel("Save")
 				.onOk(() -> {
-					calendarSourceForm.writeTo(calendarSource);
-					R.calendarSource().save(calendarSource);
-					onInsert.run();
+					try {
+						calendarSourceForm.writeTo(calendarSource);
+						R.calendarSource().save(calendarSource);
+						onInsert.run();
+					} catch (ValidationException e) {
+						throw new RuntimeException(e);
+					}
 				})
 				.open();
 	}

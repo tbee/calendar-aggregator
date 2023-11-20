@@ -13,8 +13,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tbee.jakarta.validator.UrlValidator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,6 +42,7 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 
 	@NotNull
+	@UrlValidator
 	protected String url;
 	static public final String URL_PROPERTYID = "url";
 	public String url() {
