@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
 
     @NotNull
-    private String content;
+    private String content = "";
     static public final String CONTENT_PROPERTYID = "content";
     public String content() {
         return content;
@@ -166,9 +166,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(timePattern, locale);
 
         if (scrapeUrl != null && !scrapeUrl.isBlank()) {
-            if (stringBuilder != null) stringBuilder.append("Reading: " + scrapeUrl + "\n");
-            String content = readScrapeUrl();
-            if (stringBuilder != null) stringBuilder.append("Read content of length " + content.length() + "\n\n");
+            String content = readScrapeUrl(stringBuilder);
             content(content);
         }
 
@@ -184,7 +182,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
                 if (stringBuilder != null) stringBuilder.append(i + " " + matcher.group(i) + "\n");
             }
 
-            String subject = subjectGroupIdx < 1 ? "?" : matcher.group(subjectGroupIdx);
+            String subject = subjectGroupIdx < 1 ? "" : matcher.group(subjectGroupIdx);
             String startDateString = matcher.group(startDateGroupIdx);
             String endDateString = matcher.group(endDateGroupIdx);
             String startTimeString = startTimeGroupIdx < 1 ? startTimeDefault : matcher.group(startTimeGroupIdx);

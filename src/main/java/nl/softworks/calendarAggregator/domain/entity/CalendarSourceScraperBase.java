@@ -55,15 +55,19 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 		return this;
 	}
 
-	protected String readScrapeUrl() {
+	protected String readScrapeUrl(StringBuilder stringBuilder) {
 		try {
+			if (stringBuilder != null) stringBuilder.append("Reading: " + scrapeUrl + "\n");
 			Document doc = Jsoup.connect(scrapeUrl).get();
 			String content = doc.text();
+			if (stringBuilder != null) stringBuilder.append("Content: " + content.length() + "\n");
 			if (scrapeBlockStart != null && !scrapeBlockStart.isBlank()) {
 				content = content.substring(content.indexOf(scrapeBlockStart.trim()));
+				if (stringBuilder != null) stringBuilder.append("Content after block start: " + content.length() + "\n");
 			}
 			if (scrapeBlockEnd != null && !scrapeBlockEnd.isBlank()) {
 				content = content.substring(0, content.indexOf(scrapeBlockEnd.trim()));
+				if (stringBuilder != null) stringBuilder.append("Content after block end: " + content.length() + "\n");
 			}
 			return content;
 		} catch (IOException e) {

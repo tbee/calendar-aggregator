@@ -100,7 +100,7 @@ implements HasDynamicTitle {
 		menuBar.setWidthFull();
 		// Admin
 		if (userHasRole(Person.Role.ROLE_ADMIN)) {
-			menuBar.addItem(createMenuContent("Add test data", VaadinIcon.DATABASE), event -> inTransaction(() -> addTestdata()));
+			menuBar.addItem(createMenuContent("Add data", VaadinIcon.DATABASE), event -> inTransaction(() -> addTestdata()));
 		}
 
 		// Tabs
@@ -241,7 +241,7 @@ implements HasDynamicTitle {
 				.subjectGroupIdx(1)
 				.startDateGroupIdx(2)
 				.endDateGroupIdx(2)
-				.datePattern("dd MMMM yyyy")
+				.datePattern("d MMMM yyyy")
 				.startTimeGroupIdx(4)
 				.endTimeGroupIdx(5)
 				.timePattern("HH:mm")
@@ -253,14 +253,14 @@ implements HasDynamicTitle {
 				.lat(51.9666992)
 				.lon(6.3034428)
 				.timezone(timezoneEUAMS);
-		cityDance.generateEvents(null);
+//		cityDance.generateEvents(null);
 		R.calendarSource().save(cityDance);
 
 		CalendarSource danssalonNieuwendijk = new CalendarSourceRegexScraper()
 				.regex("([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december) +[0-9]{4})")
 				.startDateGroupIdx(1)
 				.endDateGroupIdx(1)
-				.datePattern("dd MMMM yyyy")
+				.datePattern("d MMMM yyyy")
 				.startTimeDefault("14:30")
 				.endTimeDefault("18:00")
 				.timePattern("HH:mm")
@@ -274,20 +274,20 @@ implements HasDynamicTitle {
 				.lat(51.9314535)
 				.lon(6.5908473)
 				.timezone(timezoneEUAMS);
-		danssalonNieuwendijk.generateEvents(null);
+//		danssalonNieuwendijk.generateEvents(null);
 		R.calendarSource().save(danssalonNieuwendijk);
 
 		CalendarSource danssalonDeBilt = new CalendarSourceRegexScraper()
 				.regex("([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december) +[0-9]{4})")
 				.startDateGroupIdx(1)
 				.endDateGroupIdx(1)
-				.datePattern("dd MMMM yyyy")
+				.datePattern("d MMMM yyyy")
 				.startTimeDefault("14:30")
 				.endTimeDefault("18:00")
 				.timePattern("HH:mm")
 				.dateTimeLocale("NL")
 				.scrapeUrl("https://de-danssalon.nl/agenda/")
-				.scrapeBlockStart("Locatie De Bilt")
+				.scrapeBlockStart("Locatie de Bilt")
 				.scrapeBlockEnd("Entree:")
 				.url("https://de-danssalon.nl/agenda/")
 				.name("Danssalon in de Bilt")
@@ -295,14 +295,14 @@ implements HasDynamicTitle {
 				.lat(51.9314535)
 				.lon(6.5908473)
 				.timezone(timezoneEUAMS);
-		danssalonDeBilt.generateEvents(null);
+//		danssalonDeBilt.generateEvents(null);
 		R.calendarSource().save(danssalonDeBilt);
 
 		CalendarSource styledancing2023 = new CalendarSourceRegexScraper()
-				.regex("([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december)")
+				.regex("([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december))")
 				.startDateGroupIdx(1)
 				.endDateGroupIdx(1)
-				.datePattern("dd MMMM")
+				.datePattern("d MMMM")
 				.yearDefault(2023)
 				.startTimeDefault("20:30")
 				.endTimeDefault("23:30")
@@ -317,9 +317,31 @@ implements HasDynamicTitle {
 				.lat(51.7157652)
 				.lon(5.3607253)
 				.timezone(timezoneEUAMS);
-		danssalonDeBilt.generateEvents(null);
-		R.calendarSource().save(danssalonDeBilt);
+//		styledancing2023.generateEvents(null);
+		R.calendarSource().save(styledancing2023);
 
-		showSuccessNotification("Test data added");
+		CalendarSource styledancing2024 = new CalendarSourceRegexScraper()
+				.regex("([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december))")
+				.startDateGroupIdx(1)
+				.endDateGroupIdx(1)
+				.datePattern("d MMMM")
+				.yearDefault(2024)
+				.startTimeDefault("20:30")
+				.endTimeDefault("23:30")
+				.timePattern("HH:mm")
+				.dateTimeLocale("NL")
+				.scrapeUrl("https://www.styledancing.nl/agenda-dansavond/")
+				.scrapeBlockStart("Data in 2024")
+				//.scrapeBlockEnd("Data in")
+				.url("https://www.styledancing.nl/agenda-dansavond/")
+				.name("Styledancing 2024")
+				.location("De Kentering, Dorpsstraat 54, 5241 ED Rosmalen")
+				.lat(51.7157652)
+				.lon(5.3607253)
+				.timezone(timezoneEUAMS);
+//		styledancing2024.generateEvents(null);
+		R.calendarSource().save(styledancing2024);
+
+		showSuccessNotification("Data added");
 	}
 }

@@ -1,11 +1,14 @@
 package nl.softworks.calendarAggregator.boundary.vdn;
 
+import com.vaadin.flow.component.ClickEvent;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.function.ValueProvider;
@@ -46,7 +49,7 @@ implements AfterNavigationObserver
 	private static final DateTimeFormatter YYYYMMDDHHMM = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
 	private final TreeGrid<TreeNode> calendarSourceAndEventTreeGrid = new TreeGrid<>();
-
+	private List<CalendarSource> calendarSources = List.of();
 	public CalendarSourceAndEventView() {
 		super("Overview");
 		tabs.setSelectedTab(overviewTab);
@@ -65,9 +68,21 @@ implements AfterNavigationObserver
 				.onInsert(this::insert)
 				.onEdit(this::edit)
 				.onDelete(this::delete);
+		crudButtonbar.add(new Button("Generate", (ComponentEventListener<ClickEvent<Button>>) buttonClickEvent -> generate()));
 
 		// content
-		setContent(new VerticalLayout(crudButtonbar, calendarSourceAndEventTreeGrid));
+		VerticalLayout verticalLayout = new VerticalLayout(crudButtonbar, calendarSourceAndEventTreeGrid);
+		verticalLayout.setSizeFull();
+		setContent(verticalLayout);
+	}
+
+	private void generate() {
+		for (CalendarSource calendarSource : calendarSources) {
+			calendarSource.generateEvents(null);
+			R.calendarSource().save(calendarSource);
+		}
+		reloadTreeGrid();
+		showSuccessNotification("Generated");
 	}
 
 	@Override
@@ -145,7 +160,7 @@ implements AfterNavigationObserver
 		TreeNode selectedTreeNode = getSelectedTreeNode();
 
 		// Refresh data
-		List<CalendarSource> calendarSources = R.calendarSource().findAll();
+		calendarSources = R.calendarSource().findAll();
 		List<TreeNode> treeNodes = treeNodes(calendarSources, TreeNodeCalendarSource::new);
 		calendarSourceAndEventTreeGrid.setItems(treeNodes, this::getTreeNodeChildren);
 

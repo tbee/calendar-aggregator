@@ -1,9 +1,11 @@
 package nl.softworks.calendarAggregator.boundary.vdn.form;
 
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.textfield.NumberField;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -33,6 +35,7 @@ public class CalendarSourceForm extends FormLayout {
 	private final NumberField lonNumberField = new NumberField("LON");
 	private final ComboBox<Timezone> timezoneComboBox = new ComboBox<>("Timezone");
 
+	private CalendarSource calendarSource;
 	public CalendarSourceForm() {
 		timezoneComboBox.setItemLabelGenerator(timezone -> timezone.name());
 		timezoneComboBox.setRenderer(new ComponentRenderer<>(timezone -> {
@@ -40,6 +43,18 @@ public class CalendarSourceForm extends FormLayout {
 			return nameSpan;
 		}));
 		add(nameTextField, urlTextField, locationTextField, latNumberField, lonNumberField, timezoneComboBox);
+
+		Button generateButton = new Button("Generate", evt -> {
+			StringBuilder stringBuilder = new StringBuilder();
+			calendarSource.generateEvents(stringBuilder);
+			TextArea textArea = new TextArea("Content", "", stringBuilder.toString());
+			textArea.setSizeFull();
+			OkCancelDialog dialog = new OkCancelDialog("Result", textArea);
+			dialog.setSizeFull();
+			dialog.open();
+		});
+		setColspan(generateButton, 2);
+		add(generateButton);
 
 		binder.forField(nameTextField).bind(CalendarSource::name, CalendarSource::name);
 		binder.forField(urlTextField).withValidator(s -> UrlValidatorImpl.isValid(s), "Illegal URL").bind(CalendarSource::url, CalendarSource::url);
@@ -52,6 +67,7 @@ public class CalendarSourceForm extends FormLayout {
 	public CalendarSourceForm populateWith(CalendarSource calendarSource) {
 		timezoneComboBox.setItems(R.timezoneRepo().findAll());
 		binder.readBean(calendarSource);
+		this.calendarSource = calendarSource;
 		return this;
 	}
 
