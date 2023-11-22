@@ -37,6 +37,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -212,22 +213,25 @@ implements HasDynamicTitle {
 
 		CalendarSource calendarSourceManual = new CalendarSource()
 				.url("https://www.dansstudiovieberink.nl/kalender.html")
-				.name("Manual")
+				.name("Dansstudio Vieberink")
+				.location("Bredevoortsestraatweg 121\n7121 BG AALTEN")
 				.lat(51.9314535)
 				.lon(6.5908473)
 				.timezone(timezoneEUAMS);
 		{
+			LocalDate date = LocalDate.of(2024, 1, 7);
 			CalendarEvent calendarEvent = new CalendarEvent()
-					.startDateTime(LocalDateTime.now())
-					.endDateTime(LocalDateTime.now().plusHours(3))
-					.subject("dancing");
+					.startDateTime(date.atTime(20, 30))
+					.endDateTime(date.atTime(22, 30))
+					.subject("Workshop Techniek 19.15 uur");
 			calendarSourceManual.addCalendarEvent(calendarEvent);
 		}
 		{
+			LocalDate date = LocalDate.of(2024, 1, 21);
 			CalendarEvent calendarEvent = new CalendarEvent()
-					.startDateTime(LocalDateTime.now().plusDays(1))
-					.endDateTime(LocalDateTime.now().plusDays(1).plusHours(3))
-					.subject("dancing2");
+					.startDateTime(date.atTime(20, 30))
+					.endDateTime(date.atTime(22, 30))
+					.subject("Workshop Techniek 19.15 uur");
 			calendarSourceManual.addCalendarEvent(calendarEvent);
 		}
 		R.calendarSource().save(calendarSourceManual);
@@ -243,12 +247,11 @@ implements HasDynamicTitle {
 				.timePattern("HH:mm")
 				.dateTimeLocale("NL")
 				.scrapeUrl("https://mijn.citydance.nl/agenda")
-				//.scrapeBlockStart("Agenda")
-				//.scrapeBlockEnd("<footer")
 				.url("https://www.citydance.nl/")
 				.name("City Dance")
-				.lat(51.9314535)
-				.lon(6.5908473)
+				.location("Varsseveldseweg 89\n7002 LJ Doetinchem")
+				.lat(51.9666992)
+				.lon(6.3034428)
 				.timezone(timezoneEUAMS);
 		cityDance.generateEvents(null);
 		R.calendarSource().save(cityDance);
@@ -267,11 +270,55 @@ implements HasDynamicTitle {
 				.scrapeBlockEnd("Entree:")
 				.url("https://de-danssalon.nl/agenda/")
 				.name("Danssalon in Nieuwendijk")
+				.location("H.F. Witte Centrum\nHenri Dunantplein 4\n3731 CL, De Bilt")
 				.lat(51.9314535)
 				.lon(6.5908473)
 				.timezone(timezoneEUAMS);
 		danssalonNieuwendijk.generateEvents(null);
 		R.calendarSource().save(danssalonNieuwendijk);
+
+		CalendarSource danssalonDeBilt = new CalendarSourceRegexScraper()
+				.regex("([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december) +[0-9]{4})")
+				.startDateGroupIdx(1)
+				.endDateGroupIdx(1)
+				.datePattern("dd MMMM yyyy")
+				.startTimeDefault("14:30")
+				.endTimeDefault("18:00")
+				.timePattern("HH:mm")
+				.dateTimeLocale("NL")
+				.scrapeUrl("https://de-danssalon.nl/agenda/")
+				.scrapeBlockStart("Locatie De Bilt")
+				.scrapeBlockEnd("Entree:")
+				.url("https://de-danssalon.nl/agenda/")
+				.name("Danssalon in de Bilt")
+				.location("Dorpshuis Tavenu\nSingel 16a\n4255 HD, Nieuwendijk")
+				.lat(51.9314535)
+				.lon(6.5908473)
+				.timezone(timezoneEUAMS);
+		danssalonDeBilt.generateEvents(null);
+		R.calendarSource().save(danssalonDeBilt);
+
+		CalendarSource styledancing2023 = new CalendarSourceRegexScraper()
+				.regex("([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december)")
+				.startDateGroupIdx(1)
+				.endDateGroupIdx(1)
+				.datePattern("dd MMMM")
+				.yearDefault(2023)
+				.startTimeDefault("20:30")
+				.endTimeDefault("23:30")
+				.timePattern("HH:mm")
+				.dateTimeLocale("NL")
+				.scrapeUrl("https://www.styledancing.nl/agenda-dansavond/")
+				.scrapeBlockStart("Data in 2023")
+				.scrapeBlockEnd("Data in")
+				.url("https://www.styledancing.nl/agenda-dansavond/")
+				.name("Styledancing 2023")
+				.location("De Kentering, Dorpsstraat 54, 5241 ED Rosmalen")
+				.lat(51.7157652)
+				.lon(5.3607253)
+				.timezone(timezoneEUAMS);
+		danssalonDeBilt.generateEvents(null);
+		R.calendarSource().save(danssalonDeBilt);
 
 		showSuccessNotification("Test data added");
 	}

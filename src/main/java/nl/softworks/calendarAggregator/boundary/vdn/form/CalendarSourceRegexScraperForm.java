@@ -36,6 +36,7 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 	private final IntegerField startDateGroupIdxIntegerField = new IntegerField("Start date group index");
 	private final IntegerField endDateGroupIdxIntegerField = new IntegerField("End date group index");
 	private final TextField datePatternTextField = new TextField("Date pattern");
+	private final IntegerField yearDefaultIntegerField = new IntegerField("Year default");
 	private final IntegerField startTimeGroupIdxIntegerField = new IntegerField("Start time group index");
 	private final IntegerField endTimeGroupIdxIntegerField = new IntegerField("End time group index");
 	private final TextField startTimeDefaultTextField = new TextField("Start time default");
@@ -47,7 +48,7 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 	public CalendarSourceRegexScraperForm() {
 		setColspan(contentTextField, 2);
 		setColspan(regexTextField, 2);
-		add(contentTextField, regexTextField, subjectGroupIdxIntegerField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, datePatternTextField, startTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeGroupIdxIntegerField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
+		add(contentTextField, regexTextField, subjectGroupIdxIntegerField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, datePatternTextField, yearDefaultIntegerField, startTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeGroupIdxIntegerField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
 
 		binder.forField(contentTextField).bind(CalendarSourceRegexScraper::content, CalendarSourceRegexScraper::content);
 		binder.forField(regexTextField).bind(CalendarSourceRegexScraper::regex, CalendarSourceRegexScraper::regex);
@@ -55,6 +56,7 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 		binder.forField(startDateGroupIdxIntegerField).bind(CalendarSourceRegexScraper::startDateGroupIdx, CalendarSourceRegexScraper::startDateGroupIdx);
 		binder.forField(endDateGroupIdxIntegerField).bind(CalendarSourceRegexScraper::endDateGroupIdx, CalendarSourceRegexScraper::endDateGroupIdx);
 		binder.forField(datePatternTextField).bind(CalendarSourceRegexScraper::datePattern, CalendarSourceRegexScraper::datePattern);
+		binder.forField(yearDefaultIntegerField).bind(CalendarSourceRegexScraper::yearDefault, CalendarSourceRegexScraper::yearDefault);
 		binder.forField(startTimeGroupIdxIntegerField).bind(CalendarSourceRegexScraper::startTimeGroupIdx, CalendarSourceRegexScraper::startTimeGroupIdx);
 		binder.forField(startTimeDefaultTextField).bind(CalendarSourceRegexScraper::startTimeDefault, CalendarSourceRegexScraper::startTimeDefault);
 		binder.forField(endTimeGroupIdxIntegerField).bind(CalendarSourceRegexScraper::endTimeGroupIdx, CalendarSourceRegexScraper::endTimeGroupIdx);

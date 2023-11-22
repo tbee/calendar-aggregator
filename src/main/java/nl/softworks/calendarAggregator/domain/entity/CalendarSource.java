@@ -42,6 +42,17 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 
 	@NotNull
+	protected String location;
+	static public final String LOCATION_PROPERTYID = "location";
+	public String location() {
+		return location;
+	}
+	public CalendarSource location(String v) {
+		this.location = v;
+		return this;
+	}
+
+	@NotNull
 	@UrlValidator
 	protected String url;
 	static public final String URL_PROPERTYID = "url";

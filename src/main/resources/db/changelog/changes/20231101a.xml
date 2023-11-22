@@ -66,6 +66,9 @@
             <column name="name" type="varchar(255)">
                 <constraints nullable="false" unique="true"/>
             </column>
+            <column name="location" type="nvarchar(500)">
+                <constraints nullable="true"/>
+            </column>
             <column name="url" type="nvarchar(1000)">
                 <constraints nullable="true"/>
             </column>
@@ -106,6 +109,9 @@
                 <constraints nullable="true"/>
             </column>
             <column name="date_pattern" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="year_default" type="int">
                 <constraints nullable="true"/>
             </column>
             <column name="start_time_group_idx" type="integer">

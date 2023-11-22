@@ -28,6 +28,7 @@ public class CalendarSourceForm extends FormLayout {
 
 	private final TextField nameTextField = new TextField("Name");
 	private final TextField urlTextField = new TextField("Url");
+	private final TextField locationTextField = new TextField("Location");
 	private final NumberField latNumberField = new NumberField("LAT");
 	private final NumberField lonNumberField = new NumberField("LON");
 	private final ComboBox<Timezone> timezoneComboBox = new ComboBox<>("Timezone");
@@ -38,10 +39,11 @@ public class CalendarSourceForm extends FormLayout {
 			Span nameSpan = new Span(timezone.name());
 			return nameSpan;
 		}));
-		add(nameTextField, urlTextField, latNumberField, lonNumberField, timezoneComboBox);
+		add(nameTextField, urlTextField, locationTextField, latNumberField, lonNumberField, timezoneComboBox);
 
 		binder.forField(nameTextField).bind(CalendarSource::name, CalendarSource::name);
 		binder.forField(urlTextField).withValidator(s -> UrlValidatorImpl.isValid(s), "Illegal URL").bind(CalendarSource::url, CalendarSource::url);
+		binder.forField(locationTextField).bind(CalendarSource::location, CalendarSource::location);
 		binder.forField(latNumberField).bind(CalendarSource::lat, CalendarSource::lat);
 		binder.forField(lonNumberField).bind(CalendarSource::lon, CalendarSource::lon);
 		binder.forField(timezoneComboBox).bind(CalendarSource::timezone, CalendarSource::timezone);
