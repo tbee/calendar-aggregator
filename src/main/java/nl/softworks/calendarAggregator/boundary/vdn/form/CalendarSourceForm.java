@@ -9,13 +9,8 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
-import com.vaadin.flow.data.binder.ValidationResult;
-import com.vaadin.flow.data.binder.Validator;
-import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.function.SerializablePredicate;
 import nl.softworks.calendarAggregator.boundary.vdn.component.OkCancelDialog;
-import nl.softworks.calendarAggregator.domain.boundary.C;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.Timezone;
@@ -76,9 +71,9 @@ public class CalendarSourceForm extends FormLayout {
 		return this;
 	}
 
-	public static void showInsertDialog(Runnable onInsert) {
+	public static void showInsertDialog(CalendarSource selectedCalendarSource, Runnable onInsert) {
 		CalendarSource calendarSource = new CalendarSource();
-		CalendarSourceForm calendarSourceForm = new CalendarSourceForm().populateWith(calendarSource);
+		CalendarSourceForm calendarSourceForm = new CalendarSourceForm().populateWith(selectedCalendarSource != null ? selectedCalendarSource : calendarSource);
 		new OkCancelDialog("Source", calendarSourceForm)
 				.okLabel("Save")
 				.onOk(() -> {

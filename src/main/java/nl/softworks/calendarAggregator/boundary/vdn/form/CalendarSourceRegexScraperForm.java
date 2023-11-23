@@ -101,9 +101,9 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 		return this;
 	}
 
-	public static void showInsertDialog(Runnable onInsert) {
+	public static void showInsertDialog(CalendarSource selectedCalendarSource, Runnable onInsert) {
 		CalendarSourceRegexScraper calendarSource = new CalendarSourceRegexScraper();
-		CalendarSourceRegexScraperForm calendarSourceForm = new CalendarSourceRegexScraperForm().populateWith(calendarSource);
+		CalendarSourceRegexScraperForm calendarSourceForm = new CalendarSourceRegexScraperForm().populateWith(selectedCalendarSource != null ? selectedCalendarSource : calendarSource);
 		new OkCancelDialog("Source", calendarSourceForm)
 				.okLabel("Save")
 				.onOk(() -> {

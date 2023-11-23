@@ -8,7 +8,6 @@ import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.function.ValueProvider;
@@ -92,6 +91,8 @@ implements AfterNavigationObserver
 
 	private void insert() {
 		TreeNode treeNode = getSelectedTreeNode();
+		CalendarSource calendarSource = (treeNode != null && treeNode.getClass().equals(TreeNodeCalendarSource.class)) ? ((TreeNodeCalendarSource) treeNode).calendarSource() : null;
+		CalendarSourceRegexScraper calendarSourceRegexScraper = (calendarSource instanceof CalendarSourceRegexScraper ? (CalendarSourceRegexScraper)calendarSource : null);
 
 		VerticalLayout verticalLayout = new VerticalLayout();
 		CancelDialog addSelectionDialog = new CancelDialog("Add", verticalLayout);
@@ -99,21 +100,21 @@ implements AfterNavigationObserver
 		// Manual Source
 		verticalLayout.add(new Button("Manual Source", e -> {
 			addSelectionDialog.close();
-			CalendarSourceForm.showInsertDialog(() -> reloadTreeGrid());
+			CalendarSourceForm.showInsertDialog(calendarSource, () -> reloadTreeGrid());
 		}));
 
 		// Manual Event
 		if (treeNode instanceof TreeNodeCalendarSource treeNodeCalendarSource) {
 			verticalLayout.add(new Button("Manual Event", e -> {
 				addSelectionDialog.close();
-				CalendarEventForm.showInsertDialog(treeNodeCalendarSource.calendarSource(), () -> reloadTreeGrid());
+				CalendarEventForm.showInsertDialog(calendarSource, () -> reloadTreeGrid());
 			}));
 		}
 
 		// Manual Source
 		verticalLayout.add(new Button("Regex Source", e -> {
 			addSelectionDialog.close();
-			CalendarSourceRegexScraperForm.showInsertDialog(() -> reloadTreeGrid());
+			CalendarSourceRegexScraperForm.showInsertDialog(calendarSourceRegexScraper, () -> reloadTreeGrid());
 		}));
 
 		addSelectionDialog.open();
