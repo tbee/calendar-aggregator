@@ -99,9 +99,10 @@ implements AfterNavigationObserver {
 		timezoneTreeGrid.setItems(timezones);
 
 		// Reselect
-		if (selectedTimezone != null) {
-			timezoneTreeGrid.select(selectedTimezone);
-		}
+		// TODO: make sure the select node is one from the treeNodes collection, not the old node, otherwise lazy lock goes wrong
+//		if (selectedTimezone != null) {
+//			timezoneTreeGrid.select(selectedTimezone);
+//		}
 	}
 
 	private Timezone getSelectedTimezone() {

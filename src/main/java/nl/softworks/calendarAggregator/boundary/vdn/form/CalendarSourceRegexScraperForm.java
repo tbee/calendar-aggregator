@@ -1,5 +1,6 @@
 package nl.softworks.calendarAggregator.boundary.vdn.form;
 
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Span;
@@ -48,7 +49,10 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 	public CalendarSourceRegexScraperForm() {
 		setColspan(contentTextField, 2);
 		setColspan(regexTextField, 2);
-		add(contentTextField, regexTextField, subjectGroupIdxIntegerField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, datePatternTextField, yearDefaultIntegerField, startTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeGroupIdxIntegerField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
+
+		Button testButton = new Button("Test Regex", evt -> testRegex());
+		setColspan(testButton, 2);
+		add(contentTextField, regexTextField, testButton,subjectGroupIdxIntegerField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, datePatternTextField, yearDefaultIntegerField, startTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeGroupIdxIntegerField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
 
 		binder.forField(contentTextField).bind(CalendarSourceRegexScraper::content, CalendarSourceRegexScraper::content);
 		binder.forField(regexTextField).bind(CalendarSourceRegexScraper::regex, CalendarSourceRegexScraper::regex);
@@ -63,28 +67,10 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 		binder.forField(endTimeDefaultTextField).bind(CalendarSourceRegexScraper::endTimeDefault, CalendarSourceRegexScraper::endTimeDefault);
 		binder.forField(timePatternTextField).bind(CalendarSourceRegexScraper::timePattern, CalendarSourceRegexScraper::timePattern);
 		binder.forField(dateTimeLocaleTextField).bind(CalendarSourceRegexScraper::dateTimeLocale, CalendarSourceRegexScraper::dateTimeLocale);
-
-		regexTextField.getElement().addEventListener("dblclick", e -> testRegex());
 	}
 
 	private void testRegex() {
-		try {
-			CalendarSourceRegexScraper calendarSourceRegexScraper = new CalendarSourceRegexScraper();
-			binder.writeBean(calendarSourceRegexScraper);
-
-			StringBuilder stringBuilder = new StringBuilder();
-			List<CalendarEvent> calendarEvents = calendarSourceRegexScraper.generateEvents(stringBuilder);
-			String calendarEventsString = calendarEvents.stream().map(s -> s + "\n").collect(Collectors.joining());
-
-			TextArea textArea = new TextArea("Result", stringBuilder.toString() + "\n\n" + calendarEventsString, "");
-			textArea.setSizeFull();
-
-			CancelDialog cancelDialog = new CancelDialog("Regexp", textArea);
-			cancelDialog.setSizeFull();
-			cancelDialog.open();
-		} catch (ValidationException e) {
-			Notification.show(e.toString(), 5000, Notification.Position.BOTTOM_CENTER);
-		}
+		generateAndShowTrace(new CalendarSourceRegexScraper());
 	}
 
 	@Override

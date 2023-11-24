@@ -4,6 +4,8 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -160,59 +162,77 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
 
     @Override
     public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
-        calendarEvents.clear();
-        Locale locale = new Locale(dateTimeLocale);
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(datePattern, locale);
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(timePattern, locale);
+        try {
+            calendarEvents.clear();
+            status("");
+            Locale locale = new Locale(dateTimeLocale);
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(datePattern, locale);
+            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(timePattern, locale);
 
-        if (scrapeUrl != null && !scrapeUrl.isBlank()) {
-            String content = readScrapeUrl(stringBuilder);
-            content(content);
+            if (scrapeUrl != null && !scrapeUrl.isBlank()) {
+                String content = readScrapeUrl(stringBuilder);
+                content(content);
+                if (content.isBlank()) {
+                    status("No contents");
+                    return List.of();
+                }
+            }
+
+            String content = this.content.replace("\n", " ");
+            if (stringBuilder != null) stringBuilder.append(content).append("\n---\n").append(regex).append("\n");
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(content);
+            while (matcher.find()) {
+                if (stringBuilder != null) stringBuilder.append("---\n");
+                if (stringBuilder != null) stringBuilder.append("Start index: ").append(matcher.start()).append("\n");
+                if (stringBuilder != null) stringBuilder.append("End index: ").append(matcher.end()).append("\n");
+                for (int i = 0; i < matcher.groupCount() + 1; i++) {
+                    if (stringBuilder != null) stringBuilder.append("Idx ").append(i).append(" = ").append(matcher.group(i)).append("\n");
+                }
+
+                String subject = subjectGroupIdx < 1 ? "" : matcher.group(subjectGroupIdx);
+                String startDateString = matcher.group(startDateGroupIdx);
+                String endDateString = matcher.group(endDateGroupIdx);
+                String startTimeString = startTimeGroupIdx < 1 ? startTimeDefault : matcher.group(startTimeGroupIdx);
+                String endTimeString = endTimeGroupIdx < 1 ? endTimeDefault : matcher.group(endTimeGroupIdx);
+
+                LocalDate startLocalDate;
+                if (yearDefault == 0) {
+                    startLocalDate = LocalDate.parse(startDateString, dateFormatter);
+                } else {
+                    MonthDay monthDay = MonthDay.parse(startDateString, dateFormatter);
+                    startLocalDate = LocalDate.of(yearDefault, monthDay.getMonth(), monthDay.getDayOfMonth());
+                }
+                LocalDate endLocalDate;
+                if (yearDefault == 0) {
+                    endLocalDate = LocalDate.parse(endDateString, dateFormatter);
+                } else {
+                    MonthDay monthDay = MonthDay.parse(endDateString, dateFormatter);
+                    endLocalDate = LocalDate.of(yearDefault, monthDay.getMonth(), monthDay.getDayOfMonth());
+                }
+                LocalTime startLocalTime = LocalTime.parse(startTimeString, timeFormatter);
+                LocalTime endLocalTime = LocalTime.parse(endTimeString, timeFormatter);
+
+                CalendarEvent calendarEvent = new CalendarEvent()
+                        .subject(subject)
+                        .startDateTime(LocalDateTime.of(startLocalDate, startLocalTime))
+                        .endDateTime(LocalDateTime.of(endLocalDate, endLocalTime));
+                addCalendarEvent(calendarEvent);
+            }
+            if (stringBuilder != null) stringBuilder.append("Done\n");
+            if (calendarEvents().size() == 0) {
+                status("No events are generated");
+            }
+            return calendarEvents();
         }
-
-        String content = this.content.replace("\n", " ");
-        if (stringBuilder != null) stringBuilder.append(content + "\n");
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(content);
-        while (matcher.find()) {
-            if (stringBuilder != null) stringBuilder.append("---\n");
-            if (stringBuilder != null) stringBuilder.append("Start index: " + matcher.start() + "\n");
-            if (stringBuilder != null) stringBuilder.append("End index: " + matcher.end() + "\n");
-            for (int i = 0; i < matcher.groupCount() + 1; i++) {
-                if (stringBuilder != null) stringBuilder.append(i + " " + matcher.group(i) + "\n");
+        catch (RuntimeException e) {
+            status(e.getMessage());
+            if (stringBuilder != null) {
+                StringWriter stringWriter = new StringWriter();
+                e.printStackTrace(new PrintWriter(stringWriter));
+                stringBuilder.append(stringWriter.toString());
             }
-
-            String subject = subjectGroupIdx < 1 ? "" : matcher.group(subjectGroupIdx);
-            String startDateString = matcher.group(startDateGroupIdx);
-            String endDateString = matcher.group(endDateGroupIdx);
-            String startTimeString = startTimeGroupIdx < 1 ? startTimeDefault : matcher.group(startTimeGroupIdx);
-            String endTimeString = endTimeGroupIdx < 1 ? endTimeDefault : matcher.group(endTimeGroupIdx);
-
-            LocalDate startLocalDate;
-            if (yearDefault == 0) {
-                startLocalDate = LocalDate.parse(startDateString, dateFormatter);
-            }
-            else {
-                MonthDay monthDay = MonthDay.parse(startDateString, dateFormatter);
-                startLocalDate = LocalDate.of(yearDefault, monthDay.getMonth(), monthDay.getDayOfMonth());
-            }
-            LocalDate endLocalDate;
-            if (yearDefault == 0) {
-                endLocalDate = LocalDate.parse(endDateString, dateFormatter);
-            }
-            else {
-                MonthDay monthDay = MonthDay.parse(endDateString, dateFormatter);
-                endLocalDate = LocalDate.of(yearDefault, monthDay.getMonth(), monthDay.getDayOfMonth());
-            }
-            LocalTime startLocalTime = LocalTime.parse(startTimeString, timeFormatter);
-            LocalTime endLocalTime = LocalTime.parse(endTimeString, timeFormatter);
-
-            CalendarEvent calendarEvent = new CalendarEvent()
-                    .subject(subject)
-                    .startDateTime(LocalDateTime.of(startLocalDate, startLocalTime))
-                    .endDateTime(LocalDateTime.of(endLocalDate, endLocalTime));
-            addCalendarEvent(calendarEvent);
+            throw e;
         }
-        return calendarEvents();
     }
 }

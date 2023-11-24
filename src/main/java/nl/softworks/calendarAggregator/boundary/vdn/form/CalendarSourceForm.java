@@ -4,19 +4,25 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import nl.softworks.calendarAggregator.boundary.vdn.component.CancelDialog;
 import nl.softworks.calendarAggregator.boundary.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.domain.boundary.R;
+import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.Timezone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tbee.jakarta.validator.UrlValidatorImpl;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class CalendarSourceForm extends FormLayout {
 	private static final Logger LOG = LoggerFactory.getLogger(CalendarSourceForm.class);
@@ -39,15 +45,7 @@ public class CalendarSourceForm extends FormLayout {
 		}));
 		add(nameTextField, urlTextField, locationTextField, latNumberField, lonNumberField, timezoneComboBox);
 
-		Button generateButton = new Button("Generate", evt -> {
-			StringBuilder stringBuilder = new StringBuilder();
-			calendarSource.generateEvents(stringBuilder);
-			TextArea textArea = new TextArea("Content", "", stringBuilder.toString());
-			textArea.setSizeFull();
-			OkCancelDialog dialog = new OkCancelDialog("Result", textArea);
-			dialog.setSizeFull();
-			dialog.open();
-		});
+		Button generateButton = new Button("Generate", evt -> generate());
 		setColspan(generateButton, 2);
 		add(generateButton);
 
@@ -69,6 +67,34 @@ public class CalendarSourceForm extends FormLayout {
 	public CalendarSourceForm writeTo(CalendarSource calendarSource) throws ValidationException {
 		binder.writeBean(calendarSource);
 		return this;
+	}
+
+	/*
+	 * This uses the actual source, so it can be saved
+	 */
+	private void generate() {
+		generateAndShowTrace(calendarSource);
+	}
+
+	protected void generateAndShowTrace(CalendarSource calendarSource) {
+		StringBuilder stringBuilder = new StringBuilder();
+		try {
+			writeTo(calendarSource);
+
+			List<CalendarEvent> calendarEvents = calendarSource.generateEvents(stringBuilder);
+			String calendarEventsString = calendarEvents.stream().map(s -> s + "\n").collect(Collectors.joining());
+			stringBuilder.append("\n\n").append(calendarEventsString);
+		}
+		catch (ValidationException | RuntimeException e) {
+			Notification.show(e.toString(), 5000, Notification.Position.BOTTOM_CENTER);
+		}
+
+		TextArea textArea = new TextArea("Result", stringBuilder.toString(), "");
+		textArea.setSizeFull();
+
+		CancelDialog cancelDialog = new CancelDialog("Regexp", textArea);
+		cancelDialog.setSizeFull();
+		cancelDialog.open();
 	}
 
 	public static void showInsertDialog(CalendarSource selectedCalendarSource, Runnable onInsert) {

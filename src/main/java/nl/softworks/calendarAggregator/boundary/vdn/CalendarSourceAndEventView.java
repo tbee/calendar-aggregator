@@ -77,7 +77,13 @@ implements AfterNavigationObserver
 
 	private void generate() {
 		for (CalendarSource calendarSource : calendarSources) {
-			calendarSource.generateEvents(null);
+			try {
+				calendarSource.generateEvents(null);
+			}
+			catch (RuntimeException e) {
+				calendarSource = R.calendarSource().findById(calendarSource.id()).orElse(null);
+				calendarSource.status("Exception: "+ e.getMessage());
+			}
 			R.calendarSource().save(calendarSource);
 		}
 		reloadTreeGrid();
@@ -166,12 +172,13 @@ implements AfterNavigationObserver
 		calendarSourceAndEventTreeGrid.setItems(treeNodes, this::getTreeNodeChildren);
 
 		// Reselect NODE
-		if (selectedTreeNode != null) {
-			if (selectedTreeNode instanceof TreeNodeCalendarEvent treeNodeCalendarEvent) {
-				calendarSourceAndEventTreeGrid.expand(treeNodeCalendarEvent.treeNodeCalendarSource());
-			}
-			calendarSourceAndEventTreeGrid.select(selectedTreeNode);
-		}
+		// TODO: make sure the select node is one from the treeNodes collection, not the old node, otherwise lazy lock goes wrong
+//		if (selectedTreeNode != null) {
+//			if (selectedTreeNode instanceof TreeNodeCalendarEvent treeNodeCalendarEvent) {
+//				calendarSourceAndEventTreeGrid.expand(treeNodeCalendarEvent.treeNodeCalendarSource());
+//			}
+//			calendarSourceAndEventTreeGrid.select(selectedTreeNode);
+//		}
 	}
 
 	sealed interface TreeNode permits TreeNodeCalendarSource, TreeNodeCalendarEvent {

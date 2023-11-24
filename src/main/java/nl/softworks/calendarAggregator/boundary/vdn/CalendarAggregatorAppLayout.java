@@ -236,7 +236,7 @@ implements HasDynamicTitle {
 		}
 		R.calendarSource().save(calendarSourceManual);
 
-		CalendarSource cityDance = new CalendarSourceRegexScraper()
+		R.calendarSource().save(new CalendarSourceRegexScraper()
 				.regex("([a-zA-Z]*) +[a-z]{2}\\. ([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december) +[0-9]{4}) +van ([0-9]+:[0-9]+) tot ([0-9]+:[0-9]+)")
 				.subjectGroupIdx(1)
 				.startDateGroupIdx(2)
@@ -252,11 +252,9 @@ implements HasDynamicTitle {
 				.location("Varsseveldseweg 89\n7002 LJ Doetinchem")
 				.lat(51.9666992)
 				.lon(6.3034428)
-				.timezone(timezoneEUAMS);
-//		cityDance.generateEvents(null);
-		R.calendarSource().save(cityDance);
+				.timezone(timezoneEUAMS));
 
-		CalendarSource danssalonNieuwendijk = new CalendarSourceRegexScraper()
+		R.calendarSource().save(new CalendarSourceRegexScraper()
 				.regex("([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december) +[0-9]{4})")
 				.startDateGroupIdx(1)
 				.endDateGroupIdx(1)
@@ -273,11 +271,9 @@ implements HasDynamicTitle {
 				.location("H.F. Witte Centrum\nHenri Dunantplein 4\n3731 CL, De Bilt")
 				.lat(51.9314535)
 				.lon(6.5908473)
-				.timezone(timezoneEUAMS);
-//		danssalonNieuwendijk.generateEvents(null);
-		R.calendarSource().save(danssalonNieuwendijk);
+				.timezone(timezoneEUAMS));
 
-		CalendarSource danssalonDeBilt = new CalendarSourceRegexScraper()
+		R.calendarSource().save(new CalendarSourceRegexScraper()
 				.regex("([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december) +[0-9]{4})")
 				.startDateGroupIdx(1)
 				.endDateGroupIdx(1)
@@ -294,11 +290,9 @@ implements HasDynamicTitle {
 				.location("Dorpshuis Tavenu\nSingel 16a\n4255 HD, Nieuwendijk")
 				.lat(51.9314535)
 				.lon(6.5908473)
-				.timezone(timezoneEUAMS);
-//		danssalonDeBilt.generateEvents(null);
-		R.calendarSource().save(danssalonDeBilt);
+				.timezone(timezoneEUAMS));
 
-		CalendarSource styledancing2023 = new CalendarSourceRegexScraper()
+		R.calendarSource().save(new CalendarSourceRegexScraper()
 				.regex("([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december))")
 				.startDateGroupIdx(1)
 				.endDateGroupIdx(1)
@@ -316,11 +310,9 @@ implements HasDynamicTitle {
 				.location("De Kentering, Dorpsstraat 54, 5241 ED Rosmalen")
 				.lat(51.7157652)
 				.lon(5.3607253)
-				.timezone(timezoneEUAMS);
-//		styledancing2023.generateEvents(null);
-		R.calendarSource().save(styledancing2023);
+				.timezone(timezoneEUAMS));
 
-		CalendarSource styledancing2024 = new CalendarSourceRegexScraper()
+		R.calendarSource().save(new CalendarSourceRegexScraper()
 				.regex("([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december))")
 				.startDateGroupIdx(1)
 				.endDateGroupIdx(1)
@@ -338,9 +330,27 @@ implements HasDynamicTitle {
 				.location("De Kentering, Dorpsstraat 54, 5241 ED Rosmalen")
 				.lat(51.7157652)
 				.lon(5.3607253)
-				.timezone(timezoneEUAMS);
-//		styledancing2024.generateEvents(null);
-		R.calendarSource().save(styledancing2024);
+				.timezone(timezoneEUAMS));
+
+		R.calendarSource().save(new CalendarSourceRegexScraper()
+				.regex("([0-9][0-9]? (januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december))( t/m [0-9]+ [a-z]+)? Danscaf")
+				.startDateGroupIdx(1)
+				.endDateGroupIdx(1)
+				.datePattern("d MMMM")
+				.yearDefault(2024)
+				.startTimeDefault("20:00")
+				.endTimeDefault("23:00")
+				.timePattern("HH:mm")
+				.dateTimeLocale("NL")
+				.scrapeUrl("https://dansenbijversteegh.nl/agenda/")
+				.scrapeBlockStart("20 januari")
+				//.scrapeBlockEnd("Data in")
+				.url("https://dansenbijversteegh.nl/agenda/")
+				.name("Versteegh 2024")
+				.location("Velperweg 43a, Arnhem")
+				.lat(51.9877839)
+				.lon(5.924326)
+				.timezone(timezoneEUAMS));
 
 		showSuccessNotification("Data added");
 	}
