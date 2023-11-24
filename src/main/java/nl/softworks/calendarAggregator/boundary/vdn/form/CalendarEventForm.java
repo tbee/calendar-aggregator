@@ -60,7 +60,7 @@ public class CalendarEventForm extends FormLayout {
 	}
 
 	public static void showInsertDialog(CalendarSource calendarSource, Runnable onInsert) {
-		CalendarEvent calendarEvent = new CalendarEvent();
+		CalendarEvent calendarEvent = new CalendarEvent().generated(false);
 		CalendarEventForm calendarEventForm = new CalendarEventForm().populateWith(calendarEvent);
 		new OkCancelDialog("Event", calendarEventForm)
 				.okLabel("Save")

@@ -163,7 +163,8 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
     @Override
     public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
         try {
-            calendarEvents.clear();
+            super.generateEvents(stringBuilder);
+
             status("");
             Locale locale = new Locale(dateTimeLocale);
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(datePattern, locale);

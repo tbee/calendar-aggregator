@@ -159,6 +159,9 @@
             <column name="subject" type="varchar(255)">
                 <constraints nullable="false"/>
             </column>
+            <column name="generated" type="boolean" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
         <addForeignKeyConstraint  constraintName="calendar_event__calendar_source"
                                   baseTableName="calendar_event"

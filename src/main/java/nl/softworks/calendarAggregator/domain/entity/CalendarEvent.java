@@ -46,6 +46,18 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 		return this;
 	}
 
+	@NotNull
+	protected boolean generated = true;
+	static public final String GENERATED_PROPERTYID = "generated";
+	public boolean generated() {
+		return generated;
+	}
+	public CalendarEvent generated(boolean v) {
+		this.generated = v;
+		return this;
+	}
+
+
 	public String ical() {
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss");
 

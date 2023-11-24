@@ -220,7 +220,7 @@ implements HasDynamicTitle {
 				.timezone(timezoneEUAMS);
 		{
 			LocalDate date = LocalDate.of(2024, 1, 7);
-			CalendarEvent calendarEvent = new CalendarEvent()
+			CalendarEvent calendarEvent = new CalendarEvent().generated(false)
 					.startDateTime(date.atTime(20, 30))
 					.endDateTime(date.atTime(22, 30))
 					.subject("Workshop Techniek 19.15 uur");
@@ -228,7 +228,7 @@ implements HasDynamicTitle {
 		}
 		{
 			LocalDate date = LocalDate.of(2024, 1, 21);
-			CalendarEvent calendarEvent = new CalendarEvent()
+			CalendarEvent calendarEvent = new CalendarEvent().generated(false)
 					.startDateTime(date.atTime(20, 30))
 					.endDateTime(date.atTime(22, 30))
 					.subject("Workshop Techniek 19.15 uur");
@@ -304,7 +304,7 @@ implements HasDynamicTitle {
 				.dateTimeLocale("NL")
 				.scrapeUrl("https://www.styledancing.nl/agenda-dansavond/")
 				.scrapeBlockStart("Data in 2023")
-				.scrapeBlockEnd("Data in")
+				.scrapeBlockEnd("2024")
 				.url("https://www.styledancing.nl/agenda-dansavond/")
 				.name("Styledancing 2023")
 				.location("De Kentering, Dorpsstraat 54, 5241 ED Rosmalen")

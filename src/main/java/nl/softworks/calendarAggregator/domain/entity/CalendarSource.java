@@ -81,7 +81,6 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 	public double lat() {
 		return lat;
 	}
-
 	public CalendarSource lat(double v) {
 		if (v < -90 || v > 90) {
 			throw new IllegalStateException("Latidude must be [-90,90]");
@@ -128,6 +127,7 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 
 	public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
+		calendarEvents.removeIf(ce -> ce.generated);
 		return calendarEvents();
 	}
 

@@ -109,18 +109,16 @@ implements AfterNavigationObserver
 			CalendarSourceForm.showInsertDialog(calendarSource, () -> reloadTreeGrid());
 		}));
 
-		// Manual Event
-		if (treeNode instanceof TreeNodeCalendarSource treeNodeCalendarSource) {
-			verticalLayout.add(new Button("Manual Event", e -> {
-				addSelectionDialog.close();
-				CalendarEventForm.showInsertDialog(calendarSource, () -> reloadTreeGrid());
-			}));
-		}
-
-		// Manual Source
+		// Regex Source
 		verticalLayout.add(new Button("Regex Source", e -> {
 			addSelectionDialog.close();
 			CalendarSourceRegexScraperForm.showInsertDialog(calendarSourceRegexScraper, () -> reloadTreeGrid());
+		}));
+
+		// Manual Event
+		verticalLayout.add(new Button("Manual Event", e -> {
+			addSelectionDialog.close();
+			CalendarEventForm.showInsertDialog(calendarSource, () -> reloadTreeGrid());
 		}));
 
 		addSelectionDialog.open();
@@ -308,7 +306,7 @@ implements AfterNavigationObserver
 
 		@Override
 		public int eventCount() {
-			return 0;
+			return calendarEvent.generated() ? 0 : 1;
 		}
 	}
 
