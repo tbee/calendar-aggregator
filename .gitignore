@@ -35,3 +35,4 @@ logs
 /types.d.ts
 /src/main/dev-bundle/
 /calendarAggregator.iml
+/dbdumps

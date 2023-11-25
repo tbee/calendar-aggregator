@@ -61,6 +61,7 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 	public String ical() {
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss");
 
+		// https://www.kanzaki.com/docs/ical/location.html
 		return 	"""
 				BEGIN:VEVENT
 				UID:%uid%
@@ -71,6 +72,7 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 				CLASS:PUBLIC
 				SUMMARY:%summary%
 				DESCRIPTION:%description%
+				LOCATION:%location%
 				END:VEVENT
 				"""
 				.replace("%uid%", id() + "@calendarAggregator.tbee.org")
@@ -78,6 +80,7 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 				.replace("%dtStart%", dateTimeFormatter.format(startDateTime))
 				.replace("%dtEnd%", dateTimeFormatter.format(endDateTime))
 				.replace("%summary%", (calendarSource.name() + " " + subject).trim())
+				.replace("%location%", calendarSource.location().replace("\n", ", "))
 				.replace("%description%", calendarSource.url())
 				;
 /*
