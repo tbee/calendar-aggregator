@@ -179,8 +179,8 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
                 }
             }
 
-            String content = this.content.replace("\n", " ");
-            if (stringBuilder != null) stringBuilder.append(content).append("\n---\n").append(regex).append("\n");
+            String content = sanatize(this.content, stringBuilder);
+            if (stringBuilder != null) stringBuilder.append(regex).append("\n");
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(content);
             while (matcher.find()) {

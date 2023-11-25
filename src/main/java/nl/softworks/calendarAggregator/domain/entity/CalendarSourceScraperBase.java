@@ -75,6 +75,12 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 		}
 	}
 
+	protected String sanatize(String content, StringBuilder stringBuilder) {
+		content = content.replace("\n", " ");
+		if (stringBuilder != null) stringBuilder.append(content).append("\n---\n");
+		return content;
+	}
+
 	public String toString() {
 		return super.toString() //
 		     + ",scrapeUrl=" + scrapeUrl
