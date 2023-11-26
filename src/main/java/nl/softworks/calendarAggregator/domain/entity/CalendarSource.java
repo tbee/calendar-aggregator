@@ -127,7 +127,6 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 
 	public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
-		calendarEvents.removeIf(ce -> ce.generated);
 		status("ok");
 		return calendarEvents();
 	}

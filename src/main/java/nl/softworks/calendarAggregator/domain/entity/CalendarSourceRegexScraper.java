@@ -151,32 +151,31 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
     @Override
     public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
         try {
-            super.generateEvents(stringBuilder);
+            calendarEvents.removeIf(ce -> ce.generated);
 
             status("");
             Locale locale = new Locale(dateTimeLocale);
             DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(datePattern, locale);
             DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(timePattern, locale);
 
-            if (scrapeUrl != null && !scrapeUrl.isBlank()) {
-                String content = readScrapeUrl(stringBuilder);
-                content(content);
-                if (content.isBlank()) {
-                    status("No contents");
-                    return List.of();
-                }
+            String content = readScrapeUrl(stringBuilder);
+            if (content.isBlank()) {
+                status("No contents");
+                return List.of();
             }
 
-            String content = sanatize(this.content(), stringBuilder);
+            content = sanatize(content, stringBuilder);
             if (stringBuilder != null) stringBuilder.append(regex).append("\n");
-            Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(content);
+            Matcher matcher = Pattern.compile(regex).matcher(content);
             while (matcher.find()) {
-                if (stringBuilder != null) stringBuilder.append("---\n");
-                if (stringBuilder != null) stringBuilder.append("Start index: ").append(matcher.start()).append("\n");
-                if (stringBuilder != null) stringBuilder.append("End index: ").append(matcher.end()).append("\n");
-                for (int i = 0; i < matcher.groupCount() + 1; i++) {
-                    if (stringBuilder != null) stringBuilder.append("Idx ").append(i).append(" = ").append(matcher.group(i)).append("\n");
+                if (stringBuilder != null) {
+                    stringBuilder.append("---\n");
+                    stringBuilder.append("Start index: ").append(matcher.start()).append("\n");
+                    stringBuilder.append("End index: ").append(matcher.end()).append("\n");
+                    stringBuilder.append("Matched string: ").append(content, matcher.start(), matcher.end()).append("\n");
+                    for (int i = 0; i < matcher.groupCount() + 1; i++) {
+                        stringBuilder.append("Group ").append(i).append(" = ").append(matcher.group(i)).append("\n");
+                    }
                 }
 
                 String subject = subjectGroupIdx < 1 ? "" : matcher.group(subjectGroupIdx);
@@ -209,7 +208,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
                 addCalendarEvent(calendarEvent);
             }
             if (stringBuilder != null) stringBuilder.append("Done\n");
-            if (calendarEvents().size() == 0) {
+            if (calendarEvents().isEmpty()) {
                 status("No events are generated");
                 return List.of();
             }

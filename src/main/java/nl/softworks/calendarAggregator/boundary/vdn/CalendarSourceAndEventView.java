@@ -22,10 +22,12 @@ import nl.softworks.calendarAggregator.boundary.vdn.component.CrudButtonbar;
 import nl.softworks.calendarAggregator.boundary.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.boundary.vdn.form.CalendarEventForm;
 import nl.softworks.calendarAggregator.boundary.vdn.form.CalendarSourceForm;
+import nl.softworks.calendarAggregator.boundary.vdn.form.CalendarSourceMultipleDaysScraperForm;
 import nl.softworks.calendarAggregator.boundary.vdn.form.CalendarSourceRegexScraperForm;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
+import nl.softworks.calendarAggregator.domain.entity.CalendarSourceMultipleDaysScraper;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceRegexScraper;
 import nl.softworks.calendarAggregator.domain.service.CalendarSourceService;
 import org.slf4j.Logger;
@@ -98,23 +100,26 @@ implements AfterNavigationObserver
 		TreeNode treeNode = getSelectedTreeNode();
 		CalendarSource calendarSource = (treeNode != null && treeNode.getClass().equals(TreeNodeCalendarSource.class)) ? ((TreeNodeCalendarSource) treeNode).calendarSource() : null;
 		CalendarSourceRegexScraper calendarSourceRegexScraper = (calendarSource instanceof CalendarSourceRegexScraper ? (CalendarSourceRegexScraper)calendarSource : null);
+		CalendarSourceMultipleDaysScraper calendarSourceMultipleDaysScraper = (calendarSource instanceof CalendarSourceMultipleDaysScraper ? (CalendarSourceMultipleDaysScraper)calendarSource : null);
 
 		VerticalLayout verticalLayout = new VerticalLayout();
 		CancelDialog addSelectionDialog = new CancelDialog("Add", verticalLayout);
 
-		// Manual Source
 		verticalLayout.add(new Button("Manual Source", e -> {
 			addSelectionDialog.close();
 			CalendarSourceForm.showInsertDialog(calendarSource, () -> reloadTreeGrid());
 		}));
 
-		// Regex Source
 		verticalLayout.add(new Button("Regex Source", e -> {
 			addSelectionDialog.close();
 			CalendarSourceRegexScraperForm.showInsertDialog(calendarSourceRegexScraper, () -> reloadTreeGrid());
 		}));
 
-		// Manual Event
+		verticalLayout.add(new Button("Multiple days Source", e -> {
+			addSelectionDialog.close();
+			CalendarSourceMultipleDaysScraperForm.showInsertDialog(calendarSourceMultipleDaysScraper, () -> reloadTreeGrid());
+		}));
+
 		verticalLayout.add(new Button("Manual Event", e -> {
 			addSelectionDialog.close();
 			CalendarEventForm.showInsertDialog(calendarSource, () -> reloadTreeGrid());
@@ -209,7 +214,7 @@ implements AfterNavigationObserver
 
 		@Override
 		public Icon icon() {
-			if (calendarSource instanceof CalendarSourceRegexScraper) {
+			if (calendarSource instanceof CalendarSourceRegexScraper || calendarSource instanceof CalendarSourceMultipleDaysScraper) {
 				return VaadinIcon.RECORDS.create();
 			}
 			return VaadinIcon.DATABASE.create();
@@ -222,6 +227,10 @@ implements AfterNavigationObserver
 			if (calendarSource instanceof CalendarSourceRegexScraper) {
 				calendarSourceForm = new CalendarSourceRegexScraperForm().populateWith(calendarSource);
 				title = "Regexp source";
+			}
+			else if (calendarSource instanceof CalendarSourceMultipleDaysScraper) {
+				calendarSourceForm = new CalendarSourceMultipleDaysScraperForm().populateWith(calendarSource);
+				title = "Multidays source";
 			}
 			else {
 				calendarSourceForm = new CalendarSourceForm().populateWith(calendarSource);

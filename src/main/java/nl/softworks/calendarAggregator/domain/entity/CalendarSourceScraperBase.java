@@ -43,13 +43,13 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 	}
 
 	@NotNull
-	private String content = "";
-	static public final String CONTENT_PROPERTYID = "content";
-	public String content() {
-		return content;
+	private String removeChars = "";
+	static public final String CONTENT_PROPERTYID = "removeChars";
+	public String removeChars() {
+		return removeChars;
 	}
-	public CalendarSourceScraperBase content(String v) {
-		this.content = v;
+	public CalendarSourceScraperBase removeChars(String v) {
+		this.removeChars = v;
 		return this;
 	}
 
@@ -76,6 +76,14 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 
 	protected String sanatize(String content, StringBuilder stringBuilder) {
 		content = content.replace("\n", " ");
+		if (stringBuilder != null) stringBuilder.append("Removing characters: ").append(removeChars).append("\n");
+		for (int i = 0; i < removeChars.length(); i++) {
+			String removeChar = removeChars.substring(i, i+1);
+			content = content.replace(removeChar, "");
+		}
+		while (content.contains("  ")) {
+			content = content.replace("  ", " ");
+		}
 		if (stringBuilder != null) stringBuilder.append(content).append("\n---\n");
 		return content;
 	}

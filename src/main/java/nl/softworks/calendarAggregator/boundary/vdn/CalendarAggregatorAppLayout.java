@@ -24,6 +24,7 @@ import nl.softworks.calendarAggregator.domain.ValidationException;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
+import nl.softworks.calendarAggregator.domain.entity.CalendarSourceMultipleDaysScraper;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceRegexScraper;
 import nl.softworks.calendarAggregator.domain.entity.Person;
 import nl.softworks.calendarAggregator.domain.entity.Timezone;
@@ -99,9 +100,9 @@ implements HasDynamicTitle {
 		menuBar.addThemeVariants(MenuBarVariant.LUMO_TERTIARY, MenuBarVariant.LUMO_END_ALIGNED);//, MenuBarVariant.LUMO_ICON);
 		menuBar.setWidthFull();
 		// Admin
-//		if (userHasRole(Person.Role.ROLE_ADMIN)) {
-//			menuBar.addItem(createMenuContent("Add data", VaadinIcon.DATABASE), event -> inTransaction(() -> addTestdata()));
-//		}
+		if (userHasRole(Person.Role.ROLE_ADMIN)) {
+			menuBar.addItem(createMenuContent("Add data", VaadinIcon.DATABASE), event -> inTransaction(() -> addTestdata()));
+		}
 
 		// Tabs
 		tabs.setOrientation(Tabs.Orientation.VERTICAL);
@@ -194,5 +195,44 @@ implements HasDynamicTitle {
 				runnable.run();
 			}
 		});
+	}
+
+	private void addTestdata() {
+		R.calendarSource().save(new CalendarSourceMultipleDaysScraper()
+				.regex("[0-9][0-9]? (januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december)")
+				.datePattern("d MMMM")
+				.timePattern("HH:mm")
+				.yearDefault(2023)
+				.startTimeDefault("20:30")
+				.endTimeDefault("23:59")
+				.dateTimeLocale("NL")
+				.scrapeUrl("https://www.danscentrumverhoeven.nl/agenda/")
+				.scrapeBlockStart("volgende data:")
+				.scrapeBlockEnd("2024")
+				.removeChars("*,")
+				.url("https://www.danscentrumverhoeven.nl/agenda/")
+				.name("Verhoeven Cuijk 2023")
+				.location("Stationsstraat 33, Cuijk")
+				.lat(51.7276769)
+				.lon(5.8727587)
+				.timezone(R.timezoneRepo().findByName("Europe/Amsterdam").orElseThrow()));
+		R.calendarSource().save(new CalendarSourceMultipleDaysScraper()
+				.regex("[0-9][0-9]? (januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december)")
+				.datePattern("d MMMM")
+				.timePattern("HH:mm")
+				.yearDefault(2024)
+				.startTimeDefault("20:30")
+				.endTimeDefault("23:59")
+				.dateTimeLocale("NL")
+				.scrapeUrl("https://www.danscentrumverhoeven.nl/agenda/")
+				.scrapeBlockStart("2024:")
+				.scrapeBlockEnd("Zie agenda")
+				.removeChars("*,")
+				.url("https://www.danscentrumverhoeven.nl/agenda/")
+				.name("Verhoeven Cuijk 2024")
+				.location("Stationsstraat 33, Cuijk")
+				.lat(51.7276769)
+				.lon(5.8727587)
+				.timezone(R.timezoneRepo().findByName("Europe/Amsterdam").orElseThrow()));
 	}
 }
