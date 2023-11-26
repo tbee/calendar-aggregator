@@ -36,3 +36,4 @@ logs
 /src/main/dev-bundle/
 /calendarAggregator.iml
 /dbdumps
+pom.xml.versionsBackup
