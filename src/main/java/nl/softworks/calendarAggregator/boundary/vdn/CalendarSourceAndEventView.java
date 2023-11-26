@@ -27,8 +27,10 @@ import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceRegexScraper;
+import nl.softworks.calendarAggregator.domain.service.CalendarSourceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -49,6 +51,10 @@ implements AfterNavigationObserver
 
 	private final TreeGrid<TreeNode> calendarSourceAndEventTreeGrid = new TreeGrid<>();
 	private List<CalendarSource> calendarSources = List.of();
+
+	@Autowired
+	private CalendarSourceService calendarSourceService;
+
 	public CalendarSourceAndEventView() {
 		super("Overview");
 		tabs.setSelectedTab(overviewTab);
@@ -76,18 +82,11 @@ implements AfterNavigationObserver
 	}
 
 	private void generate() {
-		for (CalendarSource calendarSource : calendarSources) {
-			try {
-				calendarSource.generateEvents(null);
-			}
-			catch (RuntimeException e) {
-				calendarSource = R.calendarSource().findById(calendarSource.id()).orElse(null);
-				calendarSource.status("Exception: "+ e.getMessage());
-			}
-			R.calendarSource().save(calendarSource);
-		}
-		reloadTreeGrid();
-		showSuccessNotification("Generated");
+		showInfoNotification("Generating in the background");
+		calendarSourceService.generateEvents(() -> {
+			reloadTreeGrid();
+			showSuccessNotification("Generated");
+		});
 	}
 
 	@Override

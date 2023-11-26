@@ -10,7 +10,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.MonthDay;
-import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -223,7 +222,9 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
             if (stringBuilder != null) stringBuilder.append("Done\n");
             if (calendarEvents().size() == 0) {
                 status("No events are generated");
+                return List.of();
             }
+            status("ok");
             return calendarEvents();
         }
         catch (RuntimeException e) {

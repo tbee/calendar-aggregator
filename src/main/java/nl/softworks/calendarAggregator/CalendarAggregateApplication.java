@@ -47,6 +47,7 @@ public class CalendarAggregateApplication {
 		messageSource.setDefaultEncoding("UTF-8");
 		return messageSource;
 	}
+
 	static private void startHsqldbServer() {
 
 		// Determine HSQLDB port

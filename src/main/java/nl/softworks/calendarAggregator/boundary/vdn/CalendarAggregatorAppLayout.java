@@ -176,6 +176,11 @@ implements HasDynamicTitle {
 		notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
 	}
 
+	protected void showInfoNotification(String message) {
+		Notification notification = Notification.show(message, 5000, Notification.Position.BOTTOM_CENTER);
+		notification.addThemeVariants(NotificationVariant.LUMO_PRIMARY);
+	}
+
 	public static class AlreadyDisplayedException extends RuntimeException {
 		public AlreadyDisplayedException(Exception e) {
 			super(e);
