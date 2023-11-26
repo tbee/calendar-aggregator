@@ -14,6 +14,15 @@ public class CalendarSourceRegexScraperTest {
     public void test() {
         StringBuilder stringBuilder = new StringBuilder();
         List<CalendarEvent> calendarEvents = new CalendarSourceRegexScraper()
+                .regex("([a-zA-Z]*) +[a-z]{2}\\. ([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december) +[0-9]{4}) +van ([0-9]+:[0-9]+) tot ([0-9]+:[0-9]+)")
+                .subjectGroupIdx(1)
+                .startDateGroupIdx(2)
+                .endDateGroupIdx(2)
+                .datePattern("dd MMMM yyyy")
+                .startTimeGroupIdx(4)
+                .endTimeGroupIdx(5)
+                .timePattern("HH:mm")
+                .dateTimeLocale("NL")
                 .content("""
                         DANSAVOND
                          za. 18 november 2023
@@ -62,15 +71,6 @@ public class CalendarSourceRegexScraperTest {
                               
                         Deuren zijn open vanaf 20.00 uur\s
                         """)
-                .regex("([a-zA-Z]*) +[a-z]{2}\\. ([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december) +[0-9]{4}) +van ([0-9]+:[0-9]+) tot ([0-9]+:[0-9]+)")
-                .subjectGroupIdx(1)
-                .startDateGroupIdx(2)
-                .endDateGroupIdx(2)
-                .datePattern("dd MMMM yyyy")
-                .startTimeGroupIdx(4)
-                .endTimeGroupIdx(5)
-                .timePattern("HH:mm")
-                .dateTimeLocale("NL")
                 .generateEvents(stringBuilder);
         System.out.println(stringBuilder);
         System.out.println(calendarEvents);

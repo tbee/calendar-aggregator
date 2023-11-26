@@ -1,6 +1,7 @@
 package nl.softworks.calendarAggregator.domain.entity;
 
 import jakarta.persistence.MappedSuperclass;
+import jakarta.validation.constraints.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.tbee.jakarta.validator.UrlValidator;
@@ -40,6 +41,18 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 		this.scrapeBlockEnd = v;
 		return this;
 	}
+
+	@NotNull
+	private String content = "";
+	static public final String CONTENT_PROPERTYID = "content";
+	public String content() {
+		return content;
+	}
+	public CalendarSourceScraperBase content(String v) {
+		this.content = v;
+		return this;
+	}
+
 
 	protected String readScrapeUrl(StringBuilder stringBuilder) {
 		try {

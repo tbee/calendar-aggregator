@@ -21,17 +21,6 @@ import java.util.regex.Pattern;
 public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
 
     @NotNull
-    private String content = "";
-    static public final String CONTENT_PROPERTYID = "content";
-    public String content() {
-        return content;
-    }
-    public CalendarSourceRegexScraper content(String v) {
-        this.content = v;
-        return this;
-    }
-
-    @NotNull
     private String regex;
     static public final String REGEX_PROPERTYID = "regex";
     public String regex() {
@@ -178,7 +167,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
                 }
             }
 
-            String content = sanatize(this.content, stringBuilder);
+            String content = sanatize(this.content(), stringBuilder);
             if (stringBuilder != null) stringBuilder.append(regex).append("\n");
             Pattern pattern = Pattern.compile(regex);
             Matcher matcher = pattern.matcher(content);

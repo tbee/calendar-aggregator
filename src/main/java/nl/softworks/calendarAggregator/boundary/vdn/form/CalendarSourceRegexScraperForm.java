@@ -31,7 +31,6 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 
 	private final Binder<CalendarSourceRegexScraper> binder = new Binder<>();
 
-	private final TextArea contentTextField = new TextArea("Content");
 	private final TextField regexTextField = new TextField("Regex");
 	private final IntegerField subjectGroupIdxIntegerField = new IntegerField("Subject group index");
 	private final IntegerField startDateGroupIdxIntegerField = new IntegerField("Start date group index");
@@ -47,14 +46,12 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 
 
 	public CalendarSourceRegexScraperForm() {
-		setColspan(contentTextField, 2);
 		setColspan(regexTextField, 2);
 
 		Button testButton = new Button("Test Regex", evt -> testRegex());
 		setColspan(testButton, 2);
-		add(contentTextField, regexTextField, testButton,subjectGroupIdxIntegerField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, datePatternTextField, yearDefaultIntegerField, startTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeGroupIdxIntegerField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
+		add(regexTextField, testButton,subjectGroupIdxIntegerField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, datePatternTextField, yearDefaultIntegerField, startTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeGroupIdxIntegerField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
 
-		binder.forField(contentTextField).bind(CalendarSourceRegexScraper::content, CalendarSourceRegexScraper::content);
 		binder.forField(regexTextField).bind(CalendarSourceRegexScraper::regex, CalendarSourceRegexScraper::regex);
 		binder.forField(subjectGroupIdxIntegerField).bind(CalendarSourceRegexScraper::subjectGroupIdx, CalendarSourceRegexScraper::subjectGroupIdx);
 		binder.forField(startDateGroupIdxIntegerField).bind(CalendarSourceRegexScraper::startDateGroupIdx, CalendarSourceRegexScraper::startDateGroupIdx);
