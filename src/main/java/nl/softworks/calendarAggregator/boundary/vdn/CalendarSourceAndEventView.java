@@ -63,6 +63,7 @@ implements AfterNavigationObserver
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::endDate).setHeader("End");
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::status).setHeader("Status");
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::eventCount).setHeader("Events");
+		calendarSourceAndEventTreeGrid.addItemDoubleClickListener(e -> edit());
 
 		// buttonbar
 		CrudButtonbar crudButtonbar = new CrudButtonbar()
@@ -79,7 +80,6 @@ implements AfterNavigationObserver
 	}
 
 	private void generate() {
-		showInfoNotification("Generating in the background");
 		calendarSourceService.generateEvents(() -> {
 			reloadTreeGrid();
 			showSuccessNotification("Generated");
@@ -93,9 +93,7 @@ implements AfterNavigationObserver
 
 	private void insert() {
 		TreeNode treeNode = getSelectedTreeNode();
-		CalendarSource calendarSource = (treeNode != null && treeNode.getClass().equals(TreeNodeCalendarSource.class)) ? ((TreeNodeCalendarSource) treeNode).calendarSource() : null;
-		CalendarSourceRegexScraper calendarSourceRegexScraper = (calendarSource instanceof CalendarSourceRegexScraper ? (CalendarSourceRegexScraper)calendarSource : null);
-		CalendarSourceMultipleDaysScraper calendarSourceMultipleDaysScraper = (calendarSource instanceof CalendarSourceMultipleDaysScraper ? (CalendarSourceMultipleDaysScraper)calendarSource : null);
+		CalendarSource calendarSource = (treeNode == null ? null : treeNode.calendarSource());
 
 		VerticalLayout verticalLayout = new VerticalLayout();
 		CancelDialog addSelectionDialog = new CancelDialog("Add", verticalLayout);
@@ -107,11 +105,13 @@ implements AfterNavigationObserver
 
 		verticalLayout.add(new Button("Regex Source", e -> {
 			addSelectionDialog.close();
+			CalendarSourceRegexScraper calendarSourceRegexScraper = (calendarSource instanceof CalendarSourceRegexScraper ? (CalendarSourceRegexScraper)calendarSource : null);
 			CalendarSourceRegexScraperForm.showInsertDialog(calendarSourceRegexScraper, () -> reloadTreeGrid());
 		}));
 
 		verticalLayout.add(new Button("Multiple days Source", e -> {
 			addSelectionDialog.close();
+			CalendarSourceMultipleDaysScraper calendarSourceMultipleDaysScraper = (calendarSource instanceof CalendarSourceMultipleDaysScraper ? (CalendarSourceMultipleDaysScraper)calendarSource : null);
 			CalendarSourceMultipleDaysScraperForm.showInsertDialog(calendarSourceMultipleDaysScraper, () -> reloadTreeGrid());
 		}));
 
@@ -182,12 +182,14 @@ implements AfterNavigationObserver
 		String text();
 		String startDate();
 		String endDate();
+		CalendarSource calendarSource();
 		void edit(Runnable onOk);
 		void delete(Runnable onOk);
 
 		String status();
 
 		int eventCount();
+
 	}
 
 	record TreeNodeCalendarSource(CalendarSource calendarSource) implements TreeNode {
@@ -267,6 +269,11 @@ implements AfterNavigationObserver
 		@Override
 		public String endDate() {
 			return calendarEvent.endDateTime().format(YYYYMMDDHHMM);
+		}
+
+		@Override
+		public CalendarSource calendarSource() {
+			return null;
 		}
 
 		@Override
