@@ -29,6 +29,10 @@ import java.util.List;
 public class CalendarSource extends EntityBase<CalendarSource> {
 	private static final Logger LOG = LoggerFactory.getLogger(CalendarSource.class);
 
+	public String type() {
+		return "Manual";
+	}
+
 	@Column(unique=true) // prevent the same name to occur
 	@NotNull
 	protected String name;

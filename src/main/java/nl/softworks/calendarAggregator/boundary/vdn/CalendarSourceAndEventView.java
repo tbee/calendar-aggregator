@@ -59,6 +59,7 @@ implements AfterNavigationObserver
 
 		// calendarSourceAndEventTreeGrid
 		calendarSourceAndEventTreeGrid.addHierarchyColumn(TreeNode::text).setHeader("Name");
+		calendarSourceAndEventTreeGrid.addColumn(TreeNode::type).setHeader("Type");
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::startDate).setHeader("Start");
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::endDate).setHeader("End");
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::status).setHeader("Status");
@@ -180,6 +181,7 @@ implements AfterNavigationObserver
 
 	sealed interface TreeNode permits TreeNodeCalendarSource, TreeNodeCalendarEvent {
 		String text();
+		String type();
 		String startDate();
 		String endDate();
 		CalendarSource calendarSource();
@@ -196,6 +198,11 @@ implements AfterNavigationObserver
 		@Override
 		public String text() {
 			return calendarSource().name();
+		}
+
+		@Override
+		public String type() {
+			return calendarSource().type();
 		}
 
 		@Override
@@ -259,6 +266,11 @@ implements AfterNavigationObserver
 		@Override
 		public String text() {
 			return calendarEvent.subject();
+		}
+
+		@Override
+		public String type() {
+			return "";
 		}
 
 		@Override

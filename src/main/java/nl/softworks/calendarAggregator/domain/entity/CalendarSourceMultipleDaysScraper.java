@@ -20,6 +20,10 @@ import java.util.regex.Pattern;
 @DiscriminatorValue("multidays")
 public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase {
 
+    public String type() {
+        return "Multiple days";
+    }
+
     @NotNull
     private String regex;
     static public final String REGEX_PROPERTYID = "regex";

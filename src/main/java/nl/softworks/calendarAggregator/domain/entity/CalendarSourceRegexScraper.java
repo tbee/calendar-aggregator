@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -19,6 +20,10 @@ import java.util.regex.Pattern;
 @Entity
 @DiscriminatorValue("regex")
 public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
+
+    public String type() {
+        return "Regex";
+    }
 
     @NotNull
     private String regex;
@@ -155,8 +160,18 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
 
             status("");
             Locale locale = new Locale(dateTimeLocale);
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(datePattern, locale);
-            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(timePattern, locale);
+            if (stringBuilder != null) stringBuilder.append("Locale ").append(locale).append("\n");
+            if (stringBuilder != null) stringBuilder.append("datePattern ").append(datePattern).append("\n");
+            if (stringBuilder != null) stringBuilder.append("timePattern ").append(timePattern).append("\n");
+            DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder()
+                    .parseCaseInsensitive()
+                    .appendPattern(datePattern)
+                    .toFormatter(locale);
+            DateTimeFormatter timeFormatter = new DateTimeFormatterBuilder()
+                    .parseCaseInsensitive()
+                    .appendPattern(timePattern)
+                    .toFormatter(locale);
+
 
             String content = readScrapeUrl(stringBuilder);
             if (content.isBlank()) {
