@@ -2,11 +2,13 @@ package nl.softworks.calendarAggregator.domain.entity;
 
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotNull;
+import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.tbee.jakarta.validator.UrlValidator;
 
 import java.io.IOException;
+import java.net.URL;
 
 @MappedSuperclass
 abstract public class CalendarSourceScraperBase extends CalendarSource {
@@ -57,18 +59,19 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 	protected String readScrapeUrl(StringBuilder stringBuilder) {
 		try {
 			if (stringBuilder != null) stringBuilder.append("Reading: " + scrapeUrl + "\n");
-			Document doc = Jsoup.connect(scrapeUrl).get();
-			String content = doc.text();
-			if (stringBuilder != null) stringBuilder.append("Content: " + content.length() + "\n");
+			String html = IOUtils.toString(new URL(scrapeUrl));
+			Document doc = Jsoup.parse(html);
+			String text = doc.text();
+			if (stringBuilder != null) stringBuilder.append("Content: " + text.length() + "\n");
 			if (scrapeBlockStart != null && !scrapeBlockStart.isBlank()) {
-				content = content.substring(content.indexOf(scrapeBlockStart.trim()));
-				if (stringBuilder != null) stringBuilder.append("Content after block start: " + content.length() + "\n");
+				text = text.substring(text.indexOf(scrapeBlockStart.trim()));
+				if (stringBuilder != null) stringBuilder.append("Content after block start: " + text.length() + "\n");
 			}
 			if (scrapeBlockEnd != null && !scrapeBlockEnd.isBlank()) {
-				content = content.substring(0, content.indexOf(scrapeBlockEnd.trim()));
-				if (stringBuilder != null) stringBuilder.append("Content after block end: " + content.length() + "\n");
+				text = text.substring(0, text.indexOf(scrapeBlockEnd.trim()));
+				if (stringBuilder != null) stringBuilder.append("Content after block end: " + text.length() + "\n");
 			}
-			return content;
+			return text;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
