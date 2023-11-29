@@ -1,6 +1,7 @@
 package nl.softworks.calendarAggregator.boundary.vdn.form;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -10,6 +11,7 @@ import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceMultipleDaysScraper;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceMultipleDaysScraper;
+import nl.softworks.calendarAggregator.domain.entity.CalendarSourceRegexScraper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,6 +24,7 @@ public class CalendarSourceMultipleDaysScraperForm extends CalendarSourceScraper
 	private final IntegerField startDateGroupIdxIntegerField = new IntegerField("Start date group index");
 	private final IntegerField endDateGroupIdxIntegerField = new IntegerField("End date group index");
 	private final TextField datePatternTextField = new TextField("Date pattern");
+	private final Checkbox nearestYearCheckbox = new Checkbox("Use Nearest year");
 	private final IntegerField yearDefaultIntegerField = new IntegerField("Year default");
 	private final TextField startTimeDefaultTextField = new TextField("Start time default");
 	private final TextField endTimeDefaultTextField = new TextField("End time default");
@@ -34,10 +37,11 @@ public class CalendarSourceMultipleDaysScraperForm extends CalendarSourceScraper
 
 		Button testButton = new Button("Test Regex", evt -> testRegex());
 		setColspan(testButton, 2);
-		add(regexTextField, testButton, datePatternTextField, yearDefaultIntegerField, startTimeDefaultTextField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
+		add(regexTextField, testButton, datePatternTextField, nearestYearCheckbox, yearDefaultIntegerField, startTimeDefaultTextField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
 
 		binder.forField(regexTextField).bind(CalendarSourceMultipleDaysScraper::regex, CalendarSourceMultipleDaysScraper::regex);
 		binder.forField(datePatternTextField).bind(CalendarSourceMultipleDaysScraper::datePattern, CalendarSourceMultipleDaysScraper::datePattern);
+		binder.forField(nearestYearCheckbox).bind(CalendarSourceMultipleDaysScraper::nearestYear, CalendarSourceMultipleDaysScraper::nearestYear);
 		binder.forField(yearDefaultIntegerField).bind(CalendarSourceMultipleDaysScraper::yearDefault, CalendarSourceMultipleDaysScraper::yearDefault);
 		binder.forField(startTimeDefaultTextField).bind(CalendarSourceMultipleDaysScraper::startTimeDefault, CalendarSourceMultipleDaysScraper::startTimeDefault);
 		binder.forField(endTimeDefaultTextField).bind(CalendarSourceMultipleDaysScraper::endTimeDefault, CalendarSourceMultipleDaysScraper::endTimeDefault);

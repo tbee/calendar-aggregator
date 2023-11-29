@@ -1,6 +1,7 @@
 package nl.softworks.calendarAggregator.boundary.vdn.form;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Span;
@@ -36,6 +37,7 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 	private final IntegerField startDateGroupIdxIntegerField = new IntegerField("Start date group index");
 	private final IntegerField endDateGroupIdxIntegerField = new IntegerField("End date group index");
 	private final TextField datePatternTextField = new TextField("Date pattern");
+	private final Checkbox nearestYearCheckbox = new Checkbox("Use Nearest year");
 	private final IntegerField yearDefaultIntegerField = new IntegerField("Year default");
 	private final IntegerField startTimeGroupIdxIntegerField = new IntegerField("Start time group index");
 	private final IntegerField endTimeGroupIdxIntegerField = new IntegerField("End time group index");
@@ -50,13 +52,14 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 
 		Button testButton = new Button("Test Regex", evt -> testRegex());
 		setColspan(testButton, 2);
-		add(regexTextField, testButton,subjectGroupIdxIntegerField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, datePatternTextField, yearDefaultIntegerField, startTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeGroupIdxIntegerField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
+		add(regexTextField, testButton,subjectGroupIdxIntegerField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, datePatternTextField, nearestYearCheckbox, yearDefaultIntegerField, startTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeGroupIdxIntegerField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
 
 		binder.forField(regexTextField).bind(CalendarSourceRegexScraper::regex, CalendarSourceRegexScraper::regex);
 		binder.forField(subjectGroupIdxIntegerField).bind(CalendarSourceRegexScraper::subjectGroupIdx, CalendarSourceRegexScraper::subjectGroupIdx);
 		binder.forField(startDateGroupIdxIntegerField).bind(CalendarSourceRegexScraper::startDateGroupIdx, CalendarSourceRegexScraper::startDateGroupIdx);
 		binder.forField(endDateGroupIdxIntegerField).bind(CalendarSourceRegexScraper::endDateGroupIdx, CalendarSourceRegexScraper::endDateGroupIdx);
 		binder.forField(datePatternTextField).bind(CalendarSourceRegexScraper::datePattern, CalendarSourceRegexScraper::datePattern);
+		binder.forField(nearestYearCheckbox).bind(CalendarSourceRegexScraper::nearestYear, CalendarSourceRegexScraper::nearestYear);
 		binder.forField(yearDefaultIntegerField).bind(CalendarSourceRegexScraper::yearDefault, CalendarSourceRegexScraper::yearDefault);
 		binder.forField(startTimeGroupIdxIntegerField).bind(CalendarSourceRegexScraper::startTimeGroupIdx, CalendarSourceRegexScraper::startTimeGroupIdx);
 		binder.forField(startTimeDefaultTextField).bind(CalendarSourceRegexScraper::startTimeDefault, CalendarSourceRegexScraper::startTimeDefault);

@@ -69,6 +69,17 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
     }
 
     @NotNull
+    protected boolean nearestYear = false;
+    static public final String NEARESTYEAR_PROPERTYID = "nearestYear";
+    public boolean nearestYear() {
+        return nearestYear;
+    }
+    public CalendarSourceMultipleDaysScraper nearestYear(boolean v) {
+        this.nearestYear = v;
+        return this;
+    }
+
+    @NotNull
     private int yearDefault;
     static public final String YEARDEFAULT_PROPERTYID = "yearDefault";
     public int yearDefault() {
@@ -149,7 +160,13 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
                     }
                     int dayOfMonth = Integer.parseInt(matchedDayString.trim());
 
-                    LocalDate startLocalDate = LocalDate.of(yearDefault(), monthDay.getMonth(), dayOfMonth);
+                    LocalDate startLocalDate;
+                    if (nearestYear) {
+                        startLocalDate = determineDateByNearestYear(MonthDay.of(monthDay.getMonth(), dayOfMonth));
+                    }
+                    else {
+                        startLocalDate = LocalDate.of(yearDefault(), monthDay.getMonth(), dayOfMonth);
+                    }
                     LocalDate endLocalDate = startLocalDate;
                     LocalTime startLocalTime = LocalTime.parse(startTimeDefault(), timeFormatter);
                     LocalTime endLocalTime = LocalTime.parse(endTimeDefault(), timeFormatter);

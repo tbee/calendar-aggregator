@@ -9,6 +9,9 @@ import org.tbee.jakarta.validator.UrlValidator;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.MonthDay;
+import java.time.Period;
 
 @MappedSuperclass
 abstract public class CalendarSourceScraperBase extends CalendarSource {
@@ -89,6 +92,40 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 		}
 		if (stringBuilder != null) stringBuilder.append(content).append("\n---\n");
 		return content;
+	}
+
+	protected LocalDate determineDateByNearestYear(MonthDay monthDay) {
+		LocalDate now = LocalDate.now();
+
+		int year = now.getYear();
+		LocalDate lastYearsDate = LocalDate.of(year - 1, monthDay.getMonth(), monthDay.getDayOfMonth());
+		LocalDate thisYearsDate = LocalDate.of(year, monthDay.getMonth(), monthDay.getDayOfMonth());
+		LocalDate nextYearsDate = LocalDate.of(year + 1, monthDay.getMonth(), monthDay.getDayOfMonth());
+
+		int lastYearsPeriod = asDays(abs(Period.between(now, lastYearsDate)));
+		int thisYearsPeriod = asDays(abs(Period.between(now, thisYearsDate)));
+		int nextYearsPeriod = asDays(abs(Period.between(now, nextYearsDate)));
+
+		int bestPeriod = lastYearsPeriod;
+		LocalDate bestDate = lastYearsDate;
+		if (thisYearsPeriod < bestPeriod) {
+			bestPeriod = thisYearsPeriod;
+			bestDate = thisYearsDate;
+		}
+		if (nextYearsPeriod < bestPeriod) {
+			bestPeriod = nextYearsPeriod;
+			bestDate = nextYearsDate;
+		}
+		return bestDate;
+	}
+	private Period abs(Period period) {
+		return (period.isNegative() ? period.negated() : period);
+	}
+	private int asDays(Period p) {
+		if (p == null) {
+			return 0;
+		}
+		return (p.getYears() * 12 + p.getMonths()) * 30 + p.getDays();
 	}
 
 	public String toString() {

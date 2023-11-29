@@ -57,7 +57,6 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 		return this;
 	}
 
-
 	public String ical() {
 		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss");
 

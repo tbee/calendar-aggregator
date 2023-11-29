@@ -81,6 +81,17 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
     }
 
     @NotNull
+    protected boolean nearestYear = false;
+    static public final String NEARESTYEAR_PROPERTYID = "nearestYear";
+    public boolean nearestYear() {
+        return nearestYear;
+    }
+    public CalendarSourceRegexScraper nearestYear(boolean v) {
+        this.nearestYear = v;
+        return this;
+    }
+
+    @NotNull
     private int yearDefault;
     static public final String YEARDEFAULT_PROPERTYID = "yearDefault";
     public int yearDefault() {
@@ -200,18 +211,26 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
                 String endTimeString = endTimeGroupIdx < 1 ? endTimeDefault : matcher.group(endTimeGroupIdx);
 
                 LocalDate startLocalDate;
-                if (yearDefault == 0) {
-                    startLocalDate = LocalDate.parse(startDateString, dateFormatter);
-                } else {
+                if (nearestYear) {
+                    MonthDay monthDay = MonthDay.parse(startDateString, dateFormatter);
+                    startLocalDate = determineDateByNearestYear(monthDay);
+                }
+                else if (yearDefault > 0) {
                     MonthDay monthDay = MonthDay.parse(startDateString, dateFormatter);
                     startLocalDate = LocalDate.of(yearDefault, monthDay.getMonth(), monthDay.getDayOfMonth());
+                } else {
+                    startLocalDate = LocalDate.parse(startDateString, dateFormatter);
                 }
                 LocalDate endLocalDate;
-                if (yearDefault == 0) {
-                    endLocalDate = LocalDate.parse(endDateString, dateFormatter);
-                } else {
+                if (nearestYear) {
+                    MonthDay monthDay = MonthDay.parse(endDateString, dateFormatter);
+                    endLocalDate = determineDateByNearestYear(monthDay);
+                }
+                else if (yearDefault > 0) {
                     MonthDay monthDay = MonthDay.parse(endDateString, dateFormatter);
                     endLocalDate = LocalDate.of(yearDefault, monthDay.getMonth(), monthDay.getDayOfMonth());
+                } else {
+                    endLocalDate = LocalDate.parse(endDateString, dateFormatter);
                 }
                 LocalTime startLocalTime = LocalTime.parse(startTimeString, timeFormatter);
                 LocalTime endLocalTime = LocalTime.parse(endTimeString, timeFormatter);
