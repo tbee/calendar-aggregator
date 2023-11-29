@@ -17,7 +17,6 @@
 	<properties>
 		<java.version>17</java.version> <!-- https://vaadin.com/docs/latest/configuration/live-reload/hotswap-agent -->
 		<vaadin.version>24.2.1</vaadin.version> <!-- https://vaadin.com/releases -->
-		<ebean.version>13.23.2-jakarta</ebean.version> <!-- https://github.com/ebean-orm/ebean/releases -->
 		<testcontainers.version>1.17.3</testcontainers.version>
 	</properties>
 
@@ -59,31 +58,6 @@
 			<groupId>org.thymeleaf.extras</groupId>
 			<artifactId>thymeleaf-extras-springsecurity6</artifactId>
 		</dependency>
-
-		<dependency>
-			<groupId>io.ebean</groupId>
-			<artifactId>ebean-spring-txn</artifactId>
-			<version>13.9.1</version>
-		</dependency>
-		<dependency>
-			<groupId>io.ebean</groupId>
-			<artifactId>ebean</artifactId>
-			<version>${ebean.version}</version>
-		</dependency>
-		<!-- java annotation processor to generate query beans
-		<dependency>
-			<groupId>io.ebean</groupId>
-			<artifactId>querybean-generator</artifactId>
-			<version>${ebean.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>io.ebean</groupId>
-			<artifactId>ebean-test</artifactId>
-			<version>${ebean.version}</version>
-			<scope>test</scope>
-		</dependency>
-		-->
 
 		<!--
 		https://www.passay.org/
@@ -207,37 +181,6 @@
 					</compilerArgs>
 				</configuration>
 			</plugin>
-<!--
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.10.1</version>
-				<configuration>
-					<release>${java.version}</release>
-					<annotationProcessorPaths>
-						<path>
-							<groupId>io.ebean</groupId>
-							<artifactId>querybean-generator</artifactId>
-							<version>${ebean.version}</version>
-						</path>
-					</annotationProcessorPaths>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>io.repaint.maven</groupId>
-				<artifactId>tiles-maven-plugin</artifactId>
-				<version>2.24</version>
-				<extensions>true</extensions>
-				<configuration>
-					<tiles>
-						<!- -            <tile>org.avaje.tile:java-compile:1.1</tile>- ->
-						<tile>io.ebean.tile:enhancement:13.0.0</tile>
-					</tiles>
-				</configuration>
-			</plugin>
--->
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
