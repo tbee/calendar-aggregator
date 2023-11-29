@@ -35,6 +35,7 @@ public class CalendarSourceForm extends FormLayout {
 	private final NumberField latNumberField = new NumberField("LAT");
 	private final NumberField lonNumberField = new NumberField("LON");
 	private final ComboBox<Timezone> timezoneComboBox = new ComboBox<>("Timezone");
+	private final TextField statusTextField = new TextField("Status");
 
 	private CalendarSource calendarSource;
 	public CalendarSourceForm() {
@@ -43,7 +44,8 @@ public class CalendarSourceForm extends FormLayout {
 			Span nameSpan = new Span(timezone.name());
 			return nameSpan;
 		}));
-		add(nameTextField, urlTextField, locationTextField, latNumberField, lonNumberField, timezoneComboBox);
+		setColspan(statusTextField, 2);
+		add(nameTextField, urlTextField, locationTextField, latNumberField, lonNumberField, timezoneComboBox, statusTextField);
 
 		Button generateButton = new Button("Generate", evt -> generate());
 		setColspan(generateButton, 2);
@@ -55,6 +57,7 @@ public class CalendarSourceForm extends FormLayout {
 		binder.forField(latNumberField).bind(CalendarSource::lat, CalendarSource::lat);
 		binder.forField(lonNumberField).bind(CalendarSource::lon, CalendarSource::lon);
 		binder.forField(timezoneComboBox).bind(CalendarSource::timezone, CalendarSource::timezone);
+		binder.forField(statusTextField).bind(CalendarSource::status, CalendarSource::status);
 	}
 
 	public CalendarSourceForm populateWith(CalendarSource calendarSource) {

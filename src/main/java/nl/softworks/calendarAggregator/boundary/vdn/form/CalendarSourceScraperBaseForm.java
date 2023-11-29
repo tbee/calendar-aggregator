@@ -22,7 +22,6 @@ public class CalendarSourceScraperBaseForm extends CalendarSourceForm {
 
 	public CalendarSourceScraperBaseForm() {
 		setColspan(scrapeURLTextField, 2);
-		setColspan(removeCharsTextField, 2);
 		add(scrapeURLTextField, scrapeBlockStartTextField, scrapeBlockEndTextField, removeCharsTextField);
 
 		binder.forField(scrapeURLTextField).withValidator(s -> UrlValidatorImpl.isValid(s), "Illegal URL").bind(CalendarSourceScraperBase::scrapeUrl, CalendarSourceScraperBase::scrapeUrl);
