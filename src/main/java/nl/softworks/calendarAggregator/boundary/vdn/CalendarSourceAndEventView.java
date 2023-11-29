@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -166,6 +167,7 @@ implements AfterNavigationObserver
 
 		// Refresh data
 		calendarSources = R.calendarSource().findAll();
+		calendarSources.sort(Comparator.comparing(CalendarSource::name));
 		List<TreeNode> treeNodes = treeNodes(calendarSources, TreeNodeCalendarSource::new);
 		calendarSourceAndEventTreeGrid.setItems(treeNodes, this::getTreeNodeChildren);
 
