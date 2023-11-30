@@ -143,7 +143,7 @@ implements AfterNavigationObserver
 			return;
 		}
 
-		new OkCancelDialog("Remove", new NativeLabel("Are you sure?"))
+		new OkCancelDialog("Remove " + selectedTreeNode.text(), new NativeLabel("Are you sure?"))
 				.okLabel("Yes")
 				.onOk(() -> {
 					selectedTreeNode.delete(() -> reloadTreeGrid());

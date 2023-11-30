@@ -26,17 +26,16 @@ public class CalendarResource {
                 .filter(e -> pastThreshold.isBefore(e.startDateTime()) && futureThreshold.isAfter(e.startDateTime()))
                 .map(ce -> ce.ical())
                 .collect(Collectors.joining());
-        
+
         return crlf(
                 """
                 BEGIN:VCALENDAR
                 VERSION:2.0
-                PRODID:-//Calendar Aggregator//NONSGML Calendar Aggregator//EN
+                PRODID:-//Softworks//NONSGML Dance moments//EN
                 CALSCALE:GREGORIAN
                 METHOD:PUBLISH
-                REFRESH-INTERVAL;VALUE=DURATION:PT8H
-                X-Robots-Tag:noindex
-                X-PUBLISHED-TTL:PT1H
+                REFRESH-INTERVAL;VALUE=DURATION:P1D
+                X-PUBLISHED-TTL:P1D
                 %timezones%
                 %events%
                 END:VCALENDAR
