@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 @RestController
@@ -13,14 +14,19 @@ public class CalendarResource {
 
     // example http://localhost:8080/pub/calendar
     @GetMapping(value = "", produces = {"text/calendar"})
-    public String greeting(HttpServletRequest request) {
+    public String calendar(HttpServletRequest request) {
 
         String timezones = R.timezoneRepo().findAll().stream()
                 .map(tz -> tz.ical())
                 .collect(Collectors.joining());
+
+        LocalDateTime pastThreshold = LocalDateTime.now().minusMonths(1);
+        LocalDateTime futureThreshold = LocalDateTime.now().plusMonths(4);
         String events = R.calendarEvent().findAll().stream()
+                .filter(e -> pastThreshold.isBefore(e.startDateTime()) && futureThreshold.isAfter(e.startDateTime()))
                 .map(ce -> ce.ical())
                 .collect(Collectors.joining());
+        
         return crlf(
                 """
                 BEGIN:VCALENDAR
