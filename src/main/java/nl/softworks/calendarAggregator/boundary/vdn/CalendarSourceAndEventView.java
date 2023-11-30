@@ -4,10 +4,13 @@ import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.StyleSheet;
+import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.AnchorTargetValue;
 import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.Route;
@@ -60,6 +63,7 @@ implements AfterNavigationObserver
 
 		// calendarSourceAndEventTreeGrid
 		calendarSourceAndEventTreeGrid.addHierarchyColumn(TreeNode::text).setHeader("Name");
+		calendarSourceAndEventTreeGrid.addComponentColumn((ValueProvider<TreeNode, Anchor>) tn -> createAnchor(tn.url())).setHeader("Website");
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::type).setHeader("Type");
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::startDate).setHeader("Start");
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::endDate).setHeader("End");
@@ -79,6 +83,12 @@ implements AfterNavigationObserver
 		VerticalLayout verticalLayout = new VerticalLayout(crudButtonbar, calendarSourceAndEventTreeGrid);
 		verticalLayout.setSizeFull();
 		setContent(verticalLayout);
+	}
+
+	private Anchor createAnchor(String url) {
+		Anchor anchor = new Anchor(url, "⇒");
+		anchor.setTarget("_blank");
+		return anchor;
 	}
 
 	private void generate() {
@@ -184,6 +194,7 @@ implements AfterNavigationObserver
 	sealed interface TreeNode permits TreeNodeCalendarSource, TreeNodeCalendarEvent {
 		String text();
 		String type();
+		String url();
 		String startDate();
 		String endDate();
 		CalendarSource calendarSource();
@@ -205,6 +216,10 @@ implements AfterNavigationObserver
 		@Override
 		public String type() {
 			return calendarSource().type();
+		}
+		@Override
+		public String url() {
+			return calendarSource().url();
 		}
 
 		@Override
@@ -272,6 +287,10 @@ implements AfterNavigationObserver
 
 		@Override
 		public String type() {
+			return "";
+		}
+		@Override
+		public String url() {
 			return "";
 		}
 

@@ -74,7 +74,7 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 				LOCATION:%location%
 				END:VEVENT
 				"""
-				.replace("%uid%", id() + "@calendarAggregator.tbee.org")
+				.replace("%uid%", id() + "@dancemoments.softworks.nl")
 				.replace("%tzid%", calendarSource.timezone().name())
 				.replace("%dtStart%", dateTimeFormatter.format(startDateTime))
 				.replace("%dtEnd%", dateTimeFormatter.format(endDateTime))
@@ -82,20 +82,6 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 				.replace("%location%", calendarSource.location().replace("\n", ", "))
 				.replace("%description%", calendarSource.url())
 				;
-/*
-
-		BEGIN:VEVENT
-		DTSTAMP:20231111T091847
-		UID:2023-02-26A@selfroster.softworks.nl
-				DTSTART;TZID=Europe/Amsterdam:20230226T190000
-				DTEND;TZID=Europe/Amsterdam:20230226T230000
-		SEQUENCE:0
-		TRANSP:OPAQUE
-		CLASS:PUBLIC
-		SUMMARY:Avond
-		DESCRIPTION:
-		END:VEVENT
-*/
 	}
 
 	@Override
