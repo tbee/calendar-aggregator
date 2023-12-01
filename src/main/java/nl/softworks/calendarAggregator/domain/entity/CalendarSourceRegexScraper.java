@@ -12,8 +12,11 @@ import java.time.LocalTime;
 import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,6 +80,17 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
     }
     public CalendarSourceRegexScraper datePattern(String v) {
         this.datePattern = v;
+        return this;
+    }
+
+    @NotNull
+    private String shortMonthNotation;
+    static public final String SHORTMONTHNOTATION_PROPERTYID = "shortMonthNotation";
+    public String shortMonthNotation() {
+        return shortMonthNotation;
+    }
+    public CalendarSourceRegexScraper shortMonthNotation(String v) {
+        this.shortMonthNotation = v;
         return this;
     }
 
@@ -172,25 +186,16 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
             status("");
             Locale locale = new Locale(dateTimeLocale);
             if (stringBuilder != null) stringBuilder.append("Locale ").append(locale).append("\n");
-            if (stringBuilder != null) stringBuilder.append("datePattern ").append(datePattern).append("\n");
-            if (stringBuilder != null) stringBuilder.append("timePattern ").append(timePattern).append("\n");
-            DateTimeFormatter dateFormatter = new DateTimeFormatterBuilder()
-                    .parseCaseInsensitive()
-                    .appendPattern(datePattern)
-                    .toFormatter(locale);
-            DateTimeFormatter timeFormatter = new DateTimeFormatterBuilder()
-                    .parseCaseInsensitive()
-                    .appendPattern(timePattern)
-                    .toFormatter(locale);
-
 
             String content = readScrapeUrl(stringBuilder);
             if (content.isBlank()) {
                 status("No contents");
                 return List.of();
             }
+            content = sanatizeContent(content, stringBuilder);
 
-            content = sanatize(content, stringBuilder);
+            DateTimeFormatter dateFormatter = createDateFormatter(datePattern, shortMonthNotation, locale, stringBuilder);
+            DateTimeFormatter timeFormatter = createTimeFormatter(timePattern, locale, stringBuilder);
             if (stringBuilder != null) stringBuilder.append(regex).append("\n");
             Matcher matcher = Pattern.compile(regex).matcher(content);
             while (matcher.find()) {
@@ -235,10 +240,19 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
                 LocalTime startLocalTime = LocalTime.parse(startTimeString, timeFormatter);
                 LocalTime endLocalTime = LocalTime.parse(endTimeString, timeFormatter);
 
+                LocalDateTime startLocalDateTime = LocalDateTime.of(startLocalDate, startLocalTime);
+                if (stringBuilder != null) stringBuilder.append("startLocalDateTime: ").append(startLocalDateTime).append("\n");
+                LocalDateTime endLocalDateTime = LocalDateTime.of(endLocalDate, endLocalTime);
+                if (stringBuilder != null) stringBuilder.append("endLocalDateTime: ").append(endLocalDateTime).append("\n");
+                if (endLocalDateTime.isBefore(startLocalDateTime)) {
+                    endLocalDateTime = endLocalDateTime.plusDays(1); // This is to correct an end time that is on or after midnight
+                    if (stringBuilder != null) stringBuilder.append("End moment < start moment, added one day: ").append(endLocalDateTime).append("\n");
+                }
+
                 CalendarEvent calendarEvent = new CalendarEvent()
                         .subject(subject)
-                        .startDateTime(LocalDateTime.of(startLocalDate, startLocalTime))
-                        .endDateTime(LocalDateTime.of(endLocalDate, endLocalTime));
+                        .startDateTime(startLocalDateTime)
+                        .endDateTime(endLocalDateTime);
                 addCalendarEvent(calendarEvent);
             }
             if (stringBuilder != null) stringBuilder.append("Done\n");

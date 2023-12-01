@@ -12,9 +12,17 @@ import java.net.URL;
 import java.time.LocalDate;
 import java.time.MonthDay;
 import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 @MappedSuperclass
 abstract public class CalendarSourceScraperBase extends CalendarSource {
+
+	final public static String SHORT_MONTH_NOTATION_PATTERN = "SMN";
 
 	@UrlValidator
 	protected String scrapeUrl;
@@ -80,7 +88,7 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 		}
 	}
 
-	protected String sanatize(String content, StringBuilder stringBuilder) {
+	protected String sanatizeContent(String content, StringBuilder stringBuilder) {
 		content = content.replace("\n", " ");
 		if (stringBuilder != null) stringBuilder.append("Removing characters: ").append(removeChars).append("\n");
 		for (int i = 0; i < removeChars.length(); i++) {
@@ -94,18 +102,64 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 		return content;
 	}
 
+	protected DateTimeFormatter createDateFormatter(String datePattern, String shortMonthNotation, Locale locale, StringBuilder stringBuilder) {
+		if (stringBuilder != null) stringBuilder.append("datePattern ").append(datePattern).append("\n");
+
+		// Default setting
+		DateTimeFormatterBuilder dateTimeFormatterBuilder = new DateTimeFormatterBuilder().parseCaseInsensitive();
+
+		// either use the custom short month notation, or just a regular pattern
+		if (datePattern.contains(SHORT_MONTH_NOTATION_PATTERN)) {
+			int idx = datePattern.indexOf(SHORT_MONTH_NOTATION_PATTERN);
+			if (idx > 0) {
+				dateTimeFormatterBuilder.appendPattern(datePattern.substring(0, idx));
+			}
+			dateTimeFormatterBuilder.appendText(ChronoField.MONTH_OF_YEAR, constructShortMonthsLookup(shortMonthNotation));
+			if (idx + SHORT_MONTH_NOTATION_PATTERN.length() < datePattern.length()) {
+				dateTimeFormatterBuilder.appendPattern(datePattern.substring(idx));
+			}
+		}
+		else {
+			dateTimeFormatterBuilder.appendPattern(datePattern);
+		}
+        return dateTimeFormatterBuilder.toFormatter(locale);
+	}
+
+	private static Map<Long, String> constructShortMonthsLookup(String shortMonthNotation) {
+		Map<Long, String> lookup = new HashMap<>();
+		String[] shortMonths = shortMonthNotation.split("\\|");
+		if (shortMonths.length != 12) {
+			throw new RuntimeException("Short months do not contain 12 entries, use the | symbol as a separator");
+		}
+		for (int i = 0; i < shortMonths.length; i++) {
+			lookup.put((long)(i + 1), shortMonths[i]);
+		}
+		return lookup;
+	}
+
+	protected DateTimeFormatter createTimeFormatter(String timePattern, Locale locale, StringBuilder stringBuilder) {
+		if (stringBuilder != null) stringBuilder.append("timePattern ").append(timePattern).append("\n");
+        return new DateTimeFormatterBuilder()
+				.parseCaseInsensitive()
+				.appendPattern(timePattern)
+				.toFormatter(locale);
+	}
+
 	protected LocalDate determineDateByNearestYear(MonthDay monthDay) {
 		LocalDate now = LocalDate.now();
 
+		// Calculate the three options
 		int year = now.getYear();
 		LocalDate lastYearsDate = LocalDate.of(year - 1, monthDay.getMonth(), monthDay.getDayOfMonth());
 		LocalDate thisYearsDate = LocalDate.of(year, monthDay.getMonth(), monthDay.getDayOfMonth());
 		LocalDate nextYearsDate = LocalDate.of(year + 1, monthDay.getMonth(), monthDay.getDayOfMonth());
 
+		// Determine the distance (period) from now
 		int lastYearsPeriod = asDays(abs(Period.between(now, lastYearsDate)));
 		int thisYearsPeriod = asDays(abs(Period.between(now, thisYearsDate)));
 		int nextYearsPeriod = asDays(abs(Period.between(now, nextYearsDate)));
 
+		// Select the nearest
 		int bestPeriod = lastYearsPeriod;
 		LocalDate bestDate = lastYearsDate;
 		if (thisYearsPeriod < bestPeriod) {
@@ -113,7 +167,7 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 			bestDate = thisYearsDate;
 		}
 		if (nextYearsPeriod < bestPeriod) {
-			bestPeriod = nextYearsPeriod;
+			//bestPeriod = nextYearsPeriod;
 			bestDate = nextYearsDate;
 		}
 		return bestDate;

@@ -58,6 +58,17 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
     }
 
     @NotNull
+    private String shortMonthNotation;
+    static public final String SHORTMONTHNOTATION_PROPERTYID = "shortMonthNotation";
+    public String shortMonthNotation() {
+        return shortMonthNotation;
+    }
+    public CalendarSourceMultipleDaysScraper shortMonthNotation(String v) {
+        this.shortMonthNotation = v;
+        return this;
+    }
+
+    @NotNull
     private String timePattern;
     static public final String TIMEPATTERN_PROPERTYID = "timePattern";
     public String timePattern() {
@@ -117,17 +128,17 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
 
             status("");
             Locale locale = new Locale(dateTimeLocale);
-            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(datePattern, locale);
-            DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(timePattern, locale);
+            if (stringBuilder != null) stringBuilder.append("Locale ").append(locale).append("\n");
 
             String content = readScrapeUrl(stringBuilder);
             if (content.isBlank()) {
                 status("No contents");
                 return List.of();
             }
-            removeChars("*,");
-            content = sanatize(content, stringBuilder);
+            content = sanatizeContent(content, stringBuilder);
 
+            DateTimeFormatter dateFormatter = createDateFormatter(datePattern, shortMonthNotation, locale, stringBuilder);
+            DateTimeFormatter timeFormatter = createTimeFormatter(timePattern, locale, stringBuilder);
             if (stringBuilder != null) stringBuilder.append(regex).append("\n");
             Matcher matcher = Pattern.compile(regex).matcher(content);
             int lastMatchEnd = -1;
@@ -171,10 +182,19 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
                     LocalTime startLocalTime = LocalTime.parse(startTimeDefault(), timeFormatter);
                     LocalTime endLocalTime = LocalTime.parse(endTimeDefault(), timeFormatter);
 
+                    LocalDateTime startLocalDateTime = LocalDateTime.of(startLocalDate, startLocalTime);
+                    if (stringBuilder != null) stringBuilder.append("startLocalDateTime: ").append(startLocalDateTime).append("\n");
+                    LocalDateTime endLocalDateTime = LocalDateTime.of(endLocalDate, endLocalTime);
+                    if (stringBuilder != null) stringBuilder.append("endLocalDateTime: ").append(endLocalDateTime).append("\n");
+                    if (endLocalDateTime.isBefore(startLocalDateTime)) {
+                        endLocalDateTime = endLocalDateTime.plusDays(1); // This is to correct an end time that is on or after midnight
+                        if (stringBuilder != null) stringBuilder.append("End moment < start moment, added one day: ").append(endLocalDateTime).append("\n");
+                    }
+
                     CalendarEvent calendarEvent = new CalendarEvent()
                             .subject("")
-                            .startDateTime(LocalDateTime.of(startLocalDate, startLocalTime))
-                            .endDateTime(LocalDateTime.of(endLocalDate, endLocalTime));
+                            .startDateTime(startLocalDateTime)
+                            .endDateTime(endLocalDateTime);
                     addCalendarEvent(calendarEvent);
                 }
                 lastMatchEnd = matcher.end();
