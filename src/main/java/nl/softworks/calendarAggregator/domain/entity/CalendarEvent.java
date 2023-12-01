@@ -84,6 +84,38 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 				;
 	}
 
+	public static String th() {
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+		return 	"""
+				<tr>
+				<td>From</td>
+				<td>To</td>
+				<td>What</td>
+				<td>Link</td>
+				</tr>
+				""";
+	}
+
+	public String tr() {
+		DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("E yyyy-MM-dd HH:mm");
+
+		return 	"""
+				<tr>
+				<td>%dtStart%</td>
+				<td>%dtEnd%</td>
+				<td>%summary%</td>
+				<td><a href="%url%" target="_blank">info</a></td>
+				</tr>
+				"""
+				.replace("%uid%", id() + "@dancemoments.softworks.nl")
+				.replace("%dtStart%", dateTimeFormatter.format(startDateTime))
+				.replace("%dtEnd%", dateTimeFormatter.format(endDateTime))
+				.replace("%summary%", (calendarSource.name() + " " + subject).trim())
+				.replace("%url%", calendarSource.url())
+				;
+	}
+
 	@Override
 	public String toString() {
 		return super.toString() //
