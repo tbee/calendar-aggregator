@@ -135,7 +135,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
     private int endTimeGroupIdx;
     static public final String ENDTIMEGROUPIDX_PROPERTYID = "endTimeGroupIdx";
     public int endTimeGroupIdx() {
-        return startTimeGroupIdx;
+        return endTimeGroupIdx;
     }
     public CalendarSourceRegexScraper endTimeGroupIdx(int v) {
         this.endTimeGroupIdx = v;
