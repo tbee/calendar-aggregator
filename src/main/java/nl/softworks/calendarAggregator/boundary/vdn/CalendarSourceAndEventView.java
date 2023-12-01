@@ -291,7 +291,7 @@ implements AfterNavigationObserver
 		}
 		@Override
 		public String url() {
-			return "";
+			return treeNodeCalendarSource.url();
 		}
 
 		@Override
