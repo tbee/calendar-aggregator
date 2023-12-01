@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>org.tbee</groupId>
 	<artifactId>calendarAggregator</artifactId>
-	<version>1.5.0</version>
+	<version>1.6.0</version>
 	<name>Calendar Aggregator</name>
 	<description>Merge all kinds of calendar sources into one calendar</description>
 	
@@ -79,6 +79,12 @@
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>2.15.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mnode.ical4j</groupId>
+			<artifactId>ical4j</artifactId>
+			<version>3.2.14</version>
 		</dependency>
 
 		<dependency>

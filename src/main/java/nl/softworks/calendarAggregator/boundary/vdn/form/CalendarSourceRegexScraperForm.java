@@ -2,30 +2,17 @@ package nl.softworks.calendarAggregator.boundary.vdn.form;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.component.textfield.NumberField;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
-import nl.softworks.calendarAggregator.boundary.vdn.component.CancelDialog;
 import nl.softworks.calendarAggregator.boundary.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.domain.boundary.R;
-import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceRegexScraper;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceScraperBase;
-import nl.softworks.calendarAggregator.domain.entity.Timezone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseForm {
 	private static final Logger LOG = LoggerFactory.getLogger(CalendarSourceRegexScraperForm.class);
@@ -51,7 +38,7 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 	public CalendarSourceRegexScraperForm() {
 		setColspan(regexTextField, 2);
 
-		Button testButton = new Button("Test Regex", evt -> testRegex());
+		Button testButton = new Button("Test", evt -> test());
 		setColspan(testButton, 2);
 		add(regexTextField, testButton,subjectGroupIdxIntegerField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, datePatternTextField, shortMonthNotationTextField, nearestYearCheckbox, yearDefaultIntegerField, startTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeGroupIdxIntegerField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
 
@@ -71,7 +58,7 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 		binder.forField(dateTimeLocaleTextField).bind(CalendarSourceRegexScraper::dateTimeLocale, CalendarSourceRegexScraper::dateTimeLocale);
 	}
 
-	private void testRegex() {
+	private void test() {
 		generateAndShowTrace(new CalendarSourceRegexScraper());
 	}
 

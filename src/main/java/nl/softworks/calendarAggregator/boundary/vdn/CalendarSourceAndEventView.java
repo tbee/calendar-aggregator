@@ -21,11 +21,13 @@ import nl.softworks.calendarAggregator.boundary.vdn.component.CrudButtonbar;
 import nl.softworks.calendarAggregator.boundary.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.boundary.vdn.form.CalendarEventForm;
 import nl.softworks.calendarAggregator.boundary.vdn.form.CalendarSourceForm;
+import nl.softworks.calendarAggregator.boundary.vdn.form.CalendarSourceICalForm;
 import nl.softworks.calendarAggregator.boundary.vdn.form.CalendarSourceMultipleDaysScraperForm;
 import nl.softworks.calendarAggregator.boundary.vdn.form.CalendarSourceRegexScraperForm;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
+import nl.softworks.calendarAggregator.domain.entity.CalendarSourceICal;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceMultipleDaysScraper;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceRegexScraper;
 import nl.softworks.calendarAggregator.domain.service.CalendarSourceService;
@@ -125,6 +127,12 @@ implements AfterNavigationObserver
 			addSelectionDialog.close();
 			CalendarSourceMultipleDaysScraper calendarSourceMultipleDaysScraper = (calendarSource instanceof CalendarSourceMultipleDaysScraper ? (CalendarSourceMultipleDaysScraper)calendarSource : null);
 			CalendarSourceMultipleDaysScraperForm.showInsertDialog(calendarSourceMultipleDaysScraper, () -> reloadTreeGrid());
+		}));
+
+		verticalLayout.add(new Button("ICal Source", e -> {
+			addSelectionDialog.close();
+			CalendarSourceICal calendarSourceICal = (calendarSource instanceof CalendarSourceICal ? (CalendarSourceICal)calendarSource : null);
+			CalendarSourceICalForm.showInsertDialog(calendarSourceICal, () -> reloadTreeGrid());
 		}));
 
 		verticalLayout.add(new Button("Manual Event", e -> {
@@ -243,6 +251,10 @@ implements AfterNavigationObserver
 			else if (calendarSource instanceof CalendarSourceMultipleDaysScraper) {
 				calendarSourceForm = new CalendarSourceMultipleDaysScraperForm().populateWith(calendarSource);
 				title = "Multidays source";
+			}
+			else if (calendarSource instanceof CalendarSourceICal) {
+				calendarSourceForm = new CalendarSourceICalForm().populateWith(calendarSource);
+				title = "ICal source";
 			}
 			else {
 				calendarSourceForm = new CalendarSourceForm().populateWith(calendarSource);
