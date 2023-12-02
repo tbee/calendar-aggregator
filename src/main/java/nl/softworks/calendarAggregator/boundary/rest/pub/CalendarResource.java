@@ -6,6 +6,7 @@ import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,7 @@ public class CalendarResource {
         LocalDateTime futureThreshold = LocalDateTime.now().plusMonths(4);
         String events = R.calendarEvent().findAll().stream()
                 .filter(e -> pastThreshold.isBefore(e.startDateTime()) && futureThreshold.isAfter(e.startDateTime()))
-                .map(ce -> ce.ical())
+                .map(this::ical)
                 .collect(Collectors.joining());
 
         return crlf(
@@ -66,7 +67,7 @@ public class CalendarResource {
         String events = R.calendarEvent().findAll().stream()
                 .filter(e -> pastThreshold.isBefore(e.startDateTime()) && futureThreshold.isAfter(e.startDateTime()))
                 .sorted(Comparator.comparing(CalendarEvent::startDateTime))
-                .map(ce -> ce.tr())
+                .map(this::tr)
                 .collect(Collectors.joining());
 
         return crlf(
@@ -81,7 +82,11 @@ public class CalendarResource {
                       <h2 class="subtitle">Ballroom en latin</h2>
                       <table class="table">
                         <thead>
-                          %th%
+				          <tr>
+				            <td>When</td>
+				            <td>What</td>
+				            <td>Web</td>
+				          </tr>
                         </thead>
                         <tbody>
                           %events%
@@ -90,8 +95,7 @@ public class CalendarResource {
                     </section>
                   </body>
                 </html>
-                """.replace("%th%", CalendarEvent.th())
-                   .replace("%events%", stripClosingNewline(events))
+                """.replace("%events%", stripClosingNewline(events))
         );
     }
 
@@ -106,5 +110,54 @@ public class CalendarResource {
         return s.replace("\r", "")
                 .replace("\n", "\r\n");
 
+    }
+
+    private String ical(CalendarEvent calendarEvent) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss");
+
+        // https://www.kanzaki.com/docs/ical/location.html
+        return 	"""
+				BEGIN:VEVENT
+				UID:%uid%
+				DTSTAMP:%dtStart%
+				DTSTART;TZID=%tzid%:%dtStart%
+				DTEND;TZID=%tzid%:%dtEnd%
+				TRANSP:OPAQUE
+				CLASS:PUBLIC
+				SUMMARY:%summary%
+				DESCRIPTION:%description%
+				LOCATION:%location%
+				END:VEVENT
+				"""
+                .replace("%uid%", calendarEvent.id() + "@dancemoments.softworks.nl")
+                .replace("%tzid%", calendarEvent.calendarSource().timezone().name())
+                .replace("%dtStart%", dateTimeFormatter.format(calendarEvent.startDateTime()))
+                .replace("%dtEnd%", dateTimeFormatter.format(calendarEvent.endDateTime()))
+                .replace("%summary%", (calendarEvent.calendarSource().name() + " " + calendarEvent.subject()).trim())
+                .replace("%location%", calendarEvent.calendarSource().location().replace("\n", ", "))
+                .replace("%description%", calendarEvent.calendarSource().url())
+                ;
+    }
+
+    private String tr(CalendarEvent calendarEvent) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("E yyyy-MM-dd HH:mm");
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+        String when = dateTimeFormatter.format(calendarEvent.startDateTime())
+                + " - "
+                + (calendarEvent.startDateTime().toLocalDate().equals(calendarEvent.endDateTime().toLocalDate()) ? timeFormatter : dateTimeFormatter).format(calendarEvent.endDateTime());
+
+        String what = calendarEvent.calendarSource().name() + (calendarEvent.subject().isBlank() ? "" : " - " + calendarEvent.subject());
+
+        return 	"""
+				<tr>
+				<td>%when%</td>
+				<td>%what%</td>
+				<td><a href="%url%" target="_blank">info</a></td>
+				</tr>
+				"""
+                .replace("%when%", when)
+                .replace("%what%", what)
+                .replace("%url%", calendarEvent.calendarSource().url())
+                ;
     }
 }

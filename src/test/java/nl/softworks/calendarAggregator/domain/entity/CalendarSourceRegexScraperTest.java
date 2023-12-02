@@ -5,6 +5,7 @@ import org.glassfish.jaxb.core.v2.TODO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -61,7 +62,7 @@ public class CalendarSourceRegexScraperTest {
         StringBuilder stringBuilder = new StringBuilder();
         List<CalendarEvent> calendarEvents = new CalendarSourceMultipleDaysScraper()
                 .regex("[0-9][0-9]? (januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december)")
-                .yearDefault(2024)
+                .nearestYear(true)
                 .datePattern("d MMMM")
                 .timePattern("HH:mm")
                 .startTimeDefault("20:30")
@@ -75,8 +76,8 @@ public class CalendarSourceRegexScraperTest {
 
         Assertions.assertEquals(13, calendarEvents.size());
         Assertions.assertEquals("", calendarEvents.get(0).subject());
-        Assertions.assertEquals(LocalDateTime.of(2024, 1, 6, 20, 30, 0), calendarEvents.get(0).startDateTime());
-        Assertions.assertEquals(LocalDateTime.of(2024, 1, 6, 23, 59, 0), calendarEvents.get(0).endDateTime());
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 1, 6, 20, 30, 0), calendarEvents.get(0).startDateTime());
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 1, 6, 23, 59, 0), calendarEvents.get(0).endDateTime());
     }
 
     @Test
@@ -85,7 +86,7 @@ public class CalendarSourceRegexScraperTest {
         List<CalendarEvent> calendarEvents = new CalendarSourceRegexScraper()
                 .regex("([0-9][0-9]? (jan|feb|mrt|apr|mei|jun|jul|aug|sep|okt|nov|dec)) (Vrije Dansavond)")
                 .subjectGroupIdx(3)
-                .yearDefault(2024)
+                .nearestYear(true)
                 .datePattern("d SMN")
                 .shortMonthNotation("jan|feb|mrt|apr|mei|jun|jul|aug|sep|okt|nov|dec")
                 .startDateGroupIdx(1)
@@ -103,7 +104,17 @@ public class CalendarSourceRegexScraperTest {
 
         Assertions.assertEquals(6, calendarEvents.size());
         Assertions.assertEquals("Vrije Dansavond", calendarEvents.get(0).subject());
-        Assertions.assertEquals(LocalDateTime.of(2024, 10, 28, 20, 30, 0), calendarEvents.get(0).startDateTime());
-        Assertions.assertEquals(LocalDateTime.of(2024, 10, 28, 23, 59, 0), calendarEvents.get(0).endDateTime());
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 28, 20, 30, 0), calendarEvents.get(0).startDateTime());
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 28, 23, 59, 0), calendarEvents.get(0).endDateTime());
+    }
+
+    private void assertLocalDateTimeNearestYear(LocalDateTime expectedLocalDateTime, LocalDateTime actualLocalDateTime) {
+        int actualYear = actualLocalDateTime.getYear();
+
+        LocalDateTime expectedLocalDateTimeIgnoreYear = expectedLocalDateTime.withYear(actualYear);
+        Assertions.assertEquals(expectedLocalDateTimeIgnoreYear, actualLocalDateTime);
+
+        int nowYear = LocalDate.now().getYear();
+        Assertions.assertTrue(actualYear == nowYear - 1 || actualYear == nowYear || actualYear == nowYear + 1);
     }
 }

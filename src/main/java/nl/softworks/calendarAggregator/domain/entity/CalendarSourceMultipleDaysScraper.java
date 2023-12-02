@@ -90,17 +90,6 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
         return this;
     }
 
-    @NotNull
-    private int yearDefault;
-    static public final String YEARDEFAULT_PROPERTYID = "yearDefault";
-    public int yearDefault() {
-        return yearDefault;
-    }
-    public CalendarSourceMultipleDaysScraper yearDefault(int v) {
-        this.yearDefault = v;
-        return this;
-    }
-
     private String startTimeDefault;
     static public final String STARTTIMEDEFAULT_PROPERTYID = "startTimeDefault";
     public String startTimeDefault() {
@@ -157,7 +146,14 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
                 }
 
                 // Parse the match into a base day-month
-                MonthDay monthDay = MonthDay.parse(matchedString, dateFormatter);
+                LocalDate localDate;
+                if (nearestYear) {
+                    MonthDay monthDay = MonthDay.parse(matchedString, dateFormatter);
+                    localDate = determineDateByNearestYear(MonthDay.of(monthDay.getMonth(), monthDay.getDayOfMonth()));
+                }
+                else {
+                    localDate = LocalDate.parse(matchedString, dateFormatter);
+                }
 
                 // Then scan al day notations
                 Matcher dayMatcher = Pattern.compile("[0-9][0-9]? ").matcher(wholeString);
@@ -173,10 +169,10 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
 
                     LocalDate startLocalDate;
                     if (nearestYear) {
-                        startLocalDate = determineDateByNearestYear(MonthDay.of(monthDay.getMonth(), dayOfMonth));
+                        startLocalDate = determineDateByNearestYear(MonthDay.of(localDate.getMonth(), dayOfMonth));
                     }
                     else {
-                        startLocalDate = LocalDate.of(yearDefault(), monthDay.getMonth(), dayOfMonth);
+                        startLocalDate = LocalDate.of(localDate.getYear(), localDate.getMonth(), dayOfMonth);
                     }
                     LocalDate endLocalDate = startLocalDate;
                     LocalTime startLocalTime = LocalTime.parse(startTimeDefault(), timeFormatter);

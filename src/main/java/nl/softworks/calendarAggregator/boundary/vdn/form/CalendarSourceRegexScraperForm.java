@@ -26,7 +26,6 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 	private final TextField datePatternTextField = new TextField("Date pattern");
 	private final TextField shortMonthNotationTextField = new TextField("Short month notation (" + CalendarSourceScraperBase.SHORT_MONTH_NOTATION_PATTERN + ")");
 	private final Checkbox nearestYearCheckbox = new Checkbox("Use Nearest year");
-	private final IntegerField yearDefaultIntegerField = new IntegerField("Year default");
 	private final IntegerField startTimeGroupIdxIntegerField = new IntegerField("Start time group index");
 	private final IntegerField endTimeGroupIdxIntegerField = new IntegerField("End time group index");
 	private final TextField startTimeDefaultTextField = new TextField("Start time default");
@@ -40,7 +39,7 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 
 		Button testButton = new Button("Test", evt -> test());
 		setColspan(testButton, 2);
-		add(regexTextField, testButton,subjectGroupIdxIntegerField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, datePatternTextField, shortMonthNotationTextField, nearestYearCheckbox, yearDefaultIntegerField, startTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeGroupIdxIntegerField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
+		add(regexTextField, testButton,subjectGroupIdxIntegerField, datePatternTextField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, shortMonthNotationTextField, nearestYearCheckbox, startTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeGroupIdxIntegerField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
 
 		binder.forField(regexTextField).bind(CalendarSourceRegexScraper::regex, CalendarSourceRegexScraper::regex);
 		binder.forField(subjectGroupIdxIntegerField).bind(CalendarSourceRegexScraper::subjectGroupIdx, CalendarSourceRegexScraper::subjectGroupIdx);
@@ -49,7 +48,6 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 		binder.forField(datePatternTextField).bind(CalendarSourceRegexScraper::datePattern, CalendarSourceRegexScraper::datePattern);
 		binder.forField(shortMonthNotationTextField).bind(CalendarSourceRegexScraper::shortMonthNotation, CalendarSourceRegexScraper::shortMonthNotation);
 		binder.forField(nearestYearCheckbox).bind(CalendarSourceRegexScraper::nearestYear, CalendarSourceRegexScraper::nearestYear);
-		binder.forField(yearDefaultIntegerField).bind(CalendarSourceRegexScraper::yearDefault, CalendarSourceRegexScraper::yearDefault);
 		binder.forField(startTimeGroupIdxIntegerField).bind(CalendarSourceRegexScraper::startTimeGroupIdx, CalendarSourceRegexScraper::startTimeGroupIdx);
 		binder.forField(startTimeDefaultTextField).bind(CalendarSourceRegexScraper::startTimeDefault, CalendarSourceRegexScraper::startTimeDefault);
 		binder.forField(endTimeGroupIdxIntegerField).bind(CalendarSourceRegexScraper::endTimeGroupIdx, CalendarSourceRegexScraper::endTimeGroupIdx);

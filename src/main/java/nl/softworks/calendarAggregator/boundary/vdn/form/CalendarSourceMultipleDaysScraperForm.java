@@ -25,7 +25,6 @@ public class CalendarSourceMultipleDaysScraperForm extends CalendarSourceScraper
 	private final IntegerField endDateGroupIdxIntegerField = new IntegerField("End date group index");
 	private final TextField datePatternTextField = new TextField("Date pattern");
 	private final Checkbox nearestYearCheckbox = new Checkbox("Use Nearest year");
-	private final IntegerField yearDefaultIntegerField = new IntegerField("Year default");
 	private final TextField startTimeDefaultTextField = new TextField("Start time default");
 	private final TextField endTimeDefaultTextField = new TextField("End time default");
 	private final TextField timePatternTextField = new TextField("Time pattern");
@@ -37,12 +36,11 @@ public class CalendarSourceMultipleDaysScraperForm extends CalendarSourceScraper
 
 		Button testButton = new Button("Test Regex", evt -> testRegex());
 		setColspan(testButton, 2);
-		add(regexTextField, testButton, datePatternTextField, nearestYearCheckbox, yearDefaultIntegerField, startTimeDefaultTextField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
+		add(regexTextField, testButton, datePatternTextField, nearestYearCheckbox, startTimeDefaultTextField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
 
 		binder.forField(regexTextField).bind(CalendarSourceMultipleDaysScraper::regex, CalendarSourceMultipleDaysScraper::regex);
 		binder.forField(datePatternTextField).bind(CalendarSourceMultipleDaysScraper::datePattern, CalendarSourceMultipleDaysScraper::datePattern);
 		binder.forField(nearestYearCheckbox).bind(CalendarSourceMultipleDaysScraper::nearestYear, CalendarSourceMultipleDaysScraper::nearestYear);
-		binder.forField(yearDefaultIntegerField).bind(CalendarSourceMultipleDaysScraper::yearDefault, CalendarSourceMultipleDaysScraper::yearDefault);
 		binder.forField(startTimeDefaultTextField).bind(CalendarSourceMultipleDaysScraper::startTimeDefault, CalendarSourceMultipleDaysScraper::startTimeDefault);
 		binder.forField(endTimeDefaultTextField).bind(CalendarSourceMultipleDaysScraper::endTimeDefault, CalendarSourceMultipleDaysScraper::endTimeDefault);
 		binder.forField(timePatternTextField).bind(CalendarSourceMultipleDaysScraper::timePattern, CalendarSourceMultipleDaysScraper::timePattern);

@@ -101,17 +101,6 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
         return this;
     }
 
-    @NotNull
-    private int yearDefault;
-    static public final String YEARDEFAULT_PROPERTYID = "yearDefault";
-    public int yearDefault() {
-        return yearDefault;
-    }
-    public CalendarSourceRegexScraper yearDefault(int v) {
-        this.yearDefault = v;
-        return this;
-    }
-
     private int startTimeGroupIdx;
     static public final String STARTTIMEGROUPIDX_PROPERTYID = "startTimeGroupIdx";
     public int startTimeGroupIdx() {
@@ -215,10 +204,6 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
                 if (nearestYear) {
                     MonthDay monthDay = MonthDay.parse(startDateString, dateFormatter);
                     startLocalDate = determineDateByNearestYear(monthDay);
-                }
-                else if (yearDefault > 0) {
-                    MonthDay monthDay = MonthDay.parse(startDateString, dateFormatter);
-                    startLocalDate = LocalDate.of(yearDefault, monthDay.getMonth(), monthDay.getDayOfMonth());
                 } else {
                     startLocalDate = LocalDate.parse(startDateString, dateFormatter);
                 }
@@ -226,10 +211,6 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
                 if (nearestYear) {
                     MonthDay monthDay = MonthDay.parse(endDateString, dateFormatter);
                     endLocalDate = determineDateByNearestYear(monthDay);
-                }
-                else if (yearDefault > 0) {
-                    MonthDay monthDay = MonthDay.parse(endDateString, dateFormatter);
-                    endLocalDate = LocalDate.of(yearDefault, monthDay.getMonth(), monthDay.getDayOfMonth());
                 } else {
                     endLocalDate = LocalDate.parse(endDateString, dateFormatter);
                 }
