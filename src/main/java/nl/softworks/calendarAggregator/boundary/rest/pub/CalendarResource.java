@@ -82,7 +82,7 @@ public class CalendarResource {
                   <body>
                     <section class="section">
                       <h1 class="title">Dance moments</h1>
-                      <h2 class="subtitle">Ballroom en latin</h2>
+                      <h2 class="subtitle">Ballroom and latin</h2>
                       <div class="block">%DISCLAIMER%</div>
                       <table class="table">
                         <thead>
