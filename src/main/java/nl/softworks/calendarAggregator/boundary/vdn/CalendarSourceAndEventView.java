@@ -64,13 +64,13 @@ implements AfterNavigationObserver
 		tabs.setSelectedTab(overviewTab);
 
 		// calendarSourceAndEventTreeGrid
-		calendarSourceAndEventTreeGrid.addHierarchyColumn(TreeNode::text).setHeader("Name");
-		calendarSourceAndEventTreeGrid.addComponentColumn((ValueProvider<TreeNode, Anchor>) tn -> createAnchor(tn.url())).setHeader("Website");
-		calendarSourceAndEventTreeGrid.addColumn(TreeNode::type).setHeader("Type");
-		calendarSourceAndEventTreeGrid.addColumn(TreeNode::startDate).setHeader("Start");
-		calendarSourceAndEventTreeGrid.addColumn(TreeNode::endDate).setHeader("End");
-		calendarSourceAndEventTreeGrid.addColumn(TreeNode::status).setHeader("Status");
-		calendarSourceAndEventTreeGrid.addColumn(TreeNode::eventCount).setHeader("Events");
+		calendarSourceAndEventTreeGrid.addHierarchyColumn(TreeNode::text).setHeader("Name").setFlexGrow(100);
+		calendarSourceAndEventTreeGrid.addComponentColumn((ValueProvider<TreeNode, Anchor>) tn -> createAnchor(tn.url())).setHeader("Website").setFlexGrow(5);
+		calendarSourceAndEventTreeGrid.addColumn(TreeNode::type).setHeader("Type").setFlexGrow(10);
+		calendarSourceAndEventTreeGrid.addColumn(TreeNode::startDate).setHeader("Start").setFlexGrow(50);
+		calendarSourceAndEventTreeGrid.addColumn(TreeNode::endDate).setHeader("End").setFlexGrow(50);
+		calendarSourceAndEventTreeGrid.addColumn(TreeNode::status).setHeader("Status").setFlexGrow(50);
+		calendarSourceAndEventTreeGrid.addColumn(TreeNode::eventCount).setHeader("Events").setFlexGrow(10);
 		calendarSourceAndEventTreeGrid.addItemDoubleClickListener(e -> edit());
 
 		// buttonbar

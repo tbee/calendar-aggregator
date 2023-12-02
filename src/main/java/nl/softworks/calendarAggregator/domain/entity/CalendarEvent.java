@@ -1,6 +1,8 @@
 package nl.softworks.calendarAggregator.domain.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.ValidationException;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import net.fortuna.ical4j.model.Date;
 import net.fortuna.ical4j.model.DateList;
@@ -142,5 +144,13 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 			+ ",endDateTime=" + endDateTime
 			+ ",rrule=" + rrule
 		    ;
+	}
+
+	@AssertTrue
+	public boolean isValid() {
+		if (!startDateTime.isBefore(endDateTime)) {
+			throw new ValidationException("Start (" + startDateTime + ") must be before end (" + endDateTime + ")");
+		}
+		return true;
 	}
 }
