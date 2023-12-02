@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 @RequestMapping("/pub")
 public class CalendarResource {
 
+    private static String DISCLAIMER = "Always check if events actually take place, and at what time exactly, on the respective websites. These dates are intended for easy planning, but may be outdated or incorrect. The listed times also are indicative; they are close enough for planning, but not necessarily the exact times.";
+
     // example http://localhost:8080/pub/calendar
     @GetMapping(path = "/calendar", produces = {"text/calendar"})
     public String calendar(HttpServletRequest request) {
@@ -81,11 +83,7 @@ public class CalendarResource {
                     <section class="section">
                       <h1 class="title">Dance moments</h1>
                       <h2 class="subtitle">Ballroom en latin</h2>
-                      <div class="block">
-                        Always check if events actually take place, and at what time exactly, on the respective websites.
-                        These dates are intended for easy planning, but may be outdated or incorrect.
-                        The listed times also are indicative; they are close enough for planning, but not necessarily the exact times.
-                      </div>
+                      <div class="block">%DISCLAIMER%</div>
                       <table class="table">
                         <thead>
                           <tr>
@@ -99,9 +97,10 @@ public class CalendarResource {
                         </tbody>
                       </table>
                     </section>
-                          </body>
+                  </body>
                 </html>
-                """.replace("%events%", stripClosingNewline(events))
+                """.replace("%DISCLAIMER%", DISCLAIMER)
+                   .replace("%events%", stripClosingNewline(events))
         );
     }
 
@@ -140,13 +139,26 @@ public class CalendarResource {
                 .replace("%tzid%", calendarEvent.calendarSource().timezone().name())
                 .replace("%dtStart%", dateTimeFormatter.format(calendarEvent.startDateTime()))
                 .replace("%dtEnd%", dateTimeFormatter.format(calendarEvent.endDateTime()))
-                .replace("%summary%", (calendarEvent.calendarSource().name() + " " + calendarEvent.subject()).trim())
-                .replace("%location%", calendarEvent.calendarSource().location().replace("\n", ", "))
-                .replace("%description%", calendarEvent.calendarSource().url())
-                .replace("%rrule%", (calendarEvent.rrule().isBlank() ? "" : "RRULE:" + calendarEvent.rrule()))
+                .replace("%summary%", wrap((calendarEvent.calendarSource().name() + " " + calendarEvent.subject()).trim()))
+                .replace("%location%", wrap(calendarEvent.calendarSource().location().replace("\n", ", ")))
+                .replace("%description%", wrap(calendarEvent.calendarSource().url() + "\\n\\n" + DISCLAIMER))
+                .replace("%rrule%", wrap((calendarEvent.rrule().isBlank() ? "" : "RRULE:" + calendarEvent.rrule())))
                 .replaceAll("(?m)^[ \t]*\r?\n", ""); // strip empty lines
         // https://www.kanzaki.com/docs/ical/exdate.html
         // EXDATE:19960402T010000Z,19960403T010000Z,19960404T010000Z
+    }
+
+    private String wrap(String s) {
+        String wrapped = "";
+        int cutOff = 60;
+        while (s.length() > cutOff) {
+            wrapped += (wrapped.isBlank() ? "" : "\r\n ") + s.substring(0, cutOff);
+            s = s.substring(cutOff);
+        }
+        if (!s.isBlank()) {
+            wrapped += (wrapped.isBlank() ? "" : "\r\n ") + s;
+        }
+        return wrapped;
     }
 
     private String tr(CalendarEvent calendarEvent) {
