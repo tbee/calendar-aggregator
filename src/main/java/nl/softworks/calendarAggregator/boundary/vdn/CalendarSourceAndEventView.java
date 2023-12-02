@@ -299,7 +299,7 @@ implements AfterNavigationObserver
 
 		@Override
 		public String type() {
-			return "";
+			return calendarEvent.rrule().isBlank() ? "" : "Recurring";
 		}
 		@Override
 		public String url() {
@@ -327,9 +327,13 @@ implements AfterNavigationObserver
 			new OkCancelDialog("Event", calendarEventForm)
 					.okLabel("Save")
 					.onOk(() -> {
-						calendarEventForm.writeTo(calendarEvent);
-						R.calendarEvent().save(calendarEvent);
-						onOk.run();
+						try {
+							calendarEventForm.writeTo(calendarEvent);
+							R.calendarEvent().save(calendarEvent);
+							onOk.run();
+						} catch (ValidationException e) {
+							throw new RuntimeException(e);
+						}
 					})
 					.open();
 		}
@@ -353,7 +357,9 @@ implements AfterNavigationObserver
 
 	public List<TreeNode> getTreeNodeChildren(TreeNode treeNode) {
 		if (treeNode instanceof TreeNodeCalendarSource treeNodeCalendarSource) {
-			return treeNodes(treeNodeCalendarSource.calendarSource().calendarEvents(), ce -> new TreeNodeCalendarEvent(treeNodeCalendarSource, ce));
+			List<CalendarEvent> calendarEvents = treeNodeCalendarSource.calendarSource().calendarEvents();
+			calendarEvents.sort(Comparator.comparing(CalendarEvent::startDateTime));
+			return treeNodes(calendarEvents, ce -> new TreeNodeCalendarEvent(treeNodeCalendarSource, ce));
 		}
 		return List.of();
 	}

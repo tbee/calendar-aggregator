@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- https://xenovation.com/blog/development/java/java-professional-developer/liquibase-related-sql-java-types -->
+
+    <changeSet id="20231202a" author="tom">
+        <addColumn tableName="calendar_event" >
+            <column name="rrule" type="nvarchar(500)" defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <update tableName="calendar_event">
+            <column name="rrule" value=""/>
+        </update>
+    </changeSet>
+</databaseChangeLog>

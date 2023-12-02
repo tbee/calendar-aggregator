@@ -1,16 +1,13 @@
 package nl.softworks.calendarAggregator.domain.entity;
 
-import nl.softworks.calendarAggregator.domain.boundary.R;
-import org.glassfish.jaxb.core.v2.TODO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
-public class CalendarSourceRegexScraperTest {
+public class CalendarSourcesTest {
 
     @Test
     public void citydance_20231127a_regexPlusTime() {

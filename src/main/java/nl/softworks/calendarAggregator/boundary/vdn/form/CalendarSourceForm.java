@@ -45,7 +45,7 @@ public class CalendarSourceForm extends FormLayout {
 			return nameSpan;
 		}));
 		setColspan(statusTextField, 2);
-		add(nameTextField, urlTextField, locationTextField, timezoneComboBox, latNumberField, lonNumberField, statusTextField);
+		add(nameTextField, urlTextField, locationTextField, latNumberField, lonNumberField, timezoneComboBox, statusTextField);
 
 		Button generateButton = new Button("Generate", evt -> generate());
 		setColspan(generateButton, 2);

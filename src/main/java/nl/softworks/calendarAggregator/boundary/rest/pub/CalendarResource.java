@@ -65,6 +65,7 @@ public class CalendarResource {
         LocalDateTime pastThreshold = LocalDateTime.now().minusDays(1);
         LocalDateTime futureThreshold = LocalDateTime.now().plusMonths(5);
         String events = R.calendarEvent().findAll().stream()
+                .flatMap(e -> e.applyRRule().stream()) // for HTML we need to generate the actual events
                 .filter(e -> pastThreshold.isBefore(e.startDateTime()) && futureThreshold.isAfter(e.startDateTime()))
                 .sorted(Comparator.comparing(CalendarEvent::startDateTime))
                 .map(this::tr)
@@ -127,6 +128,7 @@ public class CalendarResource {
 				SUMMARY:%summary%
 				DESCRIPTION:%description%
 				LOCATION:%location%
+				%rrule%
 				END:VEVENT
 				"""
                 .replace("%uid%", calendarEvent.id() + "@dancemoments.softworks.nl")
@@ -136,7 +138,10 @@ public class CalendarResource {
                 .replace("%summary%", (calendarEvent.calendarSource().name() + " " + calendarEvent.subject()).trim())
                 .replace("%location%", calendarEvent.calendarSource().location().replace("\n", ", "))
                 .replace("%description%", calendarEvent.calendarSource().url())
-                ;
+                .replace("%rrule%", (calendarEvent.rrule().isBlank() ? "" : "RRULE:" + calendarEvent.rrule()))
+                .replaceAll("(?m)^[ \t]*\r?\n", ""); // strip empty lines
+        // https://www.kanzaki.com/docs/ical/exdate.html
+        // EXDATE:19960402T010000Z,19960403T010000Z,19960404T010000Z
     }
 
     private String tr(CalendarEvent calendarEvent) {

@@ -123,7 +123,7 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.EAGER)
     protected final List<CalendarEvent> calendarEvents = new ArrayList<>();
 	public List<CalendarEvent> calendarEvents() {
-		return Collections.unmodifiableList(calendarEvents);
+		return new ArrayList<>(calendarEvents);
 	}
 	public void addCalendarEvent(CalendarEvent rosterDate) {
 		calendarEvents.add(rosterDate);
