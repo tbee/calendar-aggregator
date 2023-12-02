@@ -81,20 +81,25 @@ public class CalendarResource {
                     <section class="section">
                       <h1 class="title">Dance moments</h1>
                       <h2 class="subtitle">Ballroom en latin</h2>
+                      <div class="block">
+                        Always check if events actually take place, and at what time exactly, on the respective websites.
+                        These dates are intended for easy planning, but may be outdated or incorrect.
+                        The listed times also are indicative; they are close enough for planning, but not necessarily the exact times.
+                      </div>
                       <table class="table">
                         <thead>
-				          <tr>
-				            <td>When</td>
-				            <td>What</td>
-				            <td>Web</td>
-				          </tr>
+                          <tr>
+                            <td>When</td>
+                            <td>What</td>
+                            <td>Web</td>
+                          </tr>
                         </thead>
                         <tbody>
                           %events%
                         </tbody>
                       </table>
                     </section>
-                  </body>
+                          </body>
                 </html>
                 """.replace("%events%", stripClosingNewline(events))
         );
@@ -157,7 +162,7 @@ public class CalendarResource {
 				<tr>
 				<td>%when%</td>
 				<td>%what%</td>
-				<td><a href="%url%" target="_blank">info</a></td>
+				<td><a href="%url%" target="_blank">check here</a></td>
 				</tr>
 				"""
                 .replace("%when%", when)
