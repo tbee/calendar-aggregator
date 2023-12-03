@@ -83,8 +83,9 @@ public class CalendarSourceForm extends FormLayout {
 		StringBuilder stringBuilder = new StringBuilder();
 		try {
 			writeTo(calendarSource);
-
 			List<CalendarEvent> calendarEvents = calendarSource.generateEvents(stringBuilder);
+			populateWith(calendarSource);
+
 			String calendarEventsString = calendarEvents.stream().map(s -> s + "\n").collect(Collectors.joining());
 			stringBuilder.append("\n\n").append(calendarEventsString);
 		}
