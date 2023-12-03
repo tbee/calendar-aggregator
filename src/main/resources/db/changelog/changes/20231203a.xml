@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- https://xenovation.com/blog/development/java/java-professional-developer/liquibase-related-sql-java-types -->
+
+    <changeSet id="20231202a" author="tom">
+        <createTable tableName="calendar_event_exdate">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lazylock" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="calendar_event_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="excluded_date" type="date">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint  constraintName="calendar_event_exdate__calendar_event"
+                                  baseTableName="calendar_event_exdate"
+                                  baseColumnNames="calendar_event_id"
+                                  referencedTableName="calendar_event"
+                                  referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

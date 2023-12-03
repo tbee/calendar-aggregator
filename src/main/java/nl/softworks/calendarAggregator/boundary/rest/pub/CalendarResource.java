@@ -3,11 +3,14 @@ package nl.softworks.calendarAggregator.boundary.rest.pub;
 import jakarta.servlet.http.HttpServletRequest;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
+import nl.softworks.calendarAggregator.domain.entity.CalendarEventExdate;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -59,10 +62,6 @@ public class CalendarResource {
     // example http://localhost:8080/pub/html
     @GetMapping(path = "/html", produces = {"text/html"})
     public String html(HttpServletRequest request) {
-
-        String timezones = R.timezoneRepo().findAll().stream()
-                .map(tz -> tz.ical())
-                .collect(Collectors.joining());
 
         LocalDateTime pastThreshold = LocalDateTime.now().minusDays(1);
         LocalDateTime futureThreshold = LocalDateTime.now().plusMonths(5);
@@ -120,6 +119,14 @@ public class CalendarResource {
     private String ical(CalendarEvent calendarEvent) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss");
 
+        // Create EXDATE value
+        // EXDATE:19960402T010000Z,19960403T010000Z,19960404T010000Z
+        String exdate = calendarEvent.calendarEventExdates().stream()
+                .map(CalendarEventExdate::excludedDate)
+                .map(ld -> LocalDateTime.of(ld, calendarEvent.startDateTime().toLocalTime()))
+                .map(ldt -> dateTimeFormatter.format(ldt) + "Z")
+                .collect(Collectors.joining(","));
+
         // https://www.kanzaki.com/docs/ical/location.html
         return 	"""
 				BEGIN:VEVENT
@@ -133,6 +140,7 @@ public class CalendarResource {
 				DESCRIPTION:%description%
 				LOCATION:%location%
 				%rrule%
+				%exdate%
 				END:VEVENT
 				"""
                 .replace("%uid%", calendarEvent.id() + "@dancemoments.softworks.nl")
@@ -143,9 +151,10 @@ public class CalendarResource {
                 .replace("%location%", wrap(calendarEvent.calendarSource().location().replace("\n", ", ")))
                 .replace("%description%", wrap(calendarEvent.calendarSource().url() + "\\n\\n" + DISCLAIMER))
                 .replace("%rrule%", wrap((calendarEvent.rrule().isBlank() ? "" : "RRULE:" + calendarEvent.rrule())))
+                .replace("%exdate%", wrap((calendarEvent.rrule().isBlank() ? "" : "EXDATE:" + exdate)))
                 .replaceAll("(?m)^[ \t]*\r?\n", ""); // strip empty lines
         // https://www.kanzaki.com/docs/ical/exdate.html
-        // EXDATE:19960402T010000Z,19960403T010000Z,19960404T010000Z
+
     }
 
     private String wrap(String s) {

@@ -357,7 +357,7 @@ implements AfterNavigationObserver
 
 	public List<TreeNode> getTreeNodeChildren(TreeNode treeNode) {
 		if (treeNode instanceof TreeNodeCalendarSource treeNodeCalendarSource) {
-			List<CalendarEvent> calendarEvents = treeNodeCalendarSource.calendarSource().calendarEvents();
+			List<CalendarEvent> calendarEvents = new ArrayList<>(treeNodeCalendarSource.calendarSource().calendarEvents());
 			calendarEvents.sort(Comparator.comparing(CalendarEvent::startDateTime));
 			return treeNodes(calendarEvents, ce -> new TreeNodeCalendarEvent(treeNodeCalendarSource, ce));
 		}
