@@ -6,11 +6,9 @@ import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEventExdate;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -18,16 +16,18 @@ import java.util.stream.Collectors;
 public class CalendarResource {
 
     private static String DISCLAIMER = "Always check if events actually take place, and at what time exactly, on the respective websites. These dates are intended for easy planning, but may be outdated or incorrect. The listed times also are indicative; they are close enough for planning, but not necessarily the exact times.";
+    private static int EARTH_RADIUS = 6371;
 
     // example http://localhost:8080/pub/calendar
+    @Deprecated
     @GetMapping(path = "/calendar", produces = {"text/calendar"})
     public String calendar(HttpServletRequest request) {
-        return ical(request);
+        return ical(request, 0.0, 0.0, 0);
     }
 
     // example http://localhost:8080/pub/ical
     @GetMapping(path = "/ical", produces = {"text/calendar"})
-    public String ical(HttpServletRequest request) {
+    public String ical(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d) {
 
         String timezones = R.timezoneRepo().findAll().stream()
                 .map(tz -> tz.ical())
@@ -36,7 +36,8 @@ public class CalendarResource {
         LocalDateTime pastThreshold = LocalDateTime.now().minusMonths(1);
         LocalDateTime futureThreshold = LocalDateTime.now().plusMonths(4);
         String events = R.calendarEvent().findAll().stream()
-                .filter(e -> pastThreshold.isBefore(e.startDateTime()) && futureThreshold.isAfter(e.startDateTime()))
+                .filter(ce -> pastThreshold.isBefore(ce.startDateTime()) && futureThreshold.isAfter(ce.startDateTime()))
+                .filter(ce -> d == 0 || d > (int)calculateDistance(lat, lon, ce.calendarSource().lat(), ce.calendarSource().lon()))
                 .map(this::ical)
                 .collect(Collectors.joining());
 
@@ -61,13 +62,14 @@ public class CalendarResource {
 
     // example http://localhost:8080/pub/html
     @GetMapping(path = "/html", produces = {"text/html"})
-    public String html(HttpServletRequest request) {
+    public String html(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d) {
 
         LocalDateTime pastThreshold = LocalDateTime.now().minusDays(1);
         LocalDateTime futureThreshold = LocalDateTime.now().plusMonths(5);
         String events = R.calendarEvent().findAll().stream()
-                .flatMap(e -> e.applyRRule().stream()) // for HTML we need to generate the actual events
-                .filter(e -> pastThreshold.isBefore(e.startDateTime()) && futureThreshold.isAfter(e.startDateTime()))
+                .flatMap(ce -> ce.applyRRule().stream()) // for HTML we need to generate the actual events
+                .filter(ce -> pastThreshold.isBefore(ce.startDateTime()) && futureThreshold.isAfter(ce.startDateTime()))
+                .filter(ce -> d == 0 || d > (int)calculateDistance(lat, lon, ce.calendarSource().lat(), ce.calendarSource().lon()))
                 .sorted(Comparator.comparing(CalendarEvent::startDateTime))
                 .map(this::tr)
                 .collect(Collectors.joining());
@@ -82,7 +84,7 @@ public class CalendarResource {
                     <section class="section">
                       <h1 class="title">Dance moments</h1>
                       <h2 class="subtitle">Ballroom and latin</h2>
-                      <div class="block">%DISCLAIMER%</div>
+                      <div class="notification" style="max-width:1000px">%DISCLAIMER%</div>
                       <table class="table">
                         <thead>
                           <tr>
@@ -95,6 +97,20 @@ public class CalendarResource {
                           %events%
                         </tbody>
                       </table>
+                      <div class="notification" style="max-width:1000px">
+                        <p>
+                          You can limit the amount of entries by filtering on distance (as the crow flies).
+                          For this you need to determine the decimal latitude (lat) and longitude (lon) of where you live, for example by using Google maps.
+                          Then add these as parameters to the request, together with a distance (d) in kilometers. 
+                          For example:
+                        </p>
+                        <p style="margin-top:5px;">
+                          .../pub/html?lat=51.9214012&lon=6.5761531&d=40
+                        </p>
+                        <p style="margin-top:5px;">
+                          This is also possible for /pub/ical.
+                        </p>
+                      </div>
                     </section>
                   </body>
                 </html>
@@ -190,5 +206,23 @@ public class CalendarResource {
                 .replace("%what%", what)
                 .replace("%url%", calendarEvent.calendarSource().url())
                 ;
+    }
+
+    // https://www.baeldung.com/java-find-distance-between-points
+    private double calculateDistance(double startLat, double startLong, double endLat, double endLong) {
+
+        double dLat = Math.toRadians(endLat - startLat);
+        double dLong = Math.toRadians(endLong - startLong);
+
+        startLat = Math.toRadians(startLat);
+        endLat = Math.toRadians(endLat);
+
+        double a = haversine(dLat) + Math.cos(startLat) * Math.cos(endLat) * haversine(dLong);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return EARTH_RADIUS * c;
+    }
+    private double haversine(double val) {
+        return Math.pow(Math.sin(val / 2), 2);
     }
 }
