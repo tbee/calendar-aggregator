@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -41,7 +43,7 @@ public class CalendarResource {
                 .map(this::ical)
                 .collect(Collectors.joining());
 
-        return crlf(
+        return icalFormat(
                 """
                 BEGIN:VCALENDAR
                 VERSION:2.0
@@ -74,8 +76,7 @@ public class CalendarResource {
                 .map(this::tr)
                 .collect(Collectors.joining());
 
-        return crlf(
-                """
+        return  """
                 <html>
                   <head>
                     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
@@ -115,8 +116,7 @@ public class CalendarResource {
                   </body>
                 </html>
                 """.replace("%DISCLAIMER%", DISCLAIMER)
-                   .replace("%events%", stripClosingNewline(events))
-        );
+                   .replace("%events%", stripClosingNewline(events));
     }
 
     private String stripClosingNewline(String s) {
@@ -126,10 +126,24 @@ public class CalendarResource {
         return s;
     }
 
-    private String crlf(String s) {
+    private String icalFormat(String s) {
         return s.replace("\r", "")
-                .replace("\n", "\r\n");
+                .lines()
+                .flatMap(l -> wrap(75, l).stream())
+                .collect(Collectors.joining("\r\n"));
+    }
 
+    private List<String> wrap(int cutOff, String s) {
+        cutOff--; // compensate for the space that is prefixed
+        List<String> lines = new ArrayList<>();
+        while (s.length() > cutOff) {
+            lines.add((lines.isEmpty() ? "" : " ") + s.substring(0, cutOff));
+            s = s.substring(cutOff);
+        }
+        if (!s.isEmpty()) {
+            lines.add((lines.isEmpty() ? "" : " ") + s);
+        }
+        return lines;
     }
 
     private String ical(CalendarEvent calendarEvent) {
@@ -163,27 +177,14 @@ public class CalendarResource {
                 .replace("%tzid%", calendarEvent.calendarSource().timezone().name())
                 .replace("%dtStart%", dateTimeFormatter.format(calendarEvent.startDateTime()))
                 .replace("%dtEnd%", dateTimeFormatter.format(calendarEvent.endDateTime()))
-                .replace("%summary%", wrap((calendarEvent.calendarSource().name() + " " + calendarEvent.subject()).trim()))
-                .replace("%location%", wrap(calendarEvent.calendarSource().location().replace("\n", ", ")))
-                .replace("%description%", wrap(calendarEvent.calendarSource().url() + "\\n\\n" + DISCLAIMER))
-                .replace("%rrule%", wrap((calendarEvent.rrule().isBlank() ? "" : "RRULE:" + calendarEvent.rrule())))
-                .replace("%exdate%", wrap((calendarEvent.rrule().isBlank() ? "" : "EXDATE:" + exdate)))
+                .replace("%summary%", (calendarEvent.calendarSource().name() + " " + calendarEvent.subject()).trim())
+                .replace("%location%", calendarEvent.calendarSource().location().replace("\n", ", "))
+                .replace("%description%", calendarEvent.calendarSource().url() + "\\n\\n" + DISCLAIMER)
+                .replace("%rrule%", (calendarEvent.rrule().isBlank() ? "" : "RRULE:" + calendarEvent.rrule()))
+                .replace("%exdate%", (exdate.isBlank() ? "" : "EXDATE:" + exdate))
                 .replaceAll("(?m)^[ \t]*\r?\n", ""); // strip empty lines
         // https://www.kanzaki.com/docs/ical/exdate.html
 
-    }
-
-    private String wrap(String s) {
-        String wrapped = "";
-        int cutOff = 60;
-        while (s.length() > cutOff) {
-            wrapped += (wrapped.isBlank() ? "" : "\r\n ") + s.substring(0, cutOff);
-            s = s.substring(cutOff);
-        }
-        if (!s.isBlank()) {
-            wrapped += (wrapped.isBlank() ? "" : "\r\n ") + s;
-        }
-        return wrapped;
     }
 
     private String tr(CalendarEvent calendarEvent) {
