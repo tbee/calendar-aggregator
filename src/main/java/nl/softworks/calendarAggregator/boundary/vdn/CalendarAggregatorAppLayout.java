@@ -20,14 +20,10 @@ import com.vaadin.flow.server.VaadinSession;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import nl.softworks.calendarAggregator.boundary.SpringUtils;
+import nl.softworks.calendarAggregator.boundary.vdn.view.CalendarSourceAndEventView;
+import nl.softworks.calendarAggregator.boundary.vdn.view.TimezoneView;
 import nl.softworks.calendarAggregator.domain.ValidationException;
-import nl.softworks.calendarAggregator.domain.boundary.R;
-import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
-import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
-import nl.softworks.calendarAggregator.domain.entity.CalendarSourceMultipleDaysScraper;
-import nl.softworks.calendarAggregator.domain.entity.CalendarSourceRegexScraper;
 import nl.softworks.calendarAggregator.domain.entity.Person;
-import nl.softworks.calendarAggregator.domain.entity.Timezone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,12 +34,9 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.concurrent.Callable;
 
-abstract class CalendarAggregatorAppLayout extends AppLayout // https://vaadin.com/docs/latest/components/app-layout
+public abstract class CalendarAggregatorAppLayout extends AppLayout // https://vaadin.com/docs/latest/components/app-layout
 implements HasDynamicTitle {
 	private static final Logger LOG = LoggerFactory.getLogger(CalendarAggregatorAppLayout.class);
 

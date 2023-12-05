@@ -1,4 +1,4 @@
-package nl.softworks.calendarAggregator.boundary.vdn;
+package nl.softworks.calendarAggregator.boundary.vdn.view;
 
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.grid.Grid;
@@ -9,6 +9,7 @@ import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
+import nl.softworks.calendarAggregator.boundary.vdn.CalendarAggregatorAppLayout;
 import nl.softworks.calendarAggregator.boundary.vdn.component.CrudButtonbar;
 import nl.softworks.calendarAggregator.boundary.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.boundary.vdn.form.TimezoneForm;

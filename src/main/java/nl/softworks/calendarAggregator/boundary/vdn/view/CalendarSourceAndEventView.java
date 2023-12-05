@@ -1,11 +1,10 @@
-package nl.softworks.calendarAggregator.boundary.vdn;
+package nl.softworks.calendarAggregator.boundary.vdn.view;
 
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.AnchorTargetValue;
 import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
@@ -16,6 +15,7 @@ import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
+import nl.softworks.calendarAggregator.boundary.vdn.CalendarAggregatorAppLayout;
 import nl.softworks.calendarAggregator.boundary.vdn.component.CancelDialog;
 import nl.softworks.calendarAggregator.boundary.vdn.component.CrudButtonbar;
 import nl.softworks.calendarAggregator.boundary.vdn.component.OkCancelDialog;
