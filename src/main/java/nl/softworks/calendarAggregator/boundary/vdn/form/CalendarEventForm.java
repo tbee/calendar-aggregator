@@ -1,5 +1,7 @@
 package nl.softworks.calendarAggregator.boundary.vdn.form;
 
+import com.vaadin.flow.component.AbstractField;
+import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -24,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -40,21 +43,22 @@ public class CalendarEventForm extends FormLayout {
 	protected final List<CalendarEventExdate> calendarEventExdates = new ArrayList<>();
 	private final TextField subjectTextField = new TextField("Summary");
 	private final DatePicker.DatePickerI18n datePickerIsoFormat = new DatePicker.DatePickerI18n();
+	private final Anchor rruleHelpAnchor = new Anchor("https://freetools.textmagic.com/rrule-generator", "RRule builder", AnchorTarget.BLANK);
+	private final CrudButtonbar crudButtonbar = new CrudButtonbar()
+			.onInsert(this::insertExdate)
+			.onEdit(this::editExdate)
+			.onDelete(this::deleteExdate);
 
 	public CalendarEventForm() {
 		datePickerIsoFormat.setDateFormat("yyyy-MM-dd");
 		startDateTimePicker.setDatePickerI18n(datePickerIsoFormat);
 		endDateTimePicker.setDatePickerI18n(datePickerIsoFormat);
 
-		Anchor rruleHelpAnchor = new Anchor("https://freetools.textmagic.com/rrule-generator", "RRule builder", AnchorTarget.BLANK);
 		calendarEventExdateListBox.setRenderer(new ComponentRenderer<>(cee -> {
 			Span excludedDateSpan = new Span(cee.excludedDate().toString());
 			return excludedDateSpan;
 		}));
-		CrudButtonbar crudButtonbar = new CrudButtonbar()
-				.onInsert(this::insertExdate)
-				.onEdit(this::editExdate)
-				.onDelete(this::deleteExdate);
+
 		add(startDateTimePicker, endDateTimePicker, rruleTextField, rruleHelpAnchor);
 		HorizontalLayout exdateGroup = new HorizontalLayout(calendarEventExdateListBox, crudButtonbar);
 		addFormItem(exdateGroup, "Exdates");
@@ -64,6 +68,12 @@ public class CalendarEventForm extends FormLayout {
 		binder.forField(endDateTimePicker).bind(CalendarEvent::endDateTime, CalendarEvent::endDateTime);
 		binder.forField(rruleTextField).bind(CalendarEvent::rrule, CalendarEvent::rrule);
 		binder.forField(subjectTextField).bind(CalendarEvent::subject, CalendarEvent::subject);
+
+		startDateTimePicker.addValueChangeListener(event -> {
+			if (endDateTimePicker.isEmpty()) {
+				endDateTimePicker.setValue(startDateTimePicker.getValue());
+			}
+        });
 	}
 
 	private void deleteExdate() {
