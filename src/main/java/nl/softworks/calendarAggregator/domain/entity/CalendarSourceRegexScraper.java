@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -200,37 +201,58 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
                 String startTimeString = startTimeGroupIdx < 1 ? startTimeDefault : matcher.group(startTimeGroupIdx);
                 String endTimeString = endTimeGroupIdx < 1 ? endTimeDefault : matcher.group(endTimeGroupIdx);
 
-                LocalDate startLocalDate;
-                if (nearestYear) {
-                    MonthDay monthDay = MonthDay.parse(startDateString, dateFormatter);
-                    startLocalDate = determineDateByNearestYear(monthDay);
-                } else {
-                    startLocalDate = LocalDate.parse(startDateString, dateFormatter);
-                }
-                LocalDate endLocalDate;
-                if (nearestYear) {
-                    MonthDay monthDay = MonthDay.parse(endDateString, dateFormatter);
-                    endLocalDate = determineDateByNearestYear(monthDay);
-                } else {
-                    endLocalDate = LocalDate.parse(endDateString, dateFormatter);
-                }
-                LocalTime startLocalTime = LocalTime.parse(startTimeString, timeFormatter);
-                LocalTime endLocalTime = LocalTime.parse(endTimeString, timeFormatter);
+                try {
+                    LocalDate startLocalDate;
+                    if (nearestYear) {
+                        MonthDay monthDay = MonthDay.parse(startDateString, dateFormatter);
+                        startLocalDate = determineDateByNearestYear(monthDay);
+                    } else {
+                        if (stringBuilder != null) stringBuilder.append("Parsing ").append(startDateString).append(" with ").append(datePattern).append("\n");
+                        startLocalDate = LocalDate.parse(startDateString, dateFormatter);
+                    }
+                    LocalDate endLocalDate;
+                    if (nearestYear) {
+                        MonthDay monthDay = MonthDay.parse(endDateString, dateFormatter);
+                        endLocalDate = determineDateByNearestYear(monthDay);
+                    } else {
+                        if (stringBuilder != null) stringBuilder.append("Parsing ").append(endDateString).append(" with ").append(datePattern).append("\n");
+                        endLocalDate = LocalDate.parse(endDateString, dateFormatter);
+                    }
+                    if (stringBuilder != null) stringBuilder.append("Parsing ").append(startTimeString).append(" with ").append(timePattern).append("\n");
+                    LocalTime startLocalTime = LocalTime.parse(startTimeString, timeFormatter);
+                    if (stringBuilder != null) stringBuilder.append("Parsing ").append(endTimeString).append(" with ").append(timePattern).append("\n");
+                    LocalTime endLocalTime = LocalTime.parse(endTimeString, timeFormatter);
 
-                LocalDateTime startLocalDateTime = LocalDateTime.of(startLocalDate, startLocalTime);
-                if (stringBuilder != null) stringBuilder.append("startLocalDateTime: ").append(startLocalDateTime).append("\n");
-                LocalDateTime endLocalDateTime = LocalDateTime.of(endLocalDate, endLocalTime);
-                if (stringBuilder != null) stringBuilder.append("endLocalDateTime: ").append(endLocalDateTime).append("\n");
-                if (endLocalDateTime.isBefore(startLocalDateTime)) {
-                    endLocalDateTime = endLocalDateTime.plusDays(1); // This is to correct an end time that is on or after midnight
-                    if (stringBuilder != null) stringBuilder.append("End moment < start moment, added one day: ").append(endLocalDateTime).append("\n");
-                }
+                    LocalDateTime startLocalDateTime = LocalDateTime.of(startLocalDate, startLocalTime);
+                    if (stringBuilder != null) stringBuilder.append("startLocalDateTime: ").append(startLocalDateTime).append("\n");
+                    LocalDateTime endLocalDateTime = LocalDateTime.of(endLocalDate, endLocalTime);
+                    if (stringBuilder != null) stringBuilder.append("endLocalDateTime: ").append(endLocalDateTime).append("\n");
+                    if (endLocalDateTime.isBefore(startLocalDateTime)) {
+                        endLocalDateTime = endLocalDateTime.plusDays(1); // This is to correct an end time that is on or after midnight
+                        if (stringBuilder != null) stringBuilder.append("End moment < start moment, added one day: ").append(endLocalDateTime).append("\n");
+                    }
 
-                CalendarEvent calendarEvent = new CalendarEvent()
-                        .subject(subject)
-                        .startDateTime(startLocalDateTime)
-                        .endDateTime(endLocalDateTime);
-                addCalendarEvent(calendarEvent);
+                    CalendarEvent calendarEvent = new CalendarEvent()
+                            .subject(subject)
+                            .startDateTime(startLocalDateTime)
+                            .endDateTime(endLocalDateTime);
+                    addCalendarEvent(calendarEvent);
+                }
+                catch (DateTimeParseException e) {
+                    if (stringBuilder != null) {
+                        try {
+                            stringBuilder.append("Date example: ").append(LocalDate.of(2023,12,31).format(dateFormatter)).append("\n");
+                        } catch (DateTimeParseException e2) {
+                            // ignore
+                        }
+                        try {
+                            stringBuilder.append("Time example: ").append(LocalTime.of(12,23,45).format(timeFormatter)).append("\n");
+                        } catch (DateTimeParseException e2) {
+                            // ignore
+                        }
+                    }
+                    throw e;
+                }
             }
             if (stringBuilder != null) stringBuilder.append("Done\n");
             if (calendarEvents().isEmpty()) {
