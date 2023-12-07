@@ -33,7 +33,13 @@ public class R {
 
     @Autowired
     TimezoneRepo timezoneRepo;
-    static public TimezoneRepo timezoneRepo() {
+    static public TimezoneRepo timezone() {
         return R.singleton.timezoneRepo;
+    }
+
+    @Autowired
+    SettingsRepo settingsRepo;
+    static public SettingsRepo settings() {
+        return R.singleton.settingsRepo;
     }
 }

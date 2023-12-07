@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEventExdate;
+import nl.softworks.calendarAggregator.domain.entity.Settings;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -17,7 +18,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/pub")
 public class CalendarResource {
 
-    private static String DISCLAIMER = "Always check if events actually take place, and at what time exactly, on the respective websites. These dates are intended for easy planning, but may be outdated or incorrect. The listed times also are indicative; they are close enough for planning, but not necessarily the exact times.";
     private static int EARTH_RADIUS = 6371;
 
     // example http://localhost:8080/pub/calendar
@@ -31,7 +31,7 @@ public class CalendarResource {
     @GetMapping(path = "/ical", produces = {"text/calendar"})
     public String ical(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d) {
 
-        String timezones = R.timezoneRepo().findAll().stream()
+        String timezones = R.timezone().findAll().stream()
                 .map(tz -> tz.ical())
                 .collect(Collectors.joining());
 
@@ -43,11 +43,13 @@ public class CalendarResource {
                 .map(this::ical)
                 .collect(Collectors.joining());
 
+        Settings settings = Settings.get();
+
         return icalFormat(
                 """
                 BEGIN:VCALENDAR
                 VERSION:2.0
-                PRODID:-//Softworks//NONSGML Dance moments//EN
+                PRODID:-//Softworks//NONSGML %title%//EN
                 CALSCALE:GREGORIAN
                 METHOD:PUBLISH
                 REFRESH-INTERVAL;VALUE=DURATION:P1D
@@ -56,6 +58,7 @@ public class CalendarResource {
                 %events%
                 END:VCALENDAR
                 """
+                .replace("%title%", settings.title())
                 .replace("%timezones%", stripClosingNewline(timezones))
                 .replace("%events%", stripClosingNewline(events))
         );
@@ -76,6 +79,8 @@ public class CalendarResource {
                 .map(this::tr)
                 .collect(Collectors.joining());
 
+        Settings settings = Settings.get();
+
         return  """
                 <html>
                   <head>
@@ -83,9 +88,9 @@ public class CalendarResource {
                   </head>
                   <body>
                     <section class="section">
-                      <h1 class="title">Dance moments</h1>
-                      <h2 class="subtitle">Ballroom and latin</h2>
-                      <div class="notification" style="max-width:1000px">%DISCLAIMER%</div>
+                      <h1 class="title">%title%</h1>
+                      <h2 class="subtitle">%subtitle%</h2>
+                      <div class="block" style="max-width:1000px">%disclaimer%</div>
                       <table class="table">
                         <thead>
                           <tr>
@@ -100,22 +105,34 @@ public class CalendarResource {
                       </table>
                       <div class="notification" style="max-width:1000px">
                         <p>
+                          This list is also available in calendar form.
+                          You can add it to, for example, Google calendar by adding an external URL calendar using the following URL:
+                        </p>
+                        <p style="margin-top:5px;">
+                          <a href="%baseurl%/pub/ical" target="_blank">%baseurl%/pub/ical</a>
+                        </p>
+                      </div>
+                      <div class="notification" style="max-width:1000px">
+                        <p>
                           You can limit the amount of entries by filtering on distance (as the crow flies).
                           For this you need to determine the decimal latitude (lat) and longitude (lon) of where you live, for example by using Google maps.
-                          Then add these as parameters to the request, together with a distance (d) in kilometers. 
+                          Then add these as parameters to the URL, together with a distance (d) in kilometers. 
                           For example:
                         </p>
                         <p style="margin-top:5px;">
-                          .../pub/html?lat=51.9214012&lon=6.5761531&d=40
+                          <a href="%baseurl%/pub/html?lat=51.9214012&lon=6.5761531&d=40" target="_blank">%baseurl%/pub/html?lat=51.9214012&lon=6.5761531&d=40</a>
                         </p>
                         <p style="margin-top:5px;">
-                          This is also possible for /pub/ical.
+                          The same parameters can be set on the URL for the calendar.
                         </p>
                       </div>
                     </section>
                   </body>
                 </html>
-                """.replace("%DISCLAIMER%", DISCLAIMER)
+                """.replace("%title%", settings.title())
+                   .replace("%subtitle%", settings.subtitle())
+                   .replace("%baseurl%", settings.websiteBaseurl())
+                   .replace("%disclaimer%", settings.disclaimer())
                    .replace("%events%", stripClosingNewline(events));
     }
 
@@ -148,6 +165,7 @@ public class CalendarResource {
 
     private String ical(CalendarEvent calendarEvent) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss");
+        Settings settings = Settings.get();
 
         // Create EXDATE value
         // EXDATE:19960402T010000Z,19960403T010000Z,19960404T010000Z
@@ -179,12 +197,10 @@ public class CalendarResource {
                 .replace("%dtEnd%", dateTimeFormatter.format(calendarEvent.endDateTime()))
                 .replace("%summary%", (calendarEvent.calendarSource().name() + " " + calendarEvent.subject()).trim())
                 .replace("%location%", calendarEvent.calendarSource().location().replace("\n", ", "))
-                .replace("%description%", calendarEvent.calendarSource().url() + "\\n\\n" + DISCLAIMER)
+                .replace("%description%", calendarEvent.calendarSource().url() + "\\n\\n" + settings.disclaimer())
                 .replace("%rrule%", (calendarEvent.rrule().isBlank() ? "" : "RRULE:" + calendarEvent.rrule()))
                 .replace("%exdate%", (exdate.isBlank() ? "" : "EXDATE:" + exdate))
                 .replaceAll("(?m)^[ \t]*\r?\n", ""); // strip empty lines
-        // https://www.kanzaki.com/docs/ical/exdate.html
-
     }
 
     private String tr(CalendarEvent calendarEvent) {

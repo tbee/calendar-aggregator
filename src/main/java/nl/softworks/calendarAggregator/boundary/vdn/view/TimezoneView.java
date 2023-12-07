@@ -24,7 +24,6 @@ import java.util.Set;
 @Route("/timezone")
 @StyleSheet("context://../vaadin.css")
 @RolesAllowed("ROLE_ADMIN")
-@PermitAll
 public class TimezoneView extends CalendarAggregatorAppLayout
 implements AfterNavigationObserver {
 	private static final Logger LOG = LoggerFactory.getLogger(TimezoneView.class);
@@ -68,7 +67,7 @@ implements AfterNavigationObserver {
 				.okLabel("Save")
 				.onOk(() -> {
 					timezoneForm.writeTo(timezone);
-					R.timezoneRepo().save(timezone);
+					R.timezone().save(timezone);
 					reloadGrid();
 				})
 				.open();
@@ -83,7 +82,7 @@ implements AfterNavigationObserver {
 		new OkCancelDialog("Remove " + timezone.name(), new NativeLabel("Are you sure?"))
 				.okLabel("Yes")
 				.onOk(() -> {
-					R.timezoneRepo().delete(timezone);
+					R.timezone().delete(timezone);
 					reloadGrid();
 				})
 				.open();
@@ -95,7 +94,7 @@ implements AfterNavigationObserver {
 		Timezone selectedTimezone = getSelectedTimezone();
 
 		// Reload timezones
-		List<Timezone> timezones = R.timezoneRepo().findAll();
+		List<Timezone> timezones = R.timezone().findAll();
 		timezones.sort((timezone1, timezone2) -> timezone1.name().compareTo(timezone2.name()));
 		timezoneTreeGrid.setItems(timezones);
 

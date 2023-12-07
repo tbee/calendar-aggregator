@@ -46,7 +46,6 @@ import java.util.function.Function;
 @Route("/")
 @StyleSheet("context://../vaadin.css")
 @RolesAllowed({"ROLE_ADMIN", "ROLE_MAINTAIN"})
-@PermitAll
 public class CalendarSourceAndEventView extends CalendarAggregatorAppLayout
 implements AfterNavigationObserver
 {

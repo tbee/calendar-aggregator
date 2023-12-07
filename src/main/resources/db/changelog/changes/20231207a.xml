@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- https://xenovation.com/blog/development/java/java-professional-developer/liquibase-related-sql-java-types -->
+
+    <changeSet id="20231207a" author="tom">
+        <createTable tableName="settings">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lazylock" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="website_baseurl" type="nvarchar(1000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="subtitle" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="disclaimer" type="nvarchar(1000)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+</databaseChangeLog>

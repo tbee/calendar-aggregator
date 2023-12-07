@@ -40,7 +40,7 @@ public class TimezoneForm extends FormLayout {
 				.okLabel("Save")
 				.onOk(() -> {
 					timezoneForm.writeTo(timezone);
-					R.timezoneRepo().save(timezone);
+					R.timezone().save(timezone);
 					onInsert.run();
 				})
 				.open();

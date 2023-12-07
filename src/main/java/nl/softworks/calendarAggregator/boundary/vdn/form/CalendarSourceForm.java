@@ -61,7 +61,7 @@ public class CalendarSourceForm extends FormLayout {
 	}
 
 	public CalendarSourceForm populateWith(CalendarSource calendarSource) {
-		timezoneComboBox.setItems(R.timezoneRepo().findAll());
+		timezoneComboBox.setItems(R.timezone().findAll());
 		binder.readBean(calendarSource);
 		this.calendarSource = calendarSource;
 		return this;
