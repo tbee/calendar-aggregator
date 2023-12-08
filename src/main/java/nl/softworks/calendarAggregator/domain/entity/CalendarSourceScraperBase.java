@@ -116,7 +116,7 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 			}
 			dateTimeFormatterBuilder.appendText(ChronoField.MONTH_OF_YEAR, constructShortMonthsLookup(shortMonthNotation));
 			if (idx + SHORT_MONTH_NOTATION_PATTERN.length() < datePattern.length()) {
-				dateTimeFormatterBuilder.appendPattern(datePattern.substring(idx));
+				dateTimeFormatterBuilder.appendPattern(datePattern.substring(idx + SHORT_MONTH_NOTATION_PATTERN.length()));
 			}
 		}
 		else {

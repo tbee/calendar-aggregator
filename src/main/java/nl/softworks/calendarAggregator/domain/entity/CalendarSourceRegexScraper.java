@@ -207,7 +207,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
                         MonthDay monthDay = MonthDay.parse(startDateString, dateFormatter);
                         startLocalDate = determineDateByNearestYear(monthDay);
                     } else {
-                        if (stringBuilder != null) stringBuilder.append("Parsing ").append(startDateString).append(" with ").append(datePattern).append("\n");
+                        if (stringBuilder != null) stringBuilder.append("Parsing '").append(startDateString).append("' with '").append(datePattern).append("'\n");
                         startLocalDate = LocalDate.parse(startDateString, dateFormatter);
                     }
                     LocalDate endLocalDate;
@@ -215,12 +215,12 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
                         MonthDay monthDay = MonthDay.parse(endDateString, dateFormatter);
                         endLocalDate = determineDateByNearestYear(monthDay);
                     } else {
-                        if (stringBuilder != null) stringBuilder.append("Parsing ").append(endDateString).append(" with ").append(datePattern).append("\n");
+                        if (stringBuilder != null) stringBuilder.append("Parsing '").append(endDateString).append("' with '").append(datePattern).append("'\n");
                         endLocalDate = LocalDate.parse(endDateString, dateFormatter);
                     }
-                    if (stringBuilder != null) stringBuilder.append("Parsing ").append(startTimeString).append(" with ").append(timePattern).append("\n");
+                    if (stringBuilder != null) stringBuilder.append("Parsing '").append(startTimeString).append("' with '").append(timePattern).append("'\n");
                     LocalTime startLocalTime = LocalTime.parse(startTimeString, timeFormatter);
-                    if (stringBuilder != null) stringBuilder.append("Parsing ").append(endTimeString).append(" with ").append(timePattern).append("\n");
+                    if (stringBuilder != null) stringBuilder.append("Parsing '").append(endTimeString).append("' with '").append(timePattern).append("'\n");
                     LocalTime endLocalTime = LocalTime.parse(endTimeString, timeFormatter);
 
                     LocalDateTime startLocalDateTime = LocalDateTime.of(startLocalDate, startLocalTime);
@@ -241,13 +241,15 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
                 catch (DateTimeParseException e) {
                     if (stringBuilder != null) {
                         try {
-                            stringBuilder.append("Date example: ").append(LocalDate.of(2023,12,31).format(dateFormatter)).append("\n");
-                        } catch (DateTimeParseException e2) {
+                            String example = LocalDate.of(2023, 12, 31).format(dateFormatter);
+                            stringBuilder.append("Date example: ").append(example).append("\n");
+                        } catch (RuntimeException e2) {
                             // ignore
                         }
                         try {
-                            stringBuilder.append("Time example: ").append(LocalTime.of(12,23,45).format(timeFormatter)).append("\n");
-                        } catch (DateTimeParseException e2) {
+                            String example = LocalTime.of(12, 23, 45).format(timeFormatter);
+                            stringBuilder.append("Time example: ").append(example).append("\n");
+                        } catch (RuntimeException e2) {
                             // ignore
                         }
                     }
