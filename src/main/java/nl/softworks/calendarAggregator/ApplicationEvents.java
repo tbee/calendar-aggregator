@@ -40,7 +40,11 @@ public class ApplicationEvents {
     }
 
     private void generateEvents() {
-        if (LOG.isInfoEnabled()) LOG.info("Scheduled task runs a generate events");
-        calendarSourceService.generateEvents();
+        try {
+            if (LOG.isInfoEnabled()) LOG.info("Scheduled task runs generate events");
+            calendarSourceService.generateEvents();
+        } catch (RuntimeException e) {
+            LOG.error("Problem generating events in scheduled task", e);
+        }
     }
 }

@@ -5,6 +5,7 @@ import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,55 +26,50 @@ public class CalendarSourceService {
     private static final Logger LOG = LoggerFactory.getLogger(CalendarSourceService.class);
 
     private static final ExecutorService executorService = Executors.newCachedThreadPool();
-//    private static final ScheduledExecutorService executorService = Executors.newScheduledThreadPool(10);
 
     public void generateEvents() {
         generateEvents(null);
     }
 
     public void generateEvents(Runnable onStarted) {
-        if (LOG.isInfoEnabled()) LOG.info("Generating events");
-
-        // Only enabled ones
-        List<CalendarSource> calendarSources = R.calendarSource().findAll().stream()
-                .filter(cs -> cs.enabled())
-                .toList();
-
-        // Run in background
         try {
-            List<Callable<Void>> callables = new ArrayList<>();
-            for (CalendarSource calendarSourceLoop : calendarSources) {
-                calendarSourceLoop.status("Generating");
-                R.calendarSource().save(calendarSourceLoop);
-                callables.add(() -> {
-                    CalendarSource calendarSource = R.calendarSource().findById(calendarSourceLoop.id()).orElseThrow(); // otherwise the save may fail
-                    try {
-                        if (LOG.isInfoEnabled()) LOG.info("Generating events for " + calendarSource.name() + " in " + Thread.currentThread().getName());
-                        calendarSource.generateEvents(null);
-                    } catch (RuntimeException e) {
-                        LOG.error("Problem generating events for " + calendarSource.name(), e);
-                        calendarSource = R.calendarSource().findById(calendarSource.id()).orElse(null); // fresh does not work
-                        calendarSource.status("Exception: " + e.getMessage());
-                    }
-                    finally {
-                        R.calendarSource().save(calendarSource);
-                        if (LOG.isInfoEnabled()) LOG.info("Generating events for " + calendarSource.name() + " done in " + Thread.currentThread().getName());
-                    }
-                    return null;
-                });
-            }
-            executorService.invokeAll(callables, 1, TimeUnit.MINUTES); // TODO: tasks are not interrupted
-            if (LOG.isInfoEnabled()) LOG.info("Generating events started");
+            if (LOG.isInfoEnabled()) LOG.info("Scheduling event generation");
+            R.calendarSource().findAll().stream()
+                    .filter(cs -> cs.enabled())
+                    .forEach(cs -> {
+                        if (onStarted != null) {
+                            cs.status("Scheduled");
+                            R.calendarSource().saveAndFlush(cs);
+                        }
+                        executorService.submit(() -> generateEvents(cs.id()));
+                    });
+            if (LOG.isInfoEnabled()) LOG.info("Event generation scheduled");
             if (onStarted != null) {
                 onStarted.run();
             }
         }
         catch (RuntimeException e) {
-            LOG.error("Problem generating events", e);
+            LOG.error("Problem scheduling events", e);
             throw e;
-        } catch (InterruptedException e) {
-            LOG.error("Problem generating events", e);
-            throw new RuntimeException(e);
+        }
+    }
+
+    private void generateEvents(long calendarSourceId) {
+        // TODO: there must be a way to terminate / timeout a long running task
+        try {
+            CalendarSource calendarSource = R.calendarSource().findById(calendarSourceId).orElseThrow();
+            try {
+                if (LOG.isInfoEnabled()) LOG.info("Generating events for " + calendarSource.name() + " in " + Thread.currentThread().getName());
+                calendarSource.generateEvents(null);
+                if (LOG.isInfoEnabled()) LOG.info("Generating events for " + calendarSource.name() + " in " + Thread.currentThread().getName() + " finished");
+            } catch (RuntimeException e) {
+                LOG.error("Problem generating events for " + calendarSource.name(), e);
+                calendarSource = R.calendarSource().findById(calendarSource.id()).orElseThrow(); // fresh does not work
+                calendarSource.status("Exception: " + e.getMessage());
+            }
+            R.calendarSource().save(calendarSource);
+        } catch (RuntimeException e) {
+            LOG.error("Problem generating events for CalendarSource " + calendarSourceId, e);
         }
     }
 }
