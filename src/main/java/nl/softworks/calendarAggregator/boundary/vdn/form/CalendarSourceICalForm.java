@@ -17,15 +17,18 @@ public class CalendarSourceICalForm extends CalendarSourceForm {
 	private final Binder<CalendarSourceICal> binder = new Binder<>();
 
 	private final TextField icalUrlTextfield = new TextField("ICal URL");
+	private final TextField regexTextField = new TextField("Regex");
 
 	public CalendarSourceICalForm() {
 		setColspan(icalUrlTextfield, 2);
+		setColspan(regexTextField, 2);
 
 		Button testButton = new Button("Test", evt -> test());
 		setColspan(testButton, 2);
-		add(icalUrlTextfield, testButton);
+		add(icalUrlTextfield, regexTextField, testButton);
 
 		binder.forField(icalUrlTextfield).bind(CalendarSourceICal::icalUrl, CalendarSourceICal::icalUrl);
+		binder.forField(regexTextField).bind(CalendarSourceICal::regex, CalendarSourceICal::regex);
 	}
 
 	private void test() {

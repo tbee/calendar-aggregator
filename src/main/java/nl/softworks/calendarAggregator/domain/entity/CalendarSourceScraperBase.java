@@ -93,7 +93,7 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 		if (stringBuilder != null) stringBuilder.append("Removing characters: ").append(removeChars).append("\n");
 		for (int i = 0; i < removeChars.length(); i++) {
 			String removeChar = removeChars.substring(i, i+1);
-			content = content.replace(removeChar, "");
+			content = content.replace(removeChar, " ");
 		}
 		while (content.contains("  ")) {
 			content = content.replace("  ", " ");

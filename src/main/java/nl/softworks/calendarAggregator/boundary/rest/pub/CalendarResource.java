@@ -69,7 +69,7 @@ public class CalendarResource {
     @GetMapping(path = "/html", produces = {"text/html"})
     public String html(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d) {
 
-        LocalDateTime pastThreshold = LocalDateTime.now().minusDays(1);
+        LocalDateTime pastThreshold = LocalDateTime.now().minusHours(1);
         LocalDateTime futureThreshold = LocalDateTime.now().plusMonths(5);
         String events = R.calendarEvent().findAll().stream()
                 .flatMap(ce -> ce.applyRRule().stream()) // for HTML we need to generate the actual events

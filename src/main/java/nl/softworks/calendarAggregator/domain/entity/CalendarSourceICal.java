@@ -3,7 +3,6 @@ package nl.softworks.calendarAggregator.domain.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.NotNull;
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
@@ -12,38 +11,18 @@ import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
 import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VEvent;
-import net.fortuna.ical4j.model.component.VTimeZone;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
-import net.fortuna.ical4j.model.property.Summary;
-import net.fortuna.ical4j.model.property.TzId;
-import nl.softworks.calendarAggregator.domain.boundary.R;
 import org.apache.commons.io.IOUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.tbee.jakarta.validator.UrlValidator;
 
-import javax.swing.text.html.HTML;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.MonthDay;
-import java.time.Period;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -67,6 +46,16 @@ public class CalendarSourceICal extends CalendarSource {
 		return this;
 	}
 
+	@NotNull
+	private String regex;
+	static public final String REGEX_PROPERTYID = "regex";
+	public String regex() {
+		return regex;
+	}
+	public CalendarSourceICal regex(String v) {
+		this.regex = v;
+		return this;
+	}
 
 	@Override
 	public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
@@ -87,6 +76,8 @@ public class CalendarSourceICal extends CalendarSource {
 			Calendar calendar = builder.build(new StringReader(icalContent));
 
 			// Loop over components and find events
+			if (stringBuilder != null) stringBuilder.append("regex = ").append(regex).append("\n");
+			Pattern pattern = regex == null || regex.isEmpty() ? null : Pattern.compile(regex);
 			ComponentList<CalendarComponent> components = calendar.getComponents();
 			if (stringBuilder != null) stringBuilder.append("#components = ").append(components.size()).append("\n");
 			for (Component component : components) {
@@ -95,6 +86,22 @@ public class CalendarSourceICal extends CalendarSource {
 				}
 				if (stringBuilder != null) stringBuilder.append("---").append("\n");
 
+				String summary = vEvent.getSummary().getValue();
+				if (stringBuilder != null) stringBuilder.append("summary = ").append(summary).append("\n");
+				if (pattern != null) {
+					Matcher matcher = pattern.matcher(summary);
+					if (!matcher.matches()) {
+						if (stringBuilder != null) stringBuilder.append("Does not match the regexp\n");
+						continue;
+					} else if (stringBuilder != null) {
+						stringBuilder.append("Start index: ").append(matcher.start()).append("\n");
+						stringBuilder.append("End index: ").append(matcher.end()).append("\n");
+						stringBuilder.append("Matched string: ").append(summary, matcher.start(), matcher.end()).append("\n");
+						for (int i = 0; i < matcher.groupCount() + 1; i++) {
+							stringBuilder.append("Group ").append(i).append(" = ").append(matcher.group(i)).append("\n");
+						}
+					}
+				}
 				DtStart startDate = vEvent.getStartDate();
 				if (stringBuilder != null) stringBuilder.append("startDate = ").append(startDate);
 				LocalDateTime startLocalDateTime = LocalDateTime.ofInstant(startDate.getDate().toInstant(), ZoneId.systemDefault());
@@ -102,8 +109,6 @@ public class CalendarSourceICal extends CalendarSource {
 				DtEnd endDate = vEvent.getEndDate();
 				if (stringBuilder != null) stringBuilder.append("endDate = ").append(endDate);
 				LocalDateTime endLocalDateTime = LocalDateTime.ofInstant(endDate.getDate().toInstant(), ZoneId.systemDefault());
-
-				String summary = vEvent.getSummary().getValue();
 
 				String timezoneName = startDate.getTimeZone().getVTimeZone().getTimeZoneId().getValue();
 				if (!timezone().name().equals(timezoneName)) {
