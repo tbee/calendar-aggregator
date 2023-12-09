@@ -6,6 +6,8 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.NativeLabel;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -13,7 +15,6 @@ import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.Route;
-import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import nl.softworks.calendarAggregator.boundary.vdn.CalendarAggregatorAppLayout;
 import nl.softworks.calendarAggregator.boundary.vdn.component.CancelDialog;
@@ -53,7 +54,6 @@ implements AfterNavigationObserver
 	private static final DateTimeFormatter YYYYMMDDHHMM = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
 	private final TreeGrid<TreeNode> calendarSourceAndEventTreeGrid = new TreeGrid<>();
-	private List<CalendarSource> calendarSources = List.of();
 
 	@Autowired
 	private CalendarSourceService calendarSourceService;
@@ -64,8 +64,9 @@ implements AfterNavigationObserver
 
 		// calendarSourceAndEventTreeGrid
 		calendarSourceAndEventTreeGrid.addHierarchyColumn(TreeNode::text).setHeader("Name").setFlexGrow(100);
-		calendarSourceAndEventTreeGrid.addComponentColumn((ValueProvider<TreeNode, Anchor>) tn -> createAnchor(tn.url())).setHeader("Website").setFlexGrow(5);
+		calendarSourceAndEventTreeGrid.addComponentColumn((ValueProvider<TreeNode, Icon>) tn -> tn.enabled() == null ? null : tn.enabled() ? VaadinIcon.CHECK.create() : VaadinIcon.MINUS.create()).setHeader("Enabled").setFlexGrow(5);
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::type).setHeader("Type").setFlexGrow(10);
+		calendarSourceAndEventTreeGrid.addComponentColumn((ValueProvider<TreeNode, Anchor>) tn -> createAnchor(tn.url())).setHeader("Website").setFlexGrow(5);
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::startDate).setHeader("Start").setFlexGrow(50);
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::endDate).setHeader("End").setFlexGrow(50);
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::status).setHeader("Status").setFlexGrow(50);
@@ -95,7 +96,7 @@ implements AfterNavigationObserver
 	private void generate() {
 		calendarSourceService.generateEvents(() -> {
 			reloadTreeGrid();
-			showSuccessNotification("Generated");
+			showSuccessNotification("Generating");
 		});
 	}
 
@@ -183,7 +184,7 @@ implements AfterNavigationObserver
 		TreeNode selectedTreeNode = getSelectedTreeNode();
 
 		// Refresh data
-		calendarSources = R.calendarSource().findAll();
+		List<CalendarSource> calendarSources = R.calendarSource().findAll();
 		calendarSources.sort(Comparator.comparing(CalendarSource::name));
 		List<TreeNode> treeNodes = treeNodes(calendarSources, TreeNodeCalendarSource::new);
 		calendarSourceAndEventTreeGrid.setItems(treeNodes, this::getTreeNodeChildren);
@@ -200,6 +201,7 @@ implements AfterNavigationObserver
 
 	sealed interface TreeNode permits TreeNodeCalendarSource, TreeNodeCalendarEvent {
 		String text();
+		Boolean enabled();
 		String type();
 		String url();
 		String startDate();
@@ -219,7 +221,10 @@ implements AfterNavigationObserver
 		public String text() {
 			return calendarSource().name();
 		}
-
+		@Override
+		public Boolean enabled() {
+			return calendarSource.enabled();
+		}
 		@Override
 		public String type() {
 			return calendarSource().type();
@@ -294,6 +299,10 @@ implements AfterNavigationObserver
 		@Override
 		public String text() {
 			return calendarEvent.subject();
+		}
+		@Override
+		public Boolean enabled() {
+			return null;
 		}
 
 		@Override

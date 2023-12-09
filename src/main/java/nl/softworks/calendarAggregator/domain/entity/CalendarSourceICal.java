@@ -72,6 +72,10 @@ public class CalendarSourceICal extends CalendarSource {
 			}
 
 			// Parse ical
+			LocalDateTime pastThreshold = LocalDateTime.now().minusMonths(1);
+			if (stringBuilder != null) stringBuilder.append("pastThreshold = ").append(pastThreshold);
+			LocalDateTime futureThreshold = LocalDateTime.now().plusMonths(6);
+			if (stringBuilder != null) stringBuilder.append("futureThreshold = ").append(futureThreshold);
 			CalendarBuilder builder = new CalendarBuilder();
 			Calendar calendar = builder.build(new StringReader(icalContent));
 
@@ -85,6 +89,18 @@ public class CalendarSourceICal extends CalendarSource {
 					continue;
 				}
 				if (stringBuilder != null) stringBuilder.append("---").append("\n");
+
+				DtStart startDate = vEvent.getStartDate();
+				if (stringBuilder != null) stringBuilder.append("startDate = ").append(startDate);
+				LocalDateTime startLocalDateTime = LocalDateTime.ofInstant(startDate.getDate().toInstant(), ZoneId.systemDefault());
+				if (startLocalDateTime.isBefore(pastThreshold) || startLocalDateTime.isAfter(futureThreshold)) {
+					if (stringBuilder != null) stringBuilder.append("Outside threshold\n");
+					continue;
+				}
+
+				DtEnd endDate = vEvent.getEndDate();
+				if (stringBuilder != null) stringBuilder.append("endDate = ").append(endDate);
+				LocalDateTime endLocalDateTime = LocalDateTime.ofInstant(endDate.getDate().toInstant(), ZoneId.systemDefault());
 
 				String summary = vEvent.getSummary().getValue();
 				if (stringBuilder != null) stringBuilder.append("summary = ").append(summary).append("\n");
@@ -102,14 +118,6 @@ public class CalendarSourceICal extends CalendarSource {
 						}
 					}
 				}
-				DtStart startDate = vEvent.getStartDate();
-				if (stringBuilder != null) stringBuilder.append("startDate = ").append(startDate);
-				LocalDateTime startLocalDateTime = LocalDateTime.ofInstant(startDate.getDate().toInstant(), ZoneId.systemDefault());
-
-				DtEnd endDate = vEvent.getEndDate();
-				if (stringBuilder != null) stringBuilder.append("endDate = ").append(endDate);
-				LocalDateTime endLocalDateTime = LocalDateTime.ofInstant(endDate.getDate().toInstant(), ZoneId.systemDefault());
-
 				String timezoneName = startDate.getTimeZone().getVTimeZone().getTimeZoneId().getValue();
 				if (!timezone().name().equals(timezoneName)) {
 					throw new RuntimeException("Source's timezone is not equal to " + timezoneName);

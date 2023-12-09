@@ -13,7 +13,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tbee.jakarta.validator.UrlValidator;
@@ -117,6 +116,17 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 	public CalendarSource timezone(Timezone v) {
 		this.timezone = v;
+		return this;
+	}
+
+	@NotNull
+	protected boolean enabled = true;
+	static public final String ENABLED_PROPERTYID = "enabled";
+	public boolean enabled() {
+		return enabled;
+	}
+	public CalendarSource enabled(boolean v) {
+		this.enabled = v;
 		return this;
 	}
 

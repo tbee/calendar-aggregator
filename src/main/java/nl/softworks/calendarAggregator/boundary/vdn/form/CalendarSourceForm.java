@@ -1,6 +1,7 @@
 package nl.softworks.calendarAggregator.boundary.vdn.form;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Span;
@@ -34,6 +35,7 @@ public class CalendarSourceForm extends FormLayout {
 	private final TextField locationTextField = new TextField("Location");
 	private final NumberField latNumberField = new NumberField("LAT");
 	private final NumberField lonNumberField = new NumberField("LON");
+	private final Checkbox enabledCheckbox = new Checkbox("Enabled");
 	private final ComboBox<Timezone> timezoneComboBox = new ComboBox<>("Timezone");
 	private final TextField statusTextField = new TextField("Status");
 
@@ -44,8 +46,9 @@ public class CalendarSourceForm extends FormLayout {
 			Span nameSpan = new Span(timezone.name());
 			return nameSpan;
 		}));
+		setColspan(urlTextField, 2);
 		setColspan(statusTextField, 2);
-		add(nameTextField, urlTextField, locationTextField, timezoneComboBox, latNumberField, lonNumberField, statusTextField);
+		add(nameTextField, enabledCheckbox, urlTextField, locationTextField, timezoneComboBox, latNumberField, lonNumberField, statusTextField);
 
 		Button generateButton = new Button("Generate", evt -> generate());
 		setColspan(generateButton, 2);
@@ -56,6 +59,7 @@ public class CalendarSourceForm extends FormLayout {
 		binder.forField(locationTextField).bind(CalendarSource::location, CalendarSource::location);
 		binder.forField(latNumberField).bind(CalendarSource::lat, CalendarSource::lat);
 		binder.forField(lonNumberField).bind(CalendarSource::lon, CalendarSource::lon);
+		binder.forField(enabledCheckbox).bind(CalendarSource::enabled, CalendarSource::enabled);
 		binder.forField(timezoneComboBox).bind(CalendarSource::timezone, CalendarSource::timezone);
 		binder.forField(statusTextField).bind(CalendarSource::status, CalendarSource::status);
 	}
