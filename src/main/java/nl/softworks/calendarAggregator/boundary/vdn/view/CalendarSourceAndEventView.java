@@ -348,7 +348,9 @@ implements AfterNavigationObserver
 
 		@Override
 		public void delete(Runnable onOk) {
-			R.calendarEvent().delete(calendarEvent);
+			CalendarSource calendarSource = calendarEvent.calendarSource();
+			calendarSource.removeCalendarEvent(calendarEvent);
+			R.calendarSource().save(calendarSource);
 			onOk.run();
 		}
 

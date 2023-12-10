@@ -139,6 +139,10 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 		calendarEvents.add(calendarEvent);
 		calendarEvent.calendarSource = this;
 	}
+	public void removeCalendarEvent(CalendarEvent calendarEvent) {
+		calendarEvents.remove(calendarEvent);
+		calendarEvent.calendarSource = null;
+	}
 
 	public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
 		status("ok");
