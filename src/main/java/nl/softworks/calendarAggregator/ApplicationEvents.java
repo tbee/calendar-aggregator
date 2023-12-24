@@ -33,7 +33,10 @@ public class ApplicationEvents {
 
         // Make sure there is an admin user
         List<Person> persons = R.personRepo().findByRoleAndEnabled(Person.Role.ROLE_ADMIN.toString(), true);
-        if (persons.isEmpty()) {
+        if (!persons.isEmpty()) {
+            LOG.info("At least one administrator is present and active");
+        }
+        else {
 
             // Find a free username
             String username = "superuser";
