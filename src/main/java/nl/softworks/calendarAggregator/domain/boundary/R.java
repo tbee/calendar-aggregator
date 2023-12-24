@@ -20,6 +20,12 @@ public class R {
     }
 
     @Autowired
+    PersonRepo personRepo;
+    static public PersonRepo personRepo() {
+        return R.singleton.personRepo;
+    }
+
+    @Autowired
     CalendarSourceRepo calendarSourceRepo;
     static public CalendarSourceRepo calendarSource() {
         return R.singleton.calendarSourceRepo;

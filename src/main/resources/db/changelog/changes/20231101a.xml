@@ -31,12 +31,6 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <insert tableName="person">
-            <column name="username" value="superuser"/>
-            <column name="password" value="$2a$10$g7x95yHg2wN27QUol6I81OMkc1iHHi6gFH90cFXuuEypjGwDBRA0q"/> <!-- su<esc1L10> -->
-            <column name="role" value="ROLE_ADMIN"/>
-        </insert>
-
 
         <createTable tableName="timezone">
             <column name="id" type="bigint" autoIncrement="true" startWith="1">

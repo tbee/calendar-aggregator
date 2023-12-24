@@ -17,7 +17,7 @@ public class PersonPasswordValidatorImpl implements ConstraintValidator<PersonPa
             throw new IllegalArgumentException("@PersonPasswordValidator only applies to Person objects");
         }
         Person person = (Person) object;
-        if (person.getPassword() == null || person.getPassword().isBlank()) {
+        if (person.password() == null || person.password().isBlank()) {
             return false;
         }
         return true;
