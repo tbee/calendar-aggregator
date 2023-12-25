@@ -39,6 +39,7 @@ implements AfterNavigationObserver {
 
 		// treeGrid
 		setupTreeGrid.accept(treeGrid);
+		treeGrid.addItemDoubleClickListener(e -> edit());
 
 		// crudButtonbar
 		CrudButtonbar crudButtonbar = new CrudButtonbar()
