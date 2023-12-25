@@ -1,4 +1,4 @@
-package nl.softworks.calendarAggregator.boundary.vdn.form;
+package nl.softworks.calendarAggregator.application.vdn.form;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -12,8 +12,8 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import nl.softworks.calendarAggregator.boundary.vdn.component.CancelDialog;
-import nl.softworks.calendarAggregator.boundary.vdn.component.OkCancelDialog;
+import nl.softworks.calendarAggregator.application.vdn.component.CancelDialog;
+import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;

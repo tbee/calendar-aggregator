@@ -1,4 +1,4 @@
-package nl.softworks.calendarAggregator.boundary;
+package nl.softworks.calendarAggregator.application;
 
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;

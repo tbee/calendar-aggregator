@@ -1,4 +1,4 @@
-package nl.softworks.calendarAggregator.boundary.vdn.form;
+package nl.softworks.calendarAggregator.application.vdn.form;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -6,12 +6,10 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
-import nl.softworks.calendarAggregator.boundary.vdn.component.OkCancelDialog;
+import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceMultipleDaysScraper;
-import nl.softworks.calendarAggregator.domain.entity.CalendarSourceMultipleDaysScraper;
-import nl.softworks.calendarAggregator.domain.entity.CalendarSourceRegexScraper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

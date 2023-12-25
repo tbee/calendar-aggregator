@@ -1,4 +1,4 @@
-package nl.softworks.calendarAggregator.boundary.rest.pub;
+package nl.softworks.calendarAggregator.application.rest.pub;
 
 import jakarta.servlet.http.HttpServletRequest;
 import nl.softworks.calendarAggregator.domain.boundary.R;

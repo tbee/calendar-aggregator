@@ -1,4 +1,4 @@
-package nl.softworks.calendarAggregator.boundary.vdn.component;
+package nl.softworks.calendarAggregator.application.vdn.component;
 
 import com.vaadin.flow.component.html.Span;
 

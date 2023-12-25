@@ -1,4 +1,4 @@
-package nl.softworks.calendarAggregator.boundary.vdn;
+package nl.softworks.calendarAggregator.application.vdn;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -19,10 +19,9 @@ import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.server.VaadinSession;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import nl.softworks.calendarAggregator.boundary.SpringUtils;
-import nl.softworks.calendarAggregator.boundary.vdn.view.CalendarSourceAndEventView;
-import nl.softworks.calendarAggregator.boundary.vdn.view.SettingsView;
-import nl.softworks.calendarAggregator.boundary.vdn.view.TimezoneView;
+import nl.softworks.calendarAggregator.application.vdn.view.CalendarSourceAndEventView;
+import nl.softworks.calendarAggregator.application.vdn.view.SettingsView;
+import nl.softworks.calendarAggregator.application.vdn.view.TimezoneView;
 import nl.softworks.calendarAggregator.domain.ValidationException;
 import nl.softworks.calendarAggregator.domain.entity.Person;
 import org.slf4j.Logger;

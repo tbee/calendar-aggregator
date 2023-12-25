@@ -1,4 +1,4 @@
-package nl.softworks.calendarAggregator.boundary.vdn.form;
+package nl.softworks.calendarAggregator.application.vdn.form;
 
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.TextArea;

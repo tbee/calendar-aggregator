@@ -1,6 +1,6 @@
 package nl.softworks.calendarAggregator;
 
-import nl.softworks.calendarAggregator.boundary.jpa.RepoBaseImpl;
+import nl.softworks.calendarAggregator.application.jpa.RepoBaseImpl;
 import org.hsqldb.persist.HsqlProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

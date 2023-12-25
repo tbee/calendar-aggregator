@@ -1,4 +1,4 @@
-package nl.softworks.calendarAggregator.boundary.jpa;
+package nl.softworks.calendarAggregator.application.jpa;
 
 import jakarta.persistence.EntityManager;
 import nl.softworks.calendarAggregator.domain.boundary.RepoBase;

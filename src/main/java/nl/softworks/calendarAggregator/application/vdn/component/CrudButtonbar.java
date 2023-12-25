@@ -1,7 +1,6 @@
-package nl.softworks.calendarAggregator.boundary.vdn.component;
+package nl.softworks.calendarAggregator.application.vdn.component;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 

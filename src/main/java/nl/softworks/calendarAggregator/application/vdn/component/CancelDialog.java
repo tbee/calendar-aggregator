@@ -1,10 +1,9 @@
-package nl.softworks.calendarAggregator.boundary.vdn.component;
+package nl.softworks.calendarAggregator.application.vdn.component;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 
 public class CancelDialog extends Dialog {
