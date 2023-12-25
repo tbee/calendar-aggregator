@@ -32,7 +32,7 @@ public class ApplicationEvents {
     public void startApp() {
 
         // Make sure there is an admin user
-        List<Person> persons = R.personRepo().findByRoleAndEnabled(Person.Role.ROLE_ADMIN.toString(), true);
+        List<Person> persons = R.person().findByRoleAndEnabled(Person.Role.ROLE_ADMIN, true);
         if (!persons.isEmpty()) {
             LOG.info("At least one administrator is present and active");
         }
@@ -40,17 +40,17 @@ public class ApplicationEvents {
 
             // Find a free username
             String username = "superuser";
-            while (!R.personRepo().findByUsername(username).isEmpty()) {
+            while (!R.person().findByUsername(username).isEmpty()) {
                 username += "!";
             }
 
             // Create user
             String password = RandomStringUtils.random(32, true, true);
             LOG.warn("Creating an administrator user because non exist, note down this: " + username + " / " + password);
-            R.personRepo().save(new Person()
+            R.person().save(new Person()
                     .username(username)
                     .password(password)
-                    .role(Person.Role.ROLE_ADMIN.toString())
+                    .role(Person.Role.ROLE_ADMIN)
                     .email("test@test.com")
                     .enabled(true));
         }

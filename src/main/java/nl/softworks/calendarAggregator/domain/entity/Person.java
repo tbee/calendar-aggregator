@@ -1,8 +1,10 @@
 package nl.softworks.calendarAggregator.domain.entity;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
+import nl.softworks.calendarAggregator.application.jpa.PersonRoleConverter;
 import nl.softworks.calendarAggregator.domain.entity.validator.PersonPasswordValidator;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -14,7 +16,7 @@ public class Person extends EntityBase<Person> {
 	@Column(unique=true)
 	private String username;
 	static public final String USERNAME_PROPERTYID = "username";
-	public String uername() {
+	public String username() {
 		return username;
 	}
 	public Person username(String code) {
@@ -52,12 +54,13 @@ public class Person extends EntityBase<Person> {
 	}
 
 	@NotNull
-	private String role;
+	@Convert(converter = PersonRoleConverter.class)
+	private Role role = Role.ROLE_USER;
 	static public final String ROLE_PROPERTYID = "role";
-	public String role() {
+	public Role role() {
 		return role;
 	}
-	public Person role(String role) {
+	public Person role(Role role) {
 		this.role = role;
 		return this;
 	}

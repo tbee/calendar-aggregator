@@ -20,6 +20,7 @@ import com.vaadin.flow.server.VaadinSession;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import nl.softworks.calendarAggregator.application.vdn.view.CalendarSourceAndEventView;
+import nl.softworks.calendarAggregator.application.vdn.view.PersonView;
 import nl.softworks.calendarAggregator.application.vdn.view.SettingsView;
 import nl.softworks.calendarAggregator.application.vdn.view.TimezoneView;
 import nl.softworks.calendarAggregator.domain.ValidationException;
@@ -43,10 +44,12 @@ implements HasDynamicTitle {
 	@Autowired
 	private PlatformTransactionManager transactionManager;
 
+	final protected String title;
 	final protected Tab overviewTab = new Tab(VaadinIcon.TABLE.create(), new Span("Sources") );
 	final protected Tab timezoneTab = new Tab(VaadinIcon.CLOCK.create(), new Span("Timezones") );
+	final protected Tab personTab = new Tab(VaadinIcon.USER.create(), new Span("Persons") );
 	final protected Tab settingsTab = new Tab(VaadinIcon.LIST.create(), new Span("Settings") );
-	final protected Tabs tabs = new Tabs(overviewTab, timezoneTab, settingsTab);
+	final protected Tabs tabs = new Tabs(overviewTab, timezoneTab, personTab, settingsTab);
 
 	@Override
 	public String getPageTitle() {
@@ -54,6 +57,7 @@ implements HasDynamicTitle {
 	}
 
 	public CalendarAggregatorAppLayout(String title) {
+		this.title = title;
 		//String username = SpringUtils.getLoggedInUsername();
 
 		// Show exceptions as toasts: this is needed to display exceptions thrown by the domain when called through binding from e.g. GridUI
@@ -106,6 +110,9 @@ implements HasDynamicTitle {
 			}
 			if (event.getSelectedTab().equals(timezoneTab)) {
 				UI.getCurrent().navigate(TimezoneView.class);
+			}
+			if (event.getSelectedTab().equals(personTab)) {
+				UI.getCurrent().navigate(PersonView.class);
 			}
 			if (event.getSelectedTab().equals(settingsTab)) {
 				UI.getCurrent().navigate(SettingsView.class);

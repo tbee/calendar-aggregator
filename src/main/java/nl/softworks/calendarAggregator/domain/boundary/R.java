@@ -21,7 +21,7 @@ public class R {
 
     @Autowired
     PersonRepo personRepo;
-    static public PersonRepo personRepo() {
+    static public PersonRepo person() {
         return R.singleton.personRepo;
     }
 
