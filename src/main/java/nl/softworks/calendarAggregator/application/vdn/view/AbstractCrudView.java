@@ -23,13 +23,15 @@ implements AfterNavigationObserver {
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractCrudView.class);
 
 	private final Grid<E> treeGrid = new Grid<>();
+	private final Supplier<E> entitySupplier;
 	private final Supplier<AbstractCrudForm<E>> formSupplier;
 	private final Consumer<E> saver;
 	private final Consumer<E> deleter;
 	private final Supplier<List<E>> finder;
 
-	public AbstractCrudView(String title, Consumer<E> saver, Consumer<E> deleter, Supplier<List<E>> finder, Supplier<AbstractCrudForm<E>> formSupplier, Consumer<Grid<E>> setupTreeGrid) {
+	public AbstractCrudView(String title, Supplier<E> entitySupplier, Consumer<E> saver, Consumer<E> deleter, Supplier<List<E>> finder, Supplier<AbstractCrudForm<E>> formSupplier, Consumer<Grid<E>> setupTreeGrid) {
 		super(title);
+		this.entitySupplier = entitySupplier;
 		this.formSupplier = formSupplier;
 		this.saver = saver;
 		this.deleter = deleter;
@@ -41,7 +43,7 @@ implements AfterNavigationObserver {
 		// crudButtonbar
 		CrudButtonbar crudButtonbar = new CrudButtonbar()
 				.onReload(this::reloadGrid)
-				.onInsert(() -> formSupplier.get().showInsertDialog(this::reloadGrid))
+				.onInsert(this::insert)
 				.onEdit(this::edit)
 				.onDelete(this::delete);
 
@@ -52,6 +54,24 @@ implements AfterNavigationObserver {
 	@Override
 	public void afterNavigation(AfterNavigationEvent event) {
 		reloadGrid();
+	}
+
+	private void insert() {
+		E entity = entitySupplier.get();
+		AbstractCrudForm<E> form = formSupplier.get();
+		form.populateWith(entity);
+		new OkCancelDialog(title, form)
+				.okLabel("Save")
+				.onOk(() -> {
+					try {
+						form.writeTo(entity);
+						saver.accept(entity);
+						reloadGrid();
+					} catch (ValidationException e) {
+						throw new RuntimeException(e);
+					}
+				})
+				.open();
 	}
 
 	private void edit() {

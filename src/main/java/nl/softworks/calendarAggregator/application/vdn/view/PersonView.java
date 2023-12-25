@@ -16,7 +16,8 @@ public class PersonView extends AbstractCrudView<Person> {
 	private static final Logger LOG = LoggerFactory.getLogger(PersonView.class);
 
 	public PersonView() {
-		super("Persons"
+		super("Person"
+				, Person::new
 				, p -> R.person().save(p)
 				, p -> R.person().delete(p)
 				, () -> R.person().findAllByOrderByUsernameAsc()

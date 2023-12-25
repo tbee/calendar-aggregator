@@ -7,6 +7,4 @@ abstract public class AbstractCrudForm<E> extends FormLayout {
 
 	abstract public AbstractCrudForm<E> populateWith(E item);
 	abstract public AbstractCrudForm<E> writeTo(E item) throws ValidationException;
-
-	abstract public void showInsertDialog(Runnable onInsert);
 }

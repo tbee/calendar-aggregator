@@ -8,8 +8,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
-import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +23,9 @@ public class PersonForm extends AbstractCrudForm<Person> {
 	private final Checkbox enabledCheckbox = new Checkbox("Enabled");
 
 	public PersonForm() {
-		roleComboBox.setItemLabelGenerator(r -> r.toString());
+		roleComboBox.setItemLabelGenerator(r -> r.toString().replace("ROLE_", ""));
 		roleComboBox.setRenderer(new ComponentRenderer<>(r -> {
-			Span span = new Span(r.toString());
+			Span span = new Span(r.toString().replace("ROLE_", ""));
 			return span;
 		}));
 		roleComboBox.setItems(Person.Role.values());
@@ -40,33 +38,18 @@ public class PersonForm extends AbstractCrudForm<Person> {
 		binder.forField(enabledCheckbox).bind(Person::enabled, Person::enabled);
 	}
 
+	@Override
 	public PersonForm populateWith(Person person) {
 		binder.readBean(person);
 		return this;
 	}
 
+	@Override
 	public PersonForm writeTo(Person person) throws ValidationException {
 		binder.writeBean(person);
 		if (!passwordTextField.isEmpty()) {
 			person.password(passwordTextField.getValue());
 		}
 		return this;
-	}
-
-	public void showInsertDialog(Runnable onInsert) {
-		Person person = new Person();
-		populateWith(person);
-		new OkCancelDialog("Person", this)
-				.okLabel("Save")
-				.onOk(() -> {
-					try {
-						this.writeTo(person);
-						R.person().save(person);
-						onInsert.run();
-					} catch (ValidationException e) {
-						throw new RuntimeException(e);
-					}
-				})
-				.open();
 	}
 }
