@@ -50,11 +50,14 @@ public class CalendarSourceService {
             CalendarSource calendarSource = R.calendarSource().findById(calendarSourceId).orElseThrow();
             try {
                 if (LOG.isInfoEnabled()) LOG.info("Generating events for " + calendarSource.name() + " in " + Thread.currentThread().getName());
-                calendarSource.generateEvents(null);
+                StringBuilder stringBuilder = new StringBuilder();
+                calendarSource.generateEvents(stringBuilder);
+                calendarSource.log(stringBuilder.toString());
                 if (LOG.isInfoEnabled()) LOG.info("Generating events for " + calendarSource.name() + " in " + Thread.currentThread().getName() + " finished");
             } catch (RuntimeException e) {
                 LOG.error("Problem generating events for " + calendarSource.name(), e);
                 calendarSource = R.calendarSource().findById(calendarSource.id()).orElseThrow(); // fresh does not work
+                calendarSource.log(e.toString());
                 calendarSource.status("Exception: " + e.getMessage());
             }
             calendarSource.lastRun(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));

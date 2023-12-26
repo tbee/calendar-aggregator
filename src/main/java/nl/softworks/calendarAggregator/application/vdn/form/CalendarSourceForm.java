@@ -38,6 +38,7 @@ public class CalendarSourceForm extends FormLayout {
 	private final Checkbox enabledCheckbox = new Checkbox("Enabled");
 	private final ComboBox<Timezone> timezoneComboBox = new ComboBox<>("Timezone");
 	private final TextField statusTextField = new TextField("Status");
+	private final TextArea logTextField = new TextArea("Log");
 
 	private CalendarSource calendarSource;
 	public CalendarSourceForm() {
@@ -48,7 +49,9 @@ public class CalendarSourceForm extends FormLayout {
 		}));
 		setColspan(urlTextField, 2);
 		setColspan(statusTextField, 2);
-		add(nameTextField, enabledCheckbox, urlTextField, locationTextField, timezoneComboBox, latNumberField, lonNumberField, statusTextField);
+		setColspan(logTextField, 2);
+		logTextField.setMaxHeight("15em");
+		add(nameTextField, enabledCheckbox, urlTextField, locationTextField, timezoneComboBox, latNumberField, lonNumberField, statusTextField, logTextField);
 
 		Button generateButton = new Button("Generate", evt -> generate());
 		setColspan(generateButton, 2);
@@ -62,6 +65,7 @@ public class CalendarSourceForm extends FormLayout {
 		binder.forField(enabledCheckbox).bind(CalendarSource::enabled, CalendarSource::enabled);
 		binder.forField(timezoneComboBox).bind(CalendarSource::timezone, CalendarSource::timezone);
 		binder.forField(statusTextField).bind(CalendarSource::status, CalendarSource::status);
+		binder.forField(logTextField).bind(CalendarSource::log, CalendarSource::log);
 	}
 
 	public CalendarSourceForm populateWith(CalendarSource calendarSource) {
@@ -88,12 +92,14 @@ public class CalendarSourceForm extends FormLayout {
 		try {
 			writeTo(calendarSource);
 			List<CalendarEvent> calendarEvents = calendarSource.generateEvents(stringBuilder);
+			calendarSource.log(stringBuilder.toString());
 			populateWith(calendarSource);
 
 			String calendarEventsString = calendarEvents.stream().map(s -> s + "\n").collect(Collectors.joining());
 			stringBuilder.append("\n\n").append(calendarEventsString);
 		}
 		catch (ValidationException | RuntimeException e) {
+			calendarSource.log(e.toString());
 			Notification.show(e.toString(), 5000, Notification.Position.BOTTOM_CENTER);
 		}
 

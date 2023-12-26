@@ -10,6 +10,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
@@ -141,6 +142,16 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 		return this;
 	}
 
+	@Lob
+	private String log;
+	static public final String LOG_PROPERTYID = "log";
+	public String log() {
+		return log;
+	}
+	public CalendarSource log(String v) {
+		this.log = v;
+		return this;
+	}
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.EAGER)
     protected final List<CalendarEvent> calendarEvents = new ArrayList<>();
