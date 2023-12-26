@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,6 +71,7 @@ implements AfterNavigationObserver
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::startDate).setHeader("Start").setFlexGrow(50);
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::endDate).setHeader("End").setFlexGrow(50);
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::status).setHeader("Status").setFlexGrow(50);
+		calendarSourceAndEventTreeGrid.addColumn(TreeNode::updated).setHeader("Updated").setFlexGrow(50);
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::eventCount).setHeader("Events").setFlexGrow(10);
 		calendarSourceAndEventTreeGrid.addItemDoubleClickListener(e -> edit());
 
@@ -211,6 +213,7 @@ implements AfterNavigationObserver
 		void delete(Runnable onOk);
 
 		String status();
+		LocalDateTime updated();
 
 		int eventCount();
 
@@ -290,6 +293,11 @@ implements AfterNavigationObserver
 		}
 
 		@Override
+		public LocalDateTime updated() {
+			return calendarSource.lastRun();
+		}
+
+		@Override
 		public int eventCount() {
 			return calendarSource.calendarEvents().size();
 		}
@@ -357,6 +365,11 @@ implements AfterNavigationObserver
 		@Override
 		public String status() {
 			return "";
+		}
+
+		@Override
+		public LocalDateTime updated() {
+			return null;
 		}
 
 		@Override

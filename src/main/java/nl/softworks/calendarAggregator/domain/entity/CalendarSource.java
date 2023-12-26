@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tbee.jakarta.validator.UrlValidator;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -129,6 +130,17 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 		this.enabled = v;
 		return this;
 	}
+
+	private LocalDateTime lastRun;
+	static public final String LASTRUN_PROPERTYID = "lastRun";
+	public LocalDateTime lastRun() {
+		return lastRun;
+	}
+	public CalendarSource lastRun(LocalDateTime v) {
+		this.lastRun = v;
+		return this;
+	}
+
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.EAGER)
     protected final List<CalendarEvent> calendarEvents = new ArrayList<>();
