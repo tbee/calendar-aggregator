@@ -345,7 +345,7 @@ implements AfterNavigationObserver
 					.onOk(() -> {
 						try {
 							calendarEventForm.writeTo(calendarEvent);
-							R.calendarEvent().save(calendarEvent);
+							R.calendarSource().save(calendarEvent.calendarSource());
 							onOk.run();
 						} catch (ValidationException e) {
 							throw new RuntimeException(e);

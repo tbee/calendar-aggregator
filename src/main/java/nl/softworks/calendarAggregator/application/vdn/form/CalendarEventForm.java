@@ -140,7 +140,7 @@ public class CalendarEventForm extends FormLayout {
 					try {
 						calendarEventForm.writeTo(calendarEvent);
 						calendarSource.addCalendarEvent(calendarEvent);
-						R.calendarEvent().save(calendarEvent);
+						R.calendarSource().save(calendarSource);
 						onInsert.run();
 					} catch (ValidationException e) {
 						throw new RuntimeException(e);
