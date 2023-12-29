@@ -4,12 +4,6 @@
 # Log file
 *.log
 
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
 # Package Files #
 *.jar
 *.war
@@ -23,17 +17,19 @@
 hs_err_pid*
 replay_pid*
 
+target
 frontend
 .run
 hsqldb
 target
 .idea
 logs
-/package.json
-/package-lock.json
-/tsconfig.json
-/types.d.ts
-/src/main/dev-bundle/
-/calendarAggregator.iml
-/dbdumps
+package.json
+package-lock.json
+tsconfig.json
+types.d.ts
+src/main/dev-bundle/
+calendarAggregator.iml
+dbdumps
 pom.xml.versionsBackup
+app/src/main/dev-bundle
