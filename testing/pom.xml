@@ -6,7 +6,7 @@
 
     <groupId>org.tbee</groupId>
     <artifactId>calendarAggregatorTesting</artifactId>
-    <version>1.14.0</version>
+    <version>1.0.0</version>
     <name>Calendar Aggregator Testing</name>
 
     <properties>
@@ -14,6 +14,9 @@
         <playwright.version>1.37.0</playwright.version>
         <junit.version>4.12</junit.version>
         <hamcrest.version>2.2</hamcrest.version>
+        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.release>17</maven.compiler.release>
     </properties>
 
     <dependencies>

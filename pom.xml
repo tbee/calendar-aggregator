@@ -4,10 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.tbee</groupId>
 	<artifactId>calendarAggregator-top</artifactId>
-	<version>1.14.0</version>
+	<version>1</version>
 	<name>Calendar Aggregator top</name>
 	<packaging>pom</packaging>
 
+	<!-- these modules just exist for easy import in EDIs -->
 	<modules>
 		<module>app</module>
 		<module>testing</module>
