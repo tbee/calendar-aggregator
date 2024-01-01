@@ -64,7 +64,9 @@ public class CalendarSourceICal extends CalendarSource {
 			status("");
 
 			// Get ical as string
-			String icalContent = IOUtils.toString(new URL(icalUrl));
+			String url = resolveUrl(icalUrl, stringBuilder);
+			if (stringBuilder != null) stringBuilder.append("url = ").append(url);
+			String icalContent = IOUtils.toString(new URL(url));
 			if (stringBuilder != null) {
 				String logContent = (icalContent.length() > 10000 ? icalContent.substring(0, 10000) + "\n...\n" : icalContent);
 				stringBuilder.append(logContent).append("\n");

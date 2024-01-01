@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.tbee.jakarta.validator.UrlValidator;
 
 import java.io.IOException;
 import java.net.URL;
@@ -24,7 +23,7 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 
 	final public static String SHORT_MONTH_NOTATION_PATTERN = "SMN";
 
-	@UrlValidator
+//	@UrlValidator
 	protected String scrapeUrl;
 	static public final String SCRAPEURL_PROPERTYID = "scrapeUrl";
 	public String scrapeUrl() {
@@ -69,8 +68,9 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 
 	protected String readScrapeUrl(StringBuilder stringBuilder) {
 		try {
-			if (stringBuilder != null) stringBuilder.append("Reading: " + scrapeUrl + "\n");
-			String html = IOUtils.toString(new URL(scrapeUrl));
+			String url = resolveUrl(scrapeUrl, stringBuilder);
+			if (stringBuilder != null) stringBuilder.append("Reading: " + url + "\n");
+			String html = IOUtils.toString(new URL(url));
 			Document doc = Jsoup.parse(html);
 			String text = doc.text();
 			if (stringBuilder != null) stringBuilder.append("Content: " + text.length() + "\n");

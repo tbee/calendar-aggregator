@@ -14,14 +14,23 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
+import org.mvel2.MVEL;
+import org.mvel2.ParserConfiguration;
+import org.mvel2.ParserContext;
+import org.mvel2.templates.CompiledTemplate;
+import org.mvel2.templates.TemplateCompiler;
+import org.mvel2.templates.TemplateRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tbee.jakarta.validator.UrlValidator;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -167,6 +176,42 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 		calendarEvent.calendarSource = null;
 	}
 
+	/**
+	 * Using MVEL2 http://mvel.documentnode.com/
+	 *
+	 * @param url
+	 * @param stringBuilder
+	 * @return
+	 */
+	protected String resolveUrl(String url, StringBuilder stringBuilder) {
+		if (stringBuilder != null) stringBuilder.append("URL before: " + url + "\n");
+
+		// Predefined custom functions
+		String functions =
+    			"""
+				def nowFormatted(format) {
+				   java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern(format));
+				}
+				""";
+		HashMap<String, Object> functionMap = new HashMap<>();
+		MVEL.eval(functions, functionMap);
+
+		// Compile the template, but in some opinionated context
+		ParserConfiguration parserConfiguration = new ParserConfiguration();
+		parserConfiguration.addPackageImport("java.time");
+		parserConfiguration.addPackageImport("java.time.format");
+		ParserContext context = new ParserContext(parserConfiguration);
+		CompiledTemplate compiledExpression = TemplateCompiler.compileTemplate(url, context);
+
+		// Evaluate the expression
+		Map<String, Object> vars = new HashMap<>(functionMap);
+		vars.put("now", LocalDateTime.now());
+		vars.put("yyyy_MM_dd", DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		String newUrl = (String) TemplateRuntime.execute(compiledExpression, vars);
+		if (stringBuilder != null) stringBuilder.append("URL after: " + newUrl + "\n");
+		return newUrl;
+	}
+
 	public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
 		status("ok");
 		return calendarEvents();
@@ -178,3 +223,4 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 		     ;
 	}
 }
+
