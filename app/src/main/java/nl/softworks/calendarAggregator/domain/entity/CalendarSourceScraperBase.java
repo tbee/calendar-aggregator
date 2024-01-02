@@ -1,10 +1,12 @@
 package nl.softworks.calendarAggregator.domain.entity;
 
 import jakarta.persistence.MappedSuperclass;
+import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.tbee.jakarta.validator.UrlValidatorImpl;
 
 import java.io.IOException;
 import java.net.URL;
@@ -23,7 +25,6 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 
 	final public static String SHORT_MONTH_NOTATION_PATTERN = "SMN";
 
-//	@UrlValidator
 	protected String scrapeUrl;
 	static public final String SCRAPEURL_PROPERTYID = "scrapeUrl";
 	public String scrapeUrl() {
@@ -32,6 +33,10 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 	public CalendarSourceScraperBase scrapeUrl(String v) {
 		this.scrapeUrl = v;
 		return this;
+	}
+	@AssertTrue(message = "Scraper URL is not a valid URL")
+	public boolean isValidScraperURL() {
+		return scrapeUrl == null || scrapeUrl.isBlank() || UrlValidatorImpl.isValid(resolveUrl(scrapeUrl, null));
 	}
 
 	protected String scrapeBlockStart;

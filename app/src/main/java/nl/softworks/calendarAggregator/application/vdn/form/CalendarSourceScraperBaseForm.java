@@ -23,7 +23,7 @@ public class CalendarSourceScraperBaseForm extends CalendarSourceForm {
 		add(scrapeURLTextField, scrapeBlockStartTextField, scrapeBlockEndTextField, removeCharsTextField);
 
 		binder.forField(scrapeURLTextField)
-//				.withValidator(s -> UrlValidatorImpl.isValid(s), "Illegal URL")
+				//.withValidator(s -> UrlValidatorImpl.isValid(s), "Illegal URL") // conflicts with MVEL expressions, moved to the entity
 				.bind(CalendarSourceScraperBase::scrapeUrl, CalendarSourceScraperBase::scrapeUrl);
 		binder.forField(scrapeBlockStartTextField).bind(CalendarSourceScraperBase::scrapeBlockStart, CalendarSourceScraperBase::scrapeBlockStart);
 		binder.forField(scrapeBlockEndTextField).bind(CalendarSourceScraperBase::scrapeBlockEnd, CalendarSourceScraperBase::scrapeBlockEnd);
