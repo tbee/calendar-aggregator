@@ -4,12 +4,11 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 
 public class OkCancelDialog extends Dialog {
 
-    Button okButton = new Button("Ok", VaadinIcon.SAFE.create());
+    Button okButton = new Button("Ok");
     private Runnable onOk = null;
 
     public OkCancelDialog(String title) {
@@ -25,6 +24,7 @@ public class OkCancelDialog extends Dialog {
         getHeader().add(closeButton);
 
         // Ok
+        okButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         okButton.addClickListener(e -> ok());
         getFooter().add(okButton);
 
