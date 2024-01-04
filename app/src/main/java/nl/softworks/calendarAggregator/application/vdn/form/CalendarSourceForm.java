@@ -38,7 +38,6 @@ public class CalendarSourceForm extends FormLayout {
 	private final Checkbox enabledCheckbox = new Checkbox("Enabled");
 	private final ComboBox<Timezone> timezoneComboBox = new ComboBox<>("Timezone");
 	private final TextField statusTextField = new TextField("Status");
-	private final TextArea logTextField = new TextArea("Log");
 
 	private CalendarSource calendarSource;
 	public CalendarSourceForm() {
@@ -49,9 +48,7 @@ public class CalendarSourceForm extends FormLayout {
 		}));
 		setColspan(urlTextField, 2);
 		setColspan(statusTextField, 2);
-		setColspan(logTextField, 2);
-		logTextField.setMaxHeight("15em");
-		add(nameTextField, enabledCheckbox, urlTextField, locationTextField, timezoneComboBox, latNumberField, lonNumberField, statusTextField, logTextField);
+		add(nameTextField, enabledCheckbox, urlTextField, locationTextField, timezoneComboBox, latNumberField, lonNumberField, statusTextField);
 
 		Button generateButton = new Button("Generate", evt -> generate());
 		setColspan(generateButton, 2);
@@ -65,7 +62,6 @@ public class CalendarSourceForm extends FormLayout {
 		binder.forField(enabledCheckbox).bind(CalendarSource::enabled, CalendarSource::enabled);
 		binder.forField(timezoneComboBox).bind(CalendarSource::timezone, CalendarSource::timezone);
 		binder.forField(statusTextField).bind(CalendarSource::status, CalendarSource::status);
-		binder.forField(logTextField).bind(CalendarSource::log, CalendarSource::log);
 	}
 
 	public CalendarSourceForm populateWith(CalendarSource calendarSource) {

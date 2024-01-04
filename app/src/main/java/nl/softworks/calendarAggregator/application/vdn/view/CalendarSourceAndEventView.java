@@ -3,12 +3,14 @@ package nl.softworks.calendarAggregator.application.vdn.view;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.function.ValueProvider;
@@ -70,7 +72,7 @@ implements AfterNavigationObserver
 		calendarSourceAndEventTreeGrid.addComponentColumn((ValueProvider<TreeNode, Anchor>) tn -> createAnchor(tn.url())).setHeader("Website").setFlexGrow(5);
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::startDate).setHeader("Start").setFlexGrow(50);
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::endDate).setHeader("End").setFlexGrow(50);
-		calendarSourceAndEventTreeGrid.addColumn(TreeNode::status).setHeader("Status").setFlexGrow(50);
+		calendarSourceAndEventTreeGrid.addComponentColumn((ValueProvider<TreeNode, Button>) tn -> createShowLogButton(tn)).setHeader("Status").setFlexGrow(50);
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::updated).setHeader("Updated").setFlexGrow(50);
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::eventCount).setHeader("Events").setFlexGrow(10);
 		calendarSourceAndEventTreeGrid.addItemDoubleClickListener(e -> edit());
@@ -93,6 +95,24 @@ implements AfterNavigationObserver
 		Anchor anchor = new Anchor(url, "⇒");
 		anchor.setTarget("_blank");
 		return anchor;
+	}
+
+	private Button createShowLogButton(TreeNode treeNode) {
+		if (treeNode instanceof TreeNodeCalendarEvent) {
+			return null;
+		}
+		Button button = new Button(treeNode.status(), evt -> showLogInDialog(treeNode.calendarSource()));
+		button.addThemeVariants(ButtonVariant.LUMO_SMALL);
+		return button;
+	}
+
+	private void showLogInDialog(CalendarSource calendarSource) {
+		TextArea textArea = new TextArea("Result", calendarSource.log(), "");
+		textArea.setSizeFull();
+
+		CancelDialog cancelDialog = new CancelDialog("Log", textArea);
+		cancelDialog.setSizeFull();
+		cancelDialog.open();
 	}
 
 	private void generate() {
