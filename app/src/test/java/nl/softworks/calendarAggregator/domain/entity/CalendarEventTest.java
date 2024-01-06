@@ -3,7 +3,6 @@ package nl.softworks.calendarAggregator.domain.entity;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,7 +18,7 @@ public class CalendarEventTest {
                 .rrule("FREQ=MONTHLY;BYSETPOS=1;BYDAY=SU;INTERVAL=1;"); // first sunday of the month
 
         // WHEN: applying the rrule
-        List<CalendarEvent> calendarEvents = calendarEvent.applyRRule();
+        List<CalendarEvent> calendarEvents = calendarEvent.applyRRule(LocalDateTime.of(2023, 12, 2, 10, 0, 0));
 
         // THEN
         Assertions.assertEquals(5, calendarEvents.size());

@@ -1,6 +1,10 @@
 package nl.softworks.calendarAggregator.domain.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.ValidationException;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
@@ -110,6 +114,11 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 	}
 
 	public List<CalendarEvent> applyRRule() {
+		return applyRRule(LocalDateTime.now());
+	}
+
+	// Needed for testing
+	List<CalendarEvent> applyRRule(LocalDateTime now) {
 		if (rrule.isBlank()) {
 			return List.of(this);
 		}
@@ -120,8 +129,8 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 		Duration duration = Duration.between(startDateTime, endDateTime);
 		try {
 			// Limit the amount of events generated
-			LocalDateTime pastTreshold = LocalDateTime.now().minusMonths(1);
-			LocalDateTime futureTreshold = LocalDateTime.now().plusMonths(5);
+			LocalDateTime pastTreshold = now.minusMonths(1);
+			LocalDateTime futureTreshold = now.plusMonths(5);
 
 			// Create the recurrence rule
 			Recur recur = new Recur(rrule);

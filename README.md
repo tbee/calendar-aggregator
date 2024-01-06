@@ -58,4 +58,4 @@ CA uses a simplified DDD / hexagonal / onion architecture:
 Testing is done using functional testing based on Cucumber, in a three layer architecture:
 * Functional test scripts (feature files)
 * Page Object Model (POM) files
-* Glue code (step definitions) to make the test scripts onto the POM files.
+* Glue code (step definitions) to map the test scripts onto the POM files.
