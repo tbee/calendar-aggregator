@@ -24,6 +24,7 @@ import nl.softworks.calendarAggregator.application.vdn.CalendarAggregatorAppLayo
 import nl.softworks.calendarAggregator.application.vdn.component.CancelDialog;
 import nl.softworks.calendarAggregator.application.vdn.component.CrudButtonbar;
 import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
+import nl.softworks.calendarAggregator.application.vdn.component.VButton;
 import nl.softworks.calendarAggregator.application.vdn.form.CalendarEventForm;
 import nl.softworks.calendarAggregator.application.vdn.form.CalendarSourceForm;
 import nl.softworks.calendarAggregator.application.vdn.form.CalendarSourceICalForm;
@@ -149,30 +150,30 @@ implements AfterNavigationObserver
 		HorizontalLayout horizontalLayout = new HorizontalLayout(verticalLayout);
 		CancelDialog addSelectionDialog = new CancelDialog("Add", horizontalLayout);
 
-		verticalLayout.add(new Button("Manual Source", e -> {
+		verticalLayout.add(new VButton("Manual Source", e -> {
 			addSelectionDialog.close();
 			CalendarSourceForm.showInsertDialog(calendarSource, () -> reloadTreeGrid());
-		}));
+		}).withIsPrimary(calendarSource != null));
 
-		verticalLayout.add(new Button("Regex Source", e -> {
+		verticalLayout.add(new VButton("Regex Source", e -> {
 			addSelectionDialog.close();
 			CalendarSourceRegexScraper calendarSourceRegexScraper = (calendarSource instanceof CalendarSourceRegexScraper ? (CalendarSourceRegexScraper)calendarSource : null);
 			CalendarSourceRegexScraperForm.showInsertDialog(calendarSourceRegexScraper, () -> reloadTreeGrid());
-		}));
+		}).withIsPrimary(calendarSource instanceof CalendarSourceRegexScraper));
 
-		verticalLayout.add(new Button("Multiple days Source", e -> {
+		verticalLayout.add(new VButton("Multiple days Source", e -> {
 			addSelectionDialog.close();
 			CalendarSourceMultipleDaysScraper calendarSourceMultipleDaysScraper = (calendarSource instanceof CalendarSourceMultipleDaysScraper ? (CalendarSourceMultipleDaysScraper)calendarSource : null);
 			CalendarSourceMultipleDaysScraperForm.showInsertDialog(calendarSourceMultipleDaysScraper, () -> reloadTreeGrid());
-		}));
+		}).withIsPrimary(calendarSource instanceof CalendarSourceMultipleDaysScraper));
 
-		verticalLayout.add(new Button("ICal Source", e -> {
+		verticalLayout.add(new VButton("ICal Source", e -> {
 			addSelectionDialog.close();
 			CalendarSourceICal calendarSourceICal = (calendarSource instanceof CalendarSourceICal ? (CalendarSourceICal)calendarSource : null);
 			CalendarSourceICalForm.showInsertDialog(calendarSourceICal, () -> reloadTreeGrid());
-		}));
+		}).withIsPrimary(calendarSource instanceof CalendarSourceICal));
 
-		horizontalLayout.add(new VerticalLayout(new Button("Manual Event", e -> {
+		horizontalLayout.add(new VerticalLayout(new VButton("Manual Event", e -> {
 			addSelectionDialog.close();
 			CalendarEventForm.showInsertDialog(calendarSource, () -> reloadTreeGrid());
 		})));
