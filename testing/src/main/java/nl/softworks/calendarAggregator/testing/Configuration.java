@@ -1,5 +1,8 @@
 package nl.softworks.calendarAggregator.testing;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 public class Configuration {
@@ -7,17 +10,13 @@ public class Configuration {
     final private Properties properties = new Properties();
 
     public Configuration() {
-//        try (FileInputStream fileInputStream = new FileInputStream(nl.softworks.calendarAggregator.testing.glue.web.CucumberHooks.determineLocalSettingsFile())) {
-//            properties.load(fileInputStream);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//        try (FileInputStream fileInputStream = new FileInputStream(nl.softworks.calendarAggregator.testing.glue.web.CucumberHooks.determineLocalProjectFile())) {
-//            properties.load(fileInputStream);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
+        File file = new File("../app/src/main/resources/application.properties");
+        System.out.println(file.getAbsolutePath());
+        try (FileInputStream fileInputStream = new FileInputStream(file)) {
+            properties.load(fileInputStream);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String jdbcUsername() {
@@ -40,7 +39,11 @@ public class Configuration {
     }
 
     public String webBaseUrl() {
-        return "http://localhost:" + properties.getProperty("deploy.jbossweb.port", "9000") + "/";
+        String port = properties.getProperty("server.http.port", "8080");
+        if ("0".equals(port)) {
+            port = "8080";
+        }
+        return "http://localhost:" + port;
     }
 
     public boolean runHeadless() {

@@ -9,7 +9,9 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -67,8 +69,8 @@ implements AfterNavigationObserver
 
 		// calendarSourceAndEventTreeGrid
 		calendarSourceAndEventTreeGrid.addHierarchyColumn(TreeNode::text).setHeader("Name").setFlexGrow(100);
-		calendarSourceAndEventTreeGrid.addComponentColumn((ValueProvider<TreeNode, Icon>) tn -> tn.enabled() == null ? null : tn.enabled() ? VaadinIcon.CHECK.create() : VaadinIcon.MINUS.create()).setHeader("Enabled").setFlexGrow(5);
-		calendarSourceAndEventTreeGrid.addColumn(TreeNode::type).setHeader("Type").setFlexGrow(10);
+		calendarSourceAndEventTreeGrid.addComponentColumn((ValueProvider<TreeNode, Icon>) tn -> createEnabledIcon(tn)).setHeader("Enabled").setFlexGrow(5);
+		calendarSourceAndEventTreeGrid.addComponentColumn((ValueProvider<TreeNode, NativeLabel>) tn -> createTypeLabel(tn)).setHeader("Type").setFlexGrow(10);
 		calendarSourceAndEventTreeGrid.addComponentColumn((ValueProvider<TreeNode, Anchor>) tn -> createAnchor(tn.url())).setHeader("Website").setFlexGrow(5);
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::startDate).setHeader("Start").setFlexGrow(50);
 		calendarSourceAndEventTreeGrid.addColumn(TreeNode::endDate).setHeader("End").setFlexGrow(50);
@@ -89,6 +91,18 @@ implements AfterNavigationObserver
 		VerticalLayout verticalLayout = new VerticalLayout(crudButtonbar, calendarSourceAndEventTreeGrid);
 		verticalLayout.setSizeFull();
 		setContent(verticalLayout);
+	}
+
+	private NativeLabel createTypeLabel(TreeNode tn) {
+		NativeLabel nativeLabel = new NativeLabel(tn.type());
+		Tooltip.forComponent(nativeLabel)
+				.withText(tn.hint())
+				.withPosition(Tooltip.TooltipPosition.TOP_START);
+		return nativeLabel;
+	}
+
+	private Icon createEnabledIcon(TreeNode tn) {
+		return tn.enabled() == null ? null : tn.enabled() ? VaadinIcon.CHECK.create() : VaadinIcon.MINUS.create();
 	}
 
 	private Anchor createAnchor(String url) {
@@ -132,7 +146,8 @@ implements AfterNavigationObserver
 		CalendarSource calendarSource = (treeNode == null ? null : treeNode.calendarSource());
 
 		VerticalLayout verticalLayout = new VerticalLayout();
-		CancelDialog addSelectionDialog = new CancelDialog("Add", verticalLayout);
+		HorizontalLayout horizontalLayout = new HorizontalLayout(verticalLayout);
+		CancelDialog addSelectionDialog = new CancelDialog("Add", horizontalLayout);
 
 		verticalLayout.add(new Button("Manual Source", e -> {
 			addSelectionDialog.close();
@@ -157,10 +172,10 @@ implements AfterNavigationObserver
 			CalendarSourceICalForm.showInsertDialog(calendarSourceICal, () -> reloadTreeGrid());
 		}));
 
-		verticalLayout.add(new Button("Manual Event", e -> {
+		horizontalLayout.add(new VerticalLayout(new Button("Manual Event", e -> {
 			addSelectionDialog.close();
 			CalendarEventForm.showInsertDialog(calendarSource, () -> reloadTreeGrid());
-		}));
+		})));
 
 		addSelectionDialog.open();
 	}
@@ -237,6 +252,7 @@ implements AfterNavigationObserver
 
 		int eventCount();
 
+		String hint();
 	}
 
 	record TreeNodeCalendarSource(CalendarSource calendarSource) implements TreeNode {
@@ -321,6 +337,14 @@ implements AfterNavigationObserver
 		public int eventCount() {
 			return calendarSource.calendarEvents().size();
 		}
+
+		@Override
+		public String hint() {
+			if (calendarSource instanceof CalendarSourceRegexScraper calendarSourceRegexScraper) {
+				return calendarSourceRegexScraper.regex();
+			}
+			return "";
+		}
 	}
 
 	record TreeNodeCalendarEvent(TreeNodeCalendarSource treeNodeCalendarSource, CalendarEvent calendarEvent) implements TreeNode {
@@ -395,6 +419,11 @@ implements AfterNavigationObserver
 		@Override
 		public int eventCount() {
 			return calendarEvent.generated() ? 0 : 1;
+		}
+
+		@Override
+		public String hint() {
+			return "";
 		}
 	}
 

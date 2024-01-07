@@ -37,17 +37,20 @@ Or can be exported in iCal format to be included in Google calendar.
 
 Both HTML and iCal views can be filtered using a lat/lon position and a as-the-crow-flies distance.
 
+## Getting started
+
+Running `mvn package` will create a fat-jar that can be started using `java -jar`, optionally provide some configuration parameters via -D (like the HTTP ports as Spring has it), and that's it.
+Do search the log of the first start for 'note down' to get the password of the automatically created administrator user.
+
 ## Technology
 
-The technology stack of CA is intended to be simple and easy - basically allowing MS-Access style development.
+The technology stack of CA is intended to be simple and easy - basically allowing a 'MS-Access style' development.
 * Spring boot as the basis
 * Vaadin for the backend, so no fuss with HTML and browser issues, just plain Java.
-* HSQLDB as the database, which is started by the CA itself (in server mode on localhost, so it is accessible via standard SQL tools).
+* HSQLDB as the database, which is started by CA itself (in server mode on localhost, so it is accessible via standard SQL tools).
 * Liquibase for database migration, run automatically when the application starts.
 
-Building will create a fat-jar that can be started using `java -jar`, optionally provide some configuration parameters via -D (like the HTTP ports), and that's it.
-
-Since the HSQLDB is running in server mode, create a backup is as simple as connecting to the database and executing `BACKUP DATABASE TO '...' BLOCKING`, and copying the resulting files.
+Since the HSQLDB is running in server mode, creating a backup is as simple as connecting to the database and executing `BACKUP DATABASE TO '...' BLOCKING`, and copying the resulting files.
 
 ## Architecture
 
