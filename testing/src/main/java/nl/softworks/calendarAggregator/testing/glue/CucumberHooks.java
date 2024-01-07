@@ -14,6 +14,7 @@ import io.cucumber.java.Scenario;
 import nl.softworks.calendarAggregator.testing.Configuration;
 import nl.softworks.calendarAggregator.testing.Database;
 import nl.softworks.calendarAggregator.testing.TestContext;
+import nl.softworks.calendarAggregator.testing.impl.db.PersonDB;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -45,6 +46,7 @@ public class CucumberHooks {
         openDatabase();
         openBrowser();
         prepareTestContext();
+        makeSurePersonAdministratorExists();
         startTrace();
     }
 
@@ -67,6 +69,13 @@ public class CucumberHooks {
      */
     public void prepareTestContext() {
         TestContext.prepareToRunTest(configuration, browserContext, page, database);
+    }
+
+    public void makeSurePersonAdministratorExists() {
+        PersonDB personDB = PersonDB.get();
+        if (personDB.selectByUsername(TestContext.ADMINISTRATOR) == null) {
+            database.inTransaction(() -> personDB.insert(TestContext.ADMINISTRATOR, TestContext.get().getPasswordFor(TestContext.ADMINISTRATOR)));
+        }
     }
 
     private static void loadConfiguration() {

@@ -18,7 +18,15 @@ public class LoginPage extends Page {
         page().waitForSelector(String.format("xpath=//input[@id='username']"));
     }
 
-    public void setUsername(String username) {
+    public void fillUsername(String username) {
         page().fill("#username", username);
+    }
+
+    public void fillPassword(String username) {
+        page().fill("#password", username);
+    }
+
+    public void clickLogin() {
+        page().click("xpath=//button");
     }
 }

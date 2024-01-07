@@ -9,6 +9,7 @@ import java.util.Map;
 public class TestContext {
 
     private static final ThreadLocal<TestContext> threadLocalTestContext = new ThreadLocal<TestContext>();
+    public static final String ADMINISTRATOR = "administrator";
 
     private final Map<Class<?>, Object> instanceCache = new HashMap<>();
     private final Configuration configuration;
@@ -42,7 +43,7 @@ public class TestContext {
         this.page = page;
         this.database = database;
 
-        usernameToPassword.put("administrator", "123");
+        usernameToPassword.put(ADMINISTRATOR, "123");
     }
 
     // ===============================================================

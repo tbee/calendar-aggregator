@@ -1,7 +1,8 @@
 package nl.softworks.calendarAggregator.testing;
 
-import org.skife.jdbi.v2.DBI;
-import org.skife.jdbi.v2.Handle;
+import org.jdbi.v3.core.Handle;
+import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.jpa.JpaPlugin;
 
 import java.io.Closeable;
 import java.sql.Connection;
@@ -17,8 +18,9 @@ public class Database implements Closeable {
         if (connection == null) {
             try {
                 Configuration configuration = TestContext.get().configuration();
+                Class.forName(configuration.jdbcDriver());
                 connection = DriverManager.getConnection(configuration.jdbcUrl(), configuration.jdbcUsername(), configuration.jdbcPassword());
-            } catch (SQLException e) {
+            } catch (SQLException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
             }
         }
@@ -26,7 +28,9 @@ public class Database implements Closeable {
     }
     public Handle jdbi() {
         if (handle == null) {
-            handle = DBI.open(jdbcConnection()).begin();
+            Jdbi jdbi = Jdbi.create(jdbcConnection());
+            jdbi.installPlugin(new JpaPlugin());
+            handle = jdbi.open().begin();
         }
         return handle;
     }

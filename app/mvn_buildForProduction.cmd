@@ -1,4 +1,6 @@
-call ..\mvnw versions:set
+cd ..
+call mvnw versions:set -DgenerateBackupPoms=false -DprocessAllModules=true -DgroupId='*'
+cd app
 call ..\mvnw clean package -DskipTests -Pproduction
 pause 
 

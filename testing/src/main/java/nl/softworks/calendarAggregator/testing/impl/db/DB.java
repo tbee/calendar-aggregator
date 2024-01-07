@@ -2,7 +2,7 @@ package nl.softworks.calendarAggregator.testing.impl.db;
 
 import nl.softworks.calendarAggregator.testing.Database;
 import nl.softworks.calendarAggregator.testing.TestContext;
-import org.skife.jdbi.v2.Handle;
+import org.jdbi.v3.core.Handle;
 
 public abstract class DB {
 

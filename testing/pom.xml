@@ -3,10 +3,9 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <groupId>org.tbee</groupId>
     <artifactId>calendarAggregatorTesting</artifactId>
-    <version>1.0.0</version>
+    <version>1.17.0</version>
     <name>Calendar Aggregator Testing</name>
 
     <properties>
@@ -18,6 +17,25 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.release>17</maven.compiler.release>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-parent</artifactId>
+                <version>3.0.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jdbi</groupId>
+                <artifactId>jdbi3-bom</artifactId>
+                <type>pom</type>
+                <version>3.43.0</version>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -52,18 +70,24 @@
             <artifactId>playwright</artifactId>
             <version>${playwright.version}</version>
         </dependency>
-        <!-- JDBI, v3 requires Java 11+ -->
-        <!--        <dependency>-->
-        <!--            <groupId>org.jdbi</groupId>-->
-        <!--            <artifactId>jdbi3-bom</artifactId>-->
-        <!--            <type>pom</type>-->
-        <!--            <version>3.41.1</version>-->
-        <!--            <scope>import</scope>-->
-        <!--        </dependency>-->
+        <!-- https://jdbi.org/releases/3.43.0/ -->
         <dependency>
             <groupId>org.jdbi</groupId>
-            <artifactId>jdbi</artifactId>
-            <version>2.78</version>
+            <artifactId>jdbi3-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jdbi</groupId>
+            <artifactId>jdbi3-jpa</artifactId>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.security</groupId>-->
+<!--            <artifactId>spring-security-crypto</artifactId>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>org.tbee</groupId>
+            <artifactId>calendarAggregator</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

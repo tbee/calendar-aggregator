@@ -20,22 +20,16 @@ public class Configuration {
     }
 
     public String jdbcUsername() {
-        return properties.getProperty("mysql.system.username");
+        return properties.getProperty("spring.datasource.username");
     }
     public String jdbcPassword() {
-        return properties.getProperty("mysql.system.password");
-    }
-    public String jdbcHostname() {
-        return properties.getProperty("deploy.datasource.hostname");
+        return properties.getProperty("spring.datasource.password");
     }
     public String jdbcDriver() {
-        return "com.mysql.jdbc.Driver";
-    }
-    public String jdbcDatabasename() {
-        return properties.getProperty("deploy.datasource.database");
+        return properties.getProperty("spring.datasource.driver-class-name");
     }
     public String jdbcUrl() {
-        return "jdbc:mysql://" + jdbcHostname() + "/" + jdbcDatabasename() + "?useSSL=false";
+        return properties.getProperty("spring.datasource.url");
     }
 
     public String webBaseUrl() {
