@@ -57,7 +57,7 @@ public class ApplicationEvents {
 
         // Create scheduler
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
-        LocalDateTime firstRun = now.toLocalDate().atStartOfDay().plusDays(1).plusHours(4); // 04:00
+        LocalDateTime firstRun = now.toLocalDate().atStartOfDay().plusDays(1); // 00:00 (this will make sure unexpected restarts do not skip running the task)
         if (LOG.isInfoEnabled()) LOG.info("Creating scheduled task for generating events, first run at " + firstRun);
         long delayUntilFirstRunInSeconds = Duration.between(now, firstRun).getSeconds();
         scheduledExecutorService.scheduleAtFixedRate(this::generateEvents, delayUntilFirstRunInSeconds, TimeUnit.DAYS.toSeconds(1), TimeUnit.SECONDS); // both values are in TimeUnit
