@@ -46,7 +46,7 @@ public class ApplicationEvents {
 
             // Create user
             String password = RandomStringUtils.random(32, true, true);
-            LOG.warn("Creating an administrator user because non exist, note down this: " + username + " / " + password);
+            LOG.warn("Creating an administrator user because none exist, note down this: " + username + " / " + password);
             R.person().save(new Person()
                     .username(username)
                     .password(password)

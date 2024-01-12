@@ -197,7 +197,7 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
             }
             if (stringBuilder != null) stringBuilder.append("Done\n");
             if (calendarEvents().isEmpty()) {
-                status("No events are generated");
+                status("No events");
                 return List.of();
             }
             status("ok");
