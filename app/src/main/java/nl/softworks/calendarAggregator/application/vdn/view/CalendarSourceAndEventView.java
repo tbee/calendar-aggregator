@@ -223,7 +223,20 @@ implements AfterNavigationObserver
 
 		// Refresh data
 		List<CalendarSource> calendarSources = R.calendarSource().findAll();
-		calendarSources.sort(Comparator.comparing(CalendarSource::name));
+		// not ok statusses should always come first
+		Comparator<CalendarSource> compareByStatus = (cs1, cs2) -> {
+			boolean cs1ok = "ok".contentEquals(cs1.status());
+			boolean cs2ok = "ok".contentEquals(cs2.status());
+			if ((cs1ok && cs2ok) || (!cs1ok && !cs2ok)) {
+				return 0;
+			}
+			if (!cs1ok) {
+				return -1;
+			}
+			return 1;
+		};
+		Comparator<CalendarSource> compareByName = Comparator.comparing(CalendarSource::name);
+		calendarSources.sort(compareByStatus.thenComparing(compareByName));
 		List<TreeNode> treeNodes = treeNodes(calendarSources, TreeNodeCalendarSource::new);
 		calendarSourceAndEventTreeGrid.setItems(treeNodes, this::getTreeNodeChildren);
 
