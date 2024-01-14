@@ -200,7 +200,7 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
                 status("No events");
                 return List.of();
             }
-            status("ok");
+            status(OK);
             return calendarEvents();
         }
         catch (RuntimeException e) {

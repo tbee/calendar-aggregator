@@ -225,8 +225,8 @@ implements AfterNavigationObserver
 		List<CalendarSource> calendarSources = R.calendarSource().findAll();
 		// not ok statusses should always come first
 		Comparator<CalendarSource> compareByStatus = (cs1, cs2) -> {
-			boolean cs1ok = "ok".contentEquals(cs1.status());
-			boolean cs2ok = "ok".contentEquals(cs2.status());
+			boolean cs1ok = cs1.statusIsOk();
+			boolean cs2ok = cs2.statusIsOk();
 			if ((cs1ok && cs2ok) || (!cs1ok && !cs2ok)) {
 				return 0;
 			}

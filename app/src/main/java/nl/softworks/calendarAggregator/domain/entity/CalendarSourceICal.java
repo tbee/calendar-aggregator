@@ -139,7 +139,7 @@ public class CalendarSourceICal extends CalendarSource {
 				return List.of();
 			}
 
-			status("ok");
+			status(OK);
 			return calendarEvents();
 		}
 		catch (RuntimeException | IOException | ParserException | InterruptedException e) {

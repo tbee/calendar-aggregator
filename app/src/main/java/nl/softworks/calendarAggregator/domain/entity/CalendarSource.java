@@ -45,6 +45,7 @@ import java.util.Map;
 @DiscriminatorValue("manual")
 public class CalendarSource extends EntityBase<CalendarSource> {
 	private static final Logger LOG = LoggerFactory.getLogger(CalendarSource.class);
+	protected static final String OK = "ok";
 
 	public String type() {
 		return "Manual";
@@ -94,6 +95,9 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 	public CalendarSource status(String v) {
 		this.status = v;
 		return this;
+	}
+	public boolean statusIsOk() {
+		return OK.equals(status);
 	}
 
 	@NotNull
@@ -239,7 +243,7 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 
 	public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
-		status("ok");
+		status(OK);
 		return calendarEvents();
 	}
 
