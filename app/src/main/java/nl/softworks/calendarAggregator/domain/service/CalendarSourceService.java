@@ -8,14 +8,21 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 @Service
 public class CalendarSourceService {
     private static final Logger LOG = LoggerFactory.getLogger(CalendarSourceService.class);
 
     private static final ExecutorService executorService = Executors.newCachedThreadPool();
+    private static final ExecutorService executorServiceForTimeout = Executors.newSingleThreadExecutor(); //newCachedThreadPool();
 
     public void generateEvents() {
         generateEvents(null);
@@ -24,16 +31,20 @@ public class CalendarSourceService {
     public void generateEvents(Runnable onStarted) {
         try {
             if (LOG.isInfoEnabled()) LOG.info("Scheduling event generation");
+            Map<String, Future<?>> idToFutureMap = new TreeMap<>();
             R.calendarSource().findAll().stream()
                     .filter(cs -> cs.enabled())
                     .forEach(cs -> {
-                        if (onStarted != null) {
-                            cs.status("Scheduled");
-                            R.calendarSource().saveAndFlush(cs);
-                        }
-                        executorService.submit(() -> generateEvents(cs.id()));
+                        cs.status("Scheduled");
+                        R.calendarSource().saveAndFlush(cs);
+                        Future<?> future = executorService.submit(() -> generateEvents(cs.id()));
+                        idToFutureMap.put(cs.name(), future);
                     });
             if (LOG.isInfoEnabled()) LOG.info("Event generation scheduled");
+// Interrupting makes no difference; the task is not stopped.
+//            executorServiceForTimeout.submit(() -> {
+//                 interruptIfRunningTooLong(idToFutureMap);
+//            });
             if (onStarted != null) {
                 onStarted.run();
             }
@@ -42,6 +53,23 @@ public class CalendarSourceService {
             LOG.error("Problem scheduling events", e);
             throw e;
         }
+    }
+
+    private static void interruptIfRunningTooLong(Map<String, Future<?>> idToFutureMap) {
+        idToFutureMap.entrySet().forEach(i2f -> {
+            if (LOG.isInfoEnabled()) LOG.info("Generating events, waiting for timeout " + i2f.getKey());
+            try {
+                i2f.getValue().get(3, TimeUnit.SECONDS);
+                if (LOG.isInfoEnabled()) LOG.info("Generating events, completed within allotted time " + i2f.getKey());
+            }
+            catch (TimeoutException e) {
+                if (LOG.isInfoEnabled()) LOG.info("Generating events, timed out " + i2f.getKey());
+                i2f.getValue().cancel(true);
+            }
+            catch (InterruptedException | ExecutionException e) {
+                if (LOG.isInfoEnabled()) LOG.info("Generating events, interrupted " + i2f.getKey());
+            }
+        });
     }
 
     private void generateEvents(long calendarSourceId) {

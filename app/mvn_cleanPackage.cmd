@@ -1,3 +1,6 @@
+if exist javaHome.cmd (
+    call javaHome.cmd
+)
 call ..\mvnw.cmd clean package 
 pause
 

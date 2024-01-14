@@ -13,13 +13,11 @@ import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
-import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
@@ -66,7 +64,7 @@ public class CalendarSourceICal extends CalendarSource {
 			// Get ical as string
 			String url = resolveUrl(icalUrl, stringBuilder);
 			if (stringBuilder != null) stringBuilder.append("url = ").append(url);
-			String icalContent = IOUtils.toString(new URL(url));
+			String icalContent = getUrl(url);
 			if (stringBuilder != null) {
 				String logContent = (icalContent.length() > 10000 ? icalContent.substring(0, 10000) + "\n...\n" : icalContent);
 				stringBuilder.append(logContent).append("\n");
@@ -144,7 +142,7 @@ public class CalendarSourceICal extends CalendarSource {
 			status("ok");
 			return calendarEvents();
 		}
-		catch (RuntimeException | IOException | ParserException e) {
+		catch (RuntimeException | IOException | ParserException | InterruptedException e) {
 			status(e.getMessage());
 			if (stringBuilder != null) {
 				StringWriter stringWriter = new StringWriter();

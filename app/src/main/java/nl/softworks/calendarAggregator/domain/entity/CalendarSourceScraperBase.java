@@ -3,13 +3,11 @@ package nl.softworks.calendarAggregator.domain.entity;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
-import org.apache.commons.io.IOUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.tbee.jakarta.validator.UrlValidatorImpl;
 
 import java.io.IOException;
-import java.net.URL;
 import java.time.LocalDate;
 import java.time.MonthDay;
 import java.time.Period;
@@ -75,7 +73,7 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 		try {
 			String url = resolveUrl(scrapeUrl, stringBuilder);
 			if (stringBuilder != null) stringBuilder.append("Reading: " + url + "\n");
-			String html = IOUtils.toString(new URL(url));
+			String html = getUrl(url);
 			Document doc = Jsoup.parse(html);
 			String text = doc.text();
 			if (stringBuilder != null) stringBuilder.append("Content: " + text.length() + "\n");
@@ -88,7 +86,7 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 				if (stringBuilder != null) stringBuilder.append("Content after block end: " + text.length() + "\n");
 			}
 			return text;
-		} catch (IOException e) {
+		} catch (IOException | InterruptedException e) {
 			throw new RuntimeException(e);
 		}
 	}

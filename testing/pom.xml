@@ -13,9 +13,9 @@
         <playwright.version>1.37.0</playwright.version>
         <junit.version>4.12</junit.version>
         <hamcrest.version>2.2</hamcrest.version>
-        <maven.compiler.target>17</maven.compiler.target>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.release>17</maven.compiler.release>
+        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.release>21</maven.compiler.release>
     </properties>
 
     <dependencyManagement>

@@ -24,6 +24,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tbee.jakarta.validator.UrlValidator;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -210,6 +217,25 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 		String newUrl = (String) TemplateRuntime.execute(compiledExpression, vars);
 		if (stringBuilder != null) stringBuilder.append("URL after: " + newUrl + "\n");
 		return newUrl;
+	}
+
+	protected String getUrl(String urlString) throws IOException, InterruptedException {
+		try {
+			HttpClient client = HttpClient.newBuilder()
+					.version(HttpClient.Version.HTTP_1_1)
+					.followRedirects(HttpClient.Redirect.NORMAL)
+					.connectTimeout(Duration.ofMinutes(10))
+					.build();
+			HttpRequest request = HttpRequest.newBuilder()
+					.GET()
+					.uri(new URI(urlString))
+					.build();
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+			return response.body();
+		}
+		catch (URISyntaxException e) {
+			throw new IOException(e);
+		}
 	}
 
 	public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {

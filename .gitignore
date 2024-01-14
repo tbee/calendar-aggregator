@@ -33,3 +33,5 @@ calendarAggregator.iml
 dbdumps
 pom.xml.versionsBackup
 app/src/main/dev-bundle
+app/java.cmd
+app/javaHome.cmd
