@@ -97,7 +97,7 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 		return this;
 	}
 	public boolean statusIsOk() {
-		return OK.equals(status);
+		return OK.equals(status) || !enabled;
 	}
 
 	@NotNull
