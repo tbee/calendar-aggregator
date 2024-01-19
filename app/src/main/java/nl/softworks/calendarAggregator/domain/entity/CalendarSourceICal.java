@@ -9,6 +9,7 @@ import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.ComponentList;
+import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.DtEnd;
@@ -121,9 +122,12 @@ public class CalendarSourceICal extends CalendarSource {
 						}
 					}
 				}
-				String timezoneName = startDate.getTimeZone().getVTimeZone().getTimeZoneId().getValue();
-				if (!timezone().name().equals(timezoneName)) {
-					throw new RuntimeException("Source's timezone is not equal to " + timezoneName);
+				TimeZone timeZone = startDate.getTimeZone();
+				if (timeZone != null) {
+					String timezoneName = timeZone.getVTimeZone().getTimeZoneId().getValue();
+					if (!timezone().name().equals(timezoneName)) {
+						throw new RuntimeException("Source's timezone is not equal to " + timezoneName);
+					}
 				}
 
 				CalendarEvent calendarEvent = new CalendarEvent()
