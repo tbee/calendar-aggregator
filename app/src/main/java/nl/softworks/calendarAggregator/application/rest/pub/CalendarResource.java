@@ -5,7 +5,10 @@ import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEventExdate;
 import nl.softworks.calendarAggregator.domain.entity.Settings;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -38,7 +41,7 @@ public class CalendarResource {
         LocalDateTime pastThreshold = LocalDateTime.now().minusMonths(1);
         LocalDateTime futureThreshold = LocalDateTime.now().plusMonths(4);
         String events = R.calendarEvent().findAll().stream()
-                .filter(ce -> pastThreshold.isBefore(ce.startDateTime()) && futureThreshold.isAfter(ce.startDateTime()))
+                .filter(ce -> ce.hasRrule() || (pastThreshold.isBefore(ce.startDateTime()) && futureThreshold.isAfter(ce.startDateTime())))
                 .filter(ce -> d == 0 || d > (int)calculateDistance(lat, lon, ce.calendarSource().lat(), ce.calendarSource().lon()))
                 .map(this::ical)
                 .collect(Collectors.joining());

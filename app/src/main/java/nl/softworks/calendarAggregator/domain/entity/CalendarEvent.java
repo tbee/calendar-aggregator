@@ -96,6 +96,9 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 		this.rrule = v;
 		return this;
 	}
+	public boolean hasRrule() {
+		return !rrule.isBlank();
+	}
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarEvent", fetch = FetchType.EAGER)
 	protected final List<CalendarEventExdate> calendarEventExdates = new ArrayList<>();
