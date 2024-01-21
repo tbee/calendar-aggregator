@@ -111,6 +111,7 @@ public class CalendarAggregateApplication {
 	private static String createHsqldbAclFile() {
         try {
             File aclFile = File.createTempFile("hsqldb", "acl");
+			aclFile.deleteOnExit();
 			URL serverACLResourceURL = CalendarAggregateApplication.class.getResource("/hsqldb.acl");
 			IOUtils.copy(serverACLResourceURL, aclFile);
 			if (LOG.isInfoEnabled()) LOG.info("HSQLDB using " + aclFile.getAbsolutePath());
