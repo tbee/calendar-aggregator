@@ -1,0 +1,4 @@
+# https://www.hsqldb.org/doc/2.0/guide/listeners-chapt.html#lsc_acl
+
+# only allow connections from localhost
+allow 127.0.0.1

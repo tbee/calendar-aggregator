@@ -2,6 +2,7 @@ package nl.softworks.calendarAggregator;
 
 import jakarta.annotation.PreDestroy;
 import nl.softworks.calendarAggregator.application.jpa.RepoBaseImpl;
+import org.apache.commons.io.IOUtils;
 import org.hsqldb.persist.HsqlProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,14 +14,11 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
-import sun.misc.Signal;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.List;
+import java.net.URL;
 import java.util.Locale;
 import java.util.Properties;
 
@@ -34,42 +32,17 @@ public class CalendarAggregateApplication {
 
 	public static void main(String[] args) {
 		LOG.info("RESTART TRACING: application main called [" + Thread.currentThread().getName() + "]");
-		Thread printingHook = new Thread(() -> {
-			LOG.info("RESTART TRACING: application shutdown hook called");
-			printStackTrace();
-		});
-		Runtime.getRuntime().addShutdownHook(printingHook);
-		List<String> signals = Arrays.asList("SIGHUP", "SIGINT", "SIGQUIT", "SIGILL", "SIGTRAP", "SIGABRT", "SIGBUS", "SIGFPE", "SIGKILL", "SIGUSR1", "SIGSEGV", "SIGUSR2", "SIGPIPE", "SIGALRM", "SIGTERM", "SIGSTKFLT", "SIGCHLD", "SIGCONT", "SIGSTOP", "SIGTSTP", "SIGTTIN", "SIGTTOU", "SIGURG", "SIGXCPU", "SIGXFSZ", "SIGVTALRM", "SIGPROF", "SIGWINCH", "SIGIO", "SIGPWR", "SIGSYS", "SIGRTMIN", "SIGRTMIN+1", "SIGRTMIN+2", "SIGRTMIN+3", "SIGRTMIN+4", "SIGRTMIN+5", "SIGRTMIN+6", "SIGRTMIN+7", "SIGRTMIN+8", "SIGRTMIN+9", "SIGRTMIN+10", "SIGRTMIN+11", "SIGRTMIN+12", "SIGRTMIN+13", "SIGRTMIN+14", "SIGRTMIN+15", "SIGRTMAX-14", "SIGRTMAX-13", "SIGRTMAX-12", "SIGRTMAX-11", "SIGRTMAX-10", "SIGRTMAX-9", "SIGRTMAX-8", "SIGRTMAX-7", "SIGRTMAX-6", "SIGRTMAX-5", "SIGRTMAX-4", "SIGRTMAX-3", "SIGRTMAX-2", "SIGRTMAX-1", "SIGRTMAX");
-		signals.forEach(s -> {
-			try {
-				Signal.handle(new Signal(s), signal -> {
-					LOG.info("RESTART TRACING: signal called: " + signal.getName() + " (" + signal.getNumber() + ")");
-				});
-				LOG.info("RESTART TRACING: listening for signal " + s);
-			}
-			catch (IllegalArgumentException e) {
-				LOG.info("RESTART TRACING: " + e.getMessage());
-			}
-		});
-
 		Locale.setDefault(new Locale("NL"));
 		System.setProperty("liquibase.secureParsing", "false");
-		startHsqldbServer();
+		if (!"restartedMain".equals(Thread.currentThread().getName())) { // Vaadin auto reload patch
+			startHsqldbServer();
+		}
 		SpringApplication.run(CalendarAggregateApplication.class, args);
 	}
 
 	@PreDestroy
 	public void onExit() {
 		LOG.info("RESTART TRACING: application onExit called");
-		printStackTrace();
-	}
-
-	private static void printStackTrace() {
-		StringWriter stringWriter = new StringWriter();
-		PrintWriter printWriter = new PrintWriter(stringWriter);
-		new RuntimeException().printStackTrace(printWriter);
-		printWriter.close();
-		LOG.info(stringWriter.toString());
 	}
 
 	@Bean
@@ -92,7 +65,7 @@ public class CalendarAggregateApplication {
 		// Determine HSQLDB port
 		Properties applicationProperties = new Properties();
 		try (
-                InputStream inputStream = CalendarAggregateApplication.class.getResourceAsStream("/application.properties");
+			InputStream inputStream = CalendarAggregateApplication.class.getResourceAsStream("/application.properties");
 		) {
 			applicationProperties.load(inputStream);
 		}
@@ -114,6 +87,7 @@ public class CalendarAggregateApplication {
 	    props.setProperty("server.database.0", "file:hsqldb/" + dbname + ";user=" + username + ";password=" + password);
 	    props.setProperty("server.dbname.0", dbname);
 		props.setProperty("server.port", portnr);
+		props.setProperty("server.acl", createHsqldbAclFile());
 	    org.hsqldb.Server dbServer = new org.hsqldb.Server();
 	    try {
 	        dbServer.setProperties(props);
@@ -132,5 +106,17 @@ public class CalendarAggregateApplication {
 				if (LOG.isInfoEnabled()) LOG.info("HSQLDB shutdown");
 			}
 		}));
+	}
+
+	private static String createHsqldbAclFile() {
+        try {
+            File aclFile = File.createTempFile("hsqldb", "acl");
+			URL serverACLResourceURL = CalendarAggregateApplication.class.getResource("/hsqldb.acl");
+			IOUtils.copy(serverACLResourceURL, aclFile);
+			if (LOG.isInfoEnabled()) LOG.info("HSQLDB using " + aclFile.getAbsolutePath());
+			return aclFile.getAbsolutePath();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 	}
 }
