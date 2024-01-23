@@ -32,12 +32,17 @@ public class CalendarAggregateApplication {
 
 	public static void main(String[] args) {
 		LOG.info("RESTART TRACING: application main called [" + Thread.currentThread().getName() + "]");
-		Locale.setDefault(new Locale("NL"));
-		System.setProperty("liquibase.secureParsing", "false");
-		if (!"restartedMain".equals(Thread.currentThread().getName())) { // Vaadin auto reload patch
-			startHsqldbServer();
+		try {
+			Locale.setDefault(new Locale("NL"));
+			System.setProperty("liquibase.secureParsing", "false");
+			if (!"restartedMain".equals(Thread.currentThread().getName())) { // Vaadin auto reload patch
+				startHsqldbServer();
+			}
+			SpringApplication.run(CalendarAggregateApplication.class, args);
 		}
-		SpringApplication.run(CalendarAggregateApplication.class, args);
+		catch (RuntimeException e) {
+			LOG.error("Some error occured", e);
+		}
 	}
 
 	@PreDestroy
