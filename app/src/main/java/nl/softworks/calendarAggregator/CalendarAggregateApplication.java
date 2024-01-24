@@ -1,6 +1,5 @@
 package nl.softworks.calendarAggregator;
 
-import jakarta.annotation.PreDestroy;
 import nl.softworks.calendarAggregator.application.jpa.RepoBaseImpl;
 import org.apache.commons.io.IOUtils;
 import org.hsqldb.persist.HsqlProperties;
@@ -31,23 +30,12 @@ public class CalendarAggregateApplication {
 	private static final Logger LOG = LoggerFactory.getLogger(CalendarAggregateApplication.class);
 
 	public static void main(String[] args) {
-		LOG.info("RESTART TRACING: application main called [" + Thread.currentThread().getName() + "]");
-		try {
-			Locale.setDefault(new Locale("NL"));
-			System.setProperty("liquibase.secureParsing", "false");
-			if (!"restartedMain".equals(Thread.currentThread().getName())) { // Vaadin auto reload patch
-				startHsqldbServer();
-			}
-			SpringApplication.run(CalendarAggregateApplication.class, args);
+		Locale.setDefault(new Locale("NL"));
+		System.setProperty("liquibase.secureParsing", "false");
+		if (!"restartedMain".equals(Thread.currentThread().getName())) { // Vaadin auto reload patch
+			startHsqldbServer();
 		}
-		catch (RuntimeException e) {
-			LOG.error("Some error occured", e);
-		}
-	}
-
-	@PreDestroy
-	public void onExit() {
-		LOG.info("RESTART TRACING: application onExit called");
+		SpringApplication.run(CalendarAggregateApplication.class, args);
 	}
 
 	@Bean
@@ -96,9 +84,9 @@ public class CalendarAggregateApplication {
 	    org.hsqldb.Server dbServer = new org.hsqldb.Server();
 	    try {
 	        dbServer.setProperties(props);
-	    } catch (Exception e) {
-	    	e.printStackTrace();
-	        return;
+	    }
+		catch (Exception e) {
+	    	throw new RuntimeException(e);
 	    }
 	    dbServer.start();
 		if (LOG.isInfoEnabled()) LOG.info("HSQLDB started");
