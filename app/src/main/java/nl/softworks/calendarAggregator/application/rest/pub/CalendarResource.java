@@ -5,6 +5,8 @@ import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEventExdate;
 import nl.softworks.calendarAggregator.domain.entity.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +22,8 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/pub")
 public class CalendarResource {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CalendarResource.class);
 
     private static int EARTH_RADIUS = 6371;
 
@@ -75,7 +79,7 @@ public class CalendarResource {
         LocalDateTime pastThreshold = LocalDateTime.now().minusHours(1);
         LocalDateTime futureThreshold = LocalDateTime.now().plusMonths(5);
         String events = R.calendarEvent().findAll().stream()
-                .flatMap(ce -> ce.applyRRule().stream()) // for HTML we need to generate the actual events
+                .flatMap(ce -> applyRRule(ce).stream()) // for HTML we need to generate the actual events
                 .filter(ce -> pastThreshold.isBefore(ce.startDateTime()) && futureThreshold.isAfter(ce.startDateTime()))
                 .filter(ce -> d == 0 || d > (int)calculateDistance(lat, lon, ce.calendarSource().lat(), ce.calendarSource().lon()))
                 .sorted(Comparator.comparing(CalendarEvent::startDateTime))
@@ -137,6 +141,16 @@ public class CalendarResource {
                    .replace("%baseurl%", settings.websiteBaseurl())
                    .replace("%disclaimer%", settings.disclaimer())
                    .replace("%events%", stripClosingNewline(events));
+    }
+
+    private static List<CalendarEvent> applyRRule(CalendarEvent ce) {
+        try {
+            return ce.applyRRule();
+        }
+        catch (RuntimeException e) {
+            LOG.error("Problems applying RRule" ,e);
+            return List.of();
+        }
     }
 
     private String stripClosingNewline(String s) {
