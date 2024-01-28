@@ -5,18 +5,18 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.0.0</version>
+		<version>3.2.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>org.tbee</groupId>
 	<artifactId>calendarAggregator</artifactId>
-	<version>1.17.1</version>
+	<version>1.18.0</version>
 	<name>Calendar Aggregator</name>
 	<description>Merge all kinds of calendar sources into one calendar</description>
 	
 	<properties>
 		<java.version>17</java.version> <!-- https://vaadin.com/docs/latest/configuration/live-reload/hotswap-agent -->
-		<vaadin.version>24.2.1</vaadin.version> <!-- https://vaadin.com/releases -->
+		<vaadin.version>24.3.3</vaadin.version> <!-- https://vaadin.com/releases -->
 		<testcontainers.version>1.17.3</testcontainers.version>
 		<start-class>nl.softworks.calendarAggregator.CalendarAggregateApplication</start-class> <!-- needed for the shade plugin -->
 	</properties>
@@ -131,14 +131,14 @@
 		<dependency>
 			<groupId>org.junit.platform</groupId>
 			<artifactId>junit-platform-suite</artifactId>
-			<version>1.9.2</version>
+			<version>1.10.1</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>com.microsoft.playwright</groupId>
 			<artifactId>playwright</artifactId>
-			<version>1.29.0</version>
+			<version>1.41.1</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -207,7 +207,7 @@
 				<artifactId>maven-shade-plugin</artifactId>
 				<version>3.5.1</version>
 				<configuration>
-					<finalName>${project.artifactId}-${project.version}.shaded</finalName>
+					<finalName>${project.artifactId}-${project.version}-shade</finalName>
 					<transformers>
 						<!-- https://maven.apache.org/plugins/maven-shade-plugin/examples/resource-transformers.html -->
 <!--						<transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>-->

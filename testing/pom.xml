@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.tbee</groupId>
     <artifactId>calendarAggregatorTesting</artifactId>
-    <version>1.17.1</version>
+    <version>1.18.0</version>
     <name>Calendar Aggregator Testing</name>
 
     <properties>
