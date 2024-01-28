@@ -163,11 +163,11 @@ public class CalendarResource {
     private String icalFormat(String s) {
         return s.replace("\r", "")
                 .lines()
-                .flatMap(l -> wrap(75, l).stream())
+                .flatMap(l -> icalWrap(75, l).stream())
                 .collect(Collectors.joining("\r\n"));
     }
 
-    private List<String> wrap(int cutOff, String s) {
+    private List<String> icalWrap(int cutOff, String s) {
         cutOff--; // compensate for the space that is prefixed
         List<String> lines = new ArrayList<>();
         while (s.length() > cutOff) {
