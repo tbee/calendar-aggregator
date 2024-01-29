@@ -5,10 +5,14 @@ import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tbee.jakarta.validator.UrlValidatorImpl;
 
 import java.io.IOException;
+import java.time.DateTimeException;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.MonthDay;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
@@ -20,6 +24,8 @@ import java.util.Map;
 
 @MappedSuperclass
 abstract public class CalendarSourceScraperBase extends CalendarSource {
+
+	private static final Logger LOG = LoggerFactory.getLogger(CalendarSourceScraperBase.class);
 
 	final public static String SHORT_MONTH_NOTATION_PATTERN = "SMN";
 
@@ -153,14 +159,14 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 
 		// Calculate the three options
 		int year = now.getYear();
-		LocalDate lastYearsDate = LocalDate.of(year - 1, monthDay.getMonth(), monthDay.getDayOfMonth());
-		LocalDate thisYearsDate = LocalDate.of(year, monthDay.getMonth(), monthDay.getDayOfMonth());
-		LocalDate nextYearsDate = LocalDate.of(year + 1, monthDay.getMonth(), monthDay.getDayOfMonth());
+		LocalDate lastYearsDate = toLocalDate(year - 1, monthDay.getMonth(), monthDay.getDayOfMonth());
+		LocalDate thisYearsDate = toLocalDate(year, monthDay.getMonth(), monthDay.getDayOfMonth());
+		LocalDate nextYearsDate = toLocalDate(year + 1, monthDay.getMonth(), monthDay.getDayOfMonth());
 
 		// Determine the distance (period) from now
-		int lastYearsPeriod = asDays(abs(Period.between(now, lastYearsDate)));
-		int thisYearsPeriod = asDays(abs(Period.between(now, thisYearsDate)));
-		int nextYearsPeriod = asDays(abs(Period.between(now, nextYearsDate)));
+		int lastYearsPeriod = lastYearsDate == null ? Integer.MAX_VALUE : asDays(abs(Period.between(now, lastYearsDate)));
+		int thisYearsPeriod = thisYearsDate == null ? Integer.MAX_VALUE : asDays(abs(Period.between(now, thisYearsDate)));
+		int nextYearsPeriod = nextYearsDate == null ? Integer.MAX_VALUE : asDays(abs(Period.between(now, nextYearsDate)));
 
 		// Select the nearest
 		int bestPeriod = lastYearsPeriod;
@@ -183,6 +189,16 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 			return 0;
 		}
 		return (p.getYears() * 12 + p.getMonths()) * 30 + p.getDays();
+	}
+
+	private LocalDate toLocalDate(int year, Month month, int dayOfMonth) {
+		try {
+			return LocalDate.of(year, month, dayOfMonth);
+		}
+		catch (DateTimeException e) {
+			LOG.warn("Problems created a LocalDate", e);
+			return null;
+		}
 	}
 
 	public String toString() {
