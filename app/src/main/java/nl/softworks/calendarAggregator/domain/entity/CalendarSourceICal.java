@@ -59,8 +59,10 @@ public class CalendarSourceICal extends CalendarSource {
 	@Override
 	public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
 		try {
-			calendarEvents.removeIf(ce -> ce.generated);
 			status("");
+
+			// Remove all generated events (keep the manual ones)
+			calendarEvents.removeIf(ce -> ce.generated);
 
 			// Get ical as string
 			String url = resolveUrl(icalUrl, stringBuilder);
@@ -83,9 +85,11 @@ public class CalendarSourceICal extends CalendarSource {
 			CalendarBuilder builder = new CalendarBuilder();
 			Calendar calendar = builder.build(new StringReader(icalContent));
 
-			// Loop over components and find events
+			// Prepare regex for summary
 			if (stringBuilder != null) stringBuilder.append("regex = ").append(regex).append("\n");
 			Pattern pattern = regex == null || regex.isEmpty() ? null : Pattern.compile(regex);
+
+			// Loop over components and find events
 			ComponentList<CalendarComponent> components = calendar.getComponents();
 			if (stringBuilder != null) stringBuilder.append("#components = ").append(components.size()).append("\n");
 			for (Component component : components) {
@@ -94,6 +98,7 @@ public class CalendarSourceICal extends CalendarSource {
 				}
 				if (stringBuilder != null) stringBuilder.append("---").append("\n");
 
+				// Validate startDate
 				DtStart startDate = vEvent.getStartDate();
 				if (stringBuilder != null) stringBuilder.append("startDate = ").append(startDate);
 				LocalDateTime startLocalDateTime = LocalDateTime.ofInstant(startDate.getDate().toInstant(), ZoneId.systemDefault());
@@ -102,10 +107,12 @@ public class CalendarSourceICal extends CalendarSource {
 					continue;
 				}
 
+				// Get endDate
 				DtEnd endDate = vEvent.getEndDate();
 				if (stringBuilder != null) stringBuilder.append("endDate = ").append(endDate);
 				LocalDateTime endLocalDateTime = LocalDateTime.ofInstant(endDate.getDate().toInstant(), ZoneId.systemDefault());
 
+				// Validate summary
 				String summary = vEvent.getSummary().getValue();
 				if (stringBuilder != null) stringBuilder.append("summary = ").append(summary).append("\n");
 				if (pattern != null) {
@@ -113,15 +120,11 @@ public class CalendarSourceICal extends CalendarSource {
 					if (!matcher.matches()) {
 						if (stringBuilder != null) stringBuilder.append("Does not match the regexp\n");
 						continue;
-					} else if (stringBuilder != null) {
-						stringBuilder.append("Start index: ").append(matcher.start()).append("\n");
-						stringBuilder.append("End index: ").append(matcher.end()).append("\n");
-						stringBuilder.append("Matched string: ").append(summary, matcher.start(), matcher.end()).append("\n");
-						for (int i = 0; i < matcher.groupCount() + 1; i++) {
-							stringBuilder.append("Group ").append(i).append(" = ").append(matcher.group(i)).append("\n");
-						}
 					}
+					logMatcherInStringBuilder(matcher, summary, stringBuilder);
 				}
+
+				// Determine timezone
 				TimeZone timeZone = startDate.getTimeZone();
 				if (timeZone != null) {
 					String timezoneName = timeZone.getVTimeZone().getTimeZoneId().getValue();
@@ -130,6 +133,7 @@ public class CalendarSourceICal extends CalendarSource {
 					}
 				}
 
+				// Create event
 				CalendarEvent calendarEvent = new CalendarEvent()
 						.subject(summary)
 						.startDateTime(startLocalDateTime)

@@ -132,27 +132,25 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
             Matcher matcher = Pattern.compile(regex).matcher(content);
             int lastMatchEnd = -1;
             while (matcher.find()) {
+                logMatcherInStringBuilder(matcher, content, stringBuilder);
+
+                // Extract strings
                 String matchedString = content.substring(matcher.start(), matcher.end());
                 String wholeString = content.substring(lastMatchEnd + 1, matcher.end());
-                if (stringBuilder != null) {
-                    stringBuilder.append("---\n");
-                    stringBuilder.append("Start index: ").append(matcher.start()).append("\n");
-                    stringBuilder.append("End index: ").append(matcher.end()).append("\n");
-                    stringBuilder.append("Matched string: ").append(matchedString).append("\n");
-                    stringBuilder.append("Whole string: ").append(wholeString).append("\n");
-                    for (int i = 0; i < matcher.groupCount() + 1; i++) {
-                        stringBuilder.append("Group ").append(i).append(" = ").append(matcher.group(i)).append("\n");
-                    }
-                }
 
                 // Parse the match into a base day-month
                 LocalDate localDate;
                 if (nearestYear) {
                     MonthDay monthDay = MonthDay.parse(matchedString, dateFormatter);
-                    localDate = determineDateByNearestYear(MonthDay.of(monthDay.getMonth(), monthDay.getDayOfMonth()));
+                    localDate = determineDateByNearestYear(MonthDay.of(monthDay.getMonth(), monthDay.getDayOfMonth()), stringBuilder);
                 }
                 else {
+                    if (stringBuilder != null) stringBuilder.append("Parsing '").append(matchedString).append("' with '").append(datePattern).append("'\n");
                     localDate = LocalDate.parse(matchedString, dateFormatter);
+                }
+                if (localDate == null) {
+                    if (stringBuilder != null) stringBuilder.append("Not able to determine a date for ").append(matchedString);
+                    continue;
                 }
 
                 // Then scan al day notations
@@ -167,26 +165,33 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
                     }
                     int dayOfMonth = Integer.parseInt(matchedDayString.trim());
 
+                    // Create a date out of the matched number
                     LocalDate startLocalDate;
                     if (nearestYear) {
-                        startLocalDate = determineDateByNearestYear(MonthDay.of(localDate.getMonth(), dayOfMonth));
+                        startLocalDate = determineDateByNearestYear(MonthDay.of(localDate.getMonth(), dayOfMonth), stringBuilder);
                     }
                     else {
                         startLocalDate = LocalDate.of(localDate.getYear(), localDate.getMonth(), dayOfMonth);
                     }
+                    if (startLocalDate == null) {
+                        if (stringBuilder != null) stringBuilder.append("Not able to determine a date for ").append(matchedDayString);
+                        continue;
+                    }
+
+                    // Derive other values
                     LocalDate endLocalDate = startLocalDate;
                     LocalTime startLocalTime = LocalTime.parse(startTimeDefault(), timeFormatter);
                     LocalTime endLocalTime = LocalTime.parse(endTimeDefault(), timeFormatter);
 
                     LocalDateTime startLocalDateTime = LocalDateTime.of(startLocalDate, startLocalTime);
                     if (stringBuilder != null) stringBuilder.append("startLocalDateTime: ").append(startLocalDateTime).append("\n");
+
                     LocalDateTime endLocalDateTime = LocalDateTime.of(endLocalDate, endLocalTime);
                     if (stringBuilder != null) stringBuilder.append("endLocalDateTime: ").append(endLocalDateTime).append("\n");
-                    if (endLocalDateTime.isBefore(startLocalDateTime)) {
-                        endLocalDateTime = endLocalDateTime.plusDays(1); // This is to correct an end time that is on or after midnight
-                        if (stringBuilder != null) stringBuilder.append("End moment < start moment, added one day: ").append(endLocalDateTime).append("\n");
-                    }
 
+                    endLocalDateTime = makeSureEndIsAfterStart(startLocalDateTime, endLocalDateTime, stringBuilder);
+
+                    // Create event
                     CalendarEvent calendarEvent = new CalendarEvent()
                             .subject("")
                             .startDateTime(startLocalDateTime)

@@ -154,14 +154,14 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 				.toFormatter(locale);
 	}
 
-	protected LocalDate determineDateByNearestYear(MonthDay monthDay) {
+	protected LocalDate determineDateByNearestYear(MonthDay monthDay, StringBuilder stringBuilder) {
 		LocalDate now = LocalDate.now();
 
 		// Calculate the three options
 		int year = now.getYear();
-		LocalDate lastYearsDate = toLocalDate(year - 1, monthDay.getMonth(), monthDay.getDayOfMonth());
-		LocalDate thisYearsDate = toLocalDate(year, monthDay.getMonth(), monthDay.getDayOfMonth());
-		LocalDate nextYearsDate = toLocalDate(year + 1, monthDay.getMonth(), monthDay.getDayOfMonth());
+		LocalDate lastYearsDate = toLocalDate(year - 1, monthDay.getMonth(), monthDay.getDayOfMonth(), stringBuilder);
+		LocalDate thisYearsDate = toLocalDate(year, monthDay.getMonth(), monthDay.getDayOfMonth(), stringBuilder);
+		LocalDate nextYearsDate = toLocalDate(year + 1, monthDay.getMonth(), monthDay.getDayOfMonth(), stringBuilder);
 
 		// Determine the distance (period) from now
 		int lastYearsPeriod = lastYearsDate == null ? Integer.MAX_VALUE : asDays(abs(Period.between(now, lastYearsDate)));
@@ -191,12 +191,13 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 		return (p.getYears() * 12 + p.getMonths()) * 30 + p.getDays();
 	}
 
-	private LocalDate toLocalDate(int year, Month month, int dayOfMonth) {
+	private LocalDate toLocalDate(int year, Month month, int dayOfMonth, StringBuilder stringBuilder) {
 		try {
 			return LocalDate.of(year, month, dayOfMonth);
 		}
 		catch (DateTimeException e) {
-			LOG.warn("Problems created a LocalDate", e);
+			if (stringBuilder != null) stringBuilder.append("For " + year + "-" + month.getValue() + "-" + dayOfMonth + ": " + e.getMessage());
+			else LOG.warn("Problems creating a LocalDate " + year + "-" + month.getValue() + "-" + dayOfMonth, e);
 			return null;
 		}
 	}

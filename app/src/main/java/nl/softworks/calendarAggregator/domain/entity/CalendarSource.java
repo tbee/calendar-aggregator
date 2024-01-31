@@ -14,6 +14,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
+import org.apache.commons.io.IOUtils;
 import org.mvel2.MVEL;
 import org.mvel2.ParserConfiguration;
 import org.mvel2.ParserContext;
@@ -27,9 +28,11 @@ import org.tbee.jakarta.validator.UrlValidator;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -38,6 +41,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -224,6 +228,12 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 
 	protected String getUrl(String urlString) throws IOException, InterruptedException {
+
+		// For unit tests
+		if (urlString.startsWith("file:")) {
+			return IOUtils.toString(new URL(urlString), StandardCharsets.UTF_8);
+		}
+
 		try {
 			HttpClient client = HttpClient.newBuilder()
 					.version(HttpClient.Version.HTTP_1_1)
@@ -245,6 +255,29 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 	public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
 		status(OK);
 		return calendarEvents();
+	}
+
+	protected void logMatcherInStringBuilder(Matcher matcher, String content, StringBuilder stringBuilder) {
+		if (stringBuilder != null) {
+			stringBuilder.append("---\n");
+			stringBuilder.append("Start index: ").append(matcher.start()).append("\n");
+			stringBuilder.append("End index: ").append(matcher.end()).append("\n");
+			stringBuilder.append("Matched string: ").append(content, matcher.start(), matcher.end()).append("\n");
+			for (int i = 0; i < matcher.groupCount() + 1; i++) {
+				stringBuilder.append("Group ").append(i).append(" = ").append(matcher.group(i)).append("\n");
+			}
+		}
+	}
+
+	protected LocalDateTime makeSureEndIsAfterStart(LocalDateTime startLocalDateTime, LocalDateTime endLocalDateTime, StringBuilder stringBuilder) {
+		if (endLocalDateTime.isBefore(startLocalDateTime)) {
+			endLocalDateTime = endLocalDateTime.plusDays(1); // This is to correct an end time that is on or after midnight
+			if (stringBuilder != null) stringBuilder.append("End moment < start moment, added one day: ").append(endLocalDateTime).append("\n");
+		}
+		if (endLocalDateTime.isBefore(startLocalDateTime)) {
+			throw new RuntimeException("End date should be after start: " + startLocalDateTime + " < " + endLocalDateTime);
+		}
+		return endLocalDateTime;
 	}
 
 	public String toString() {
