@@ -56,15 +56,7 @@ public class CalendarAggregateApplication {
 	static private void startHsqldbServer() {
 
 		// Determine HSQLDB port
-		Properties applicationProperties = new Properties();
-		try (
-			InputStream inputStream = CalendarAggregateApplication.class.getResourceAsStream("/application.properties");
-		) {
-			applicationProperties.load(inputStream);
-		}
-		catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		Properties applicationProperties = loadApplicationProperties();
 		final String datasourceUrl = applicationProperties.getProperty("spring.datasource.url");
 		if (!datasourceUrl.startsWith("jdbc:hsqldb:hsql://")) {
 			LOG.warn("Not starting HSQLDB because URL seems to be of a different RDBMS: " + datasourceUrl);
@@ -99,6 +91,19 @@ public class CalendarAggregateApplication {
 				if (LOG.isInfoEnabled()) LOG.info("HSQLDB shutdown");
 			}
 		}));
+	}
+
+	private static Properties loadApplicationProperties() {
+		Properties properties = new Properties();
+		try (
+			InputStream inputStream = CalendarAggregateApplication.class.getResourceAsStream("/application.properties");
+		) {
+			properties.load(inputStream);
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		return properties;
 	}
 
 	private static String createHsqldbAclFile() {

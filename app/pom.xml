@@ -49,6 +49,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
+		<!-- https://docs.spring.io/spring-boot/docs/current/reference/html/actuator.html -->
+<!--		<dependency>-->
+<!--			<groupId>org.springframework.boot</groupId>-->
+<!--			<artifactId>spring-boot-starter-actuator</artifactId>-->
+<!--		</dependency>-->
 
 		<!-- https://vaadin.com/docs/latest/components -->
 		<dependency>
@@ -192,6 +197,7 @@
 					<classifier>boot</classifier>
 					<layout>ZIP</layout> <!-- required to be able to use -Dloader.main -->
 					<attach>false</attach>
+					<excludeDevtools>true</excludeDevtools>
 				</configuration>
 				<executions>
 					<execution>
@@ -252,13 +258,6 @@
 								</configuration>
 							</execution>
 						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.springframework.boot</groupId>
-						<artifactId>spring-boot-maven-plugin</artifactId>
-			            <configuration>
-			                <excludeDevtools>true</excludeDevtools>
-			            </configuration>
 					</plugin>
 				</plugins>
 			</build>
