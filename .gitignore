@@ -19,7 +19,6 @@ replay_pid*
 
 target
 frontend
-.run
 hsqldb
 target
 .idea

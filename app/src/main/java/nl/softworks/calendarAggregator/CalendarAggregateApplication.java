@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * TODO:
@@ -28,13 +29,12 @@ import java.util.Properties;
 @EnableJpaRepositories(repositoryBaseClass = RepoBaseImpl.class)
 public class CalendarAggregateApplication {
 	private static final Logger LOG = LoggerFactory.getLogger(CalendarAggregateApplication.class);
+	private static final AtomicBoolean hsqldbStarted = new AtomicBoolean(false);
 
 	public static void main(String[] args) {
 		Locale.setDefault(new Locale("NL"));
 		System.setProperty("liquibase.secureParsing", "false");
-		if (!"restartedMain".equals(Thread.currentThread().getName())) { // Vaadin auto reload patch
-			startHsqldbServer();
-		}
+		startHsqldbServer();
 		SpringApplication.run(CalendarAggregateApplication.class, args);
 	}
 
@@ -54,6 +54,10 @@ public class CalendarAggregateApplication {
 	}
 
 	static private void startHsqldbServer() {
+		// If already started, bail
+		if (hsqldbStarted.getAndSet(true)) { // Restart patch
+			return;
+		}
 
 		// Determine HSQLDB port
 		Properties applicationProperties = loadApplicationProperties();
@@ -85,6 +89,7 @@ public class CalendarAggregateApplication {
 
 		// Handle clean shutdown
 		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			hsqldbStarted.set(false);
 			if (!dbServer.isNotRunning()) {
 				if (LOG.isInfoEnabled()) LOG.info("HSQLDB shutting down");
 				dbServer.shutdown();
