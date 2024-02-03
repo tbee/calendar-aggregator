@@ -30,12 +30,14 @@ import nl.softworks.calendarAggregator.application.vdn.form.CalendarSourceForm;
 import nl.softworks.calendarAggregator.application.vdn.form.CalendarSourceICalForm;
 import nl.softworks.calendarAggregator.application.vdn.form.CalendarSourceMultipleDaysScraperForm;
 import nl.softworks.calendarAggregator.application.vdn.form.CalendarSourceRegexScraperForm;
+import nl.softworks.calendarAggregator.application.vdn.form.CalendarSourceXmlScraperForm;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceICal;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceMultipleDaysScraper;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceRegexScraper;
+import nl.softworks.calendarAggregator.domain.entity.CalendarSourceXmlScraper;
 import nl.softworks.calendarAggregator.domain.service.CalendarSourceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,6 +174,12 @@ implements AfterNavigationObserver
 			CalendarSourceICal calendarSourceICal = (calendarSource instanceof CalendarSourceICal ? (CalendarSourceICal)calendarSource : null);
 			CalendarSourceICalForm.showInsertDialog(calendarSourceICal, () -> reloadTreeGrid());
 		}).withIsPrimary(calendarSource instanceof CalendarSourceICal));
+
+		verticalLayout.add(new VButton("XML/JSON Source", e -> {
+			addSelectionDialog.close();
+			CalendarSourceXmlScraper calendarSourceXmlScraper = (calendarSource instanceof CalendarSourceXmlScraper ? (CalendarSourceXmlScraper)calendarSource : null);
+			CalendarSourceXmlScraperForm.showInsertDialog(calendarSourceXmlScraper, () -> reloadTreeGrid());
+		}).withIsPrimary(calendarSource instanceof CalendarSourceXmlScraper));
 
 		horizontalLayout.add(new VerticalLayout(new VButton("Manual Event", e -> {
 			addSelectionDialog.close();
@@ -313,6 +321,10 @@ implements AfterNavigationObserver
 				calendarSourceForm = new CalendarSourceICalForm().populateWith(calendarSource);
 				title = "ICal source";
 			}
+			else if (calendarSource instanceof CalendarSourceXmlScraper) {
+				calendarSourceForm = new CalendarSourceXmlScraperForm().populateWith(calendarSource);
+				title = "XML/JSON source";
+			}
 			else {
 				calendarSourceForm = new CalendarSourceForm().populateWith(calendarSource);
 				title = "Manual source";
@@ -356,6 +368,9 @@ implements AfterNavigationObserver
 		public String hint() {
 			if (calendarSource instanceof CalendarSourceRegexScraper calendarSourceRegexScraper) {
 				return calendarSourceRegexScraper.regex();
+			}
+			if (calendarSource instanceof CalendarSourceXmlScraper calendarSourceXmlScraper) {
+				return calendarSourceXmlScraper.xpath();
 			}
 			return "";
 		}

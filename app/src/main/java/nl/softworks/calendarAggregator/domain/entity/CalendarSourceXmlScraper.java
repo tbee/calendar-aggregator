@@ -216,6 +216,7 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
             if (jsonToXml) {
                 JSONObject json = new JSONObject(content);
                 content = XML.toString(json, "root");
+                if (stringBuilder != null) stringBuilder.append("XML ").append(content).append("\n");
             }
 
             // Apply json

@@ -102,7 +102,7 @@ public class CalendarSourceForm extends FormLayout {
 		TextArea textArea = new TextArea("Result", stringBuilder.toString(), "");
 		textArea.setSizeFull();
 
-		CancelDialog cancelDialog = new CancelDialog("Regexp", textArea);
+		CancelDialog cancelDialog = new CancelDialog("Result", textArea);
 		cancelDialog.setSizeFull();
 		cancelDialog.open();
 	}
