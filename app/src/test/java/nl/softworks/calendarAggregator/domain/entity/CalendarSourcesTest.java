@@ -105,6 +105,31 @@ public class CalendarSourcesTest {
         assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 28, 23, 59, 0), calendarEvents.get(0).endDateTime());
     }
 
+    @Test
+    public void danshotspot_20240203() {
+        StringBuilder stringBuilder = new StringBuilder();
+        List<CalendarEvent> calendarEvents = new CalendarSourceXmlScraper()
+                .xpath("//event/name/text/text()[contains(., 'Vrijdansen')]")
+                .startdateXpath("../../../start/local")
+                .enddateXpath("../../../end/local")
+                .starttimeXpath("../../../start/local")
+                .endtimeXpath("../../../end/local")
+                .subjectXpath(".")
+                .jsonToXml(true)
+                .datePattern("yyyy-MM-dd'T'HH:mm:ss")
+                .timePattern("yyyy-MM-dd'T'HH:mm:ss")
+                .dateTimeLocale("NL")
+                .scrapeUrl(this.getClass().getResource("/webSnapshots/danshotspot_20240203.html").toExternalForm())
+                .generateEvents(stringBuilder);
+        System.out.println(stringBuilder);
+        System.out.println(calendarEvents);
+
+        Assertions.assertEquals(4, calendarEvents.size());
+        Assertions.assertEquals("Vrijdansen, stijldansavond", calendarEvents.get(0).subject());
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 5, 16, 19, 0, 0), calendarEvents.get(0).startDateTime());
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 5, 16, 22, 0, 0), calendarEvents.get(0).endDateTime());
+    }
+
     private void assertLocalDateTimeNearestYear(LocalDateTime expectedLocalDateTime, LocalDateTime actualLocalDateTime) {
         int actualYear = actualLocalDateTime.getYear();
 

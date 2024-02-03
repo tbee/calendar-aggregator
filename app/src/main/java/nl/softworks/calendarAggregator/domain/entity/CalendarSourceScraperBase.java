@@ -4,9 +4,12 @@ import jakarta.persistence.MappedSuperclass;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.util.HtmlUtils;
 import org.tbee.jakarta.validator.UrlValidatorImpl;
 
 import java.io.IOException;
@@ -77,12 +80,27 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 
 	protected String readScrapeUrl(StringBuilder stringBuilder) {
 		try {
+
+			// Get URL
 			String url = resolveUrl(scrapeUrl, stringBuilder);
 			if (stringBuilder != null) stringBuilder.append("Reading: " + url + "\n");
 			String html = getUrl(url);
+
+			// Extract text information
 			Document doc = Jsoup.parse(html);
 			String text = doc.text();
 			if (stringBuilder != null) stringBuilder.append("Content: " + text.length() + "\n");
+
+			// special handling for certain elements: <eventbrite-modal :events="html escaped string"
+			for (Element eventbrightModalElement : doc.selectXpath("//eventbrite-modal")) {
+				Attribute eventsAttribute = eventbrightModalElement.attribute(":events");
+				if (eventsAttribute != null) {
+					text = "{\"event\":" + HtmlUtils.htmlUnescape(eventsAttribute.getValue()) + "}";
+					if (stringBuilder != null) stringBuilder.append("Content, added eventbrite-modal\n");
+				}
+			}
+
+			// extract block
 			if (scrapeBlockStart != null && !scrapeBlockStart.isBlank()) {
 				text = text.substring(text.indexOf(scrapeBlockStart.trim()));
 				if (stringBuilder != null) stringBuilder.append("Content after block start: " + text.length() + "\n");
