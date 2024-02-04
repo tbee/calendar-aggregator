@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -76,8 +77,8 @@ public class CalendarResource {
     @GetMapping(path = "/html", produces = {"text/html"})
     public String html(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d) {
 
-        LocalDateTime pastThreshold = LocalDateTime.now().minusHours(1);
-        LocalDateTime futureThreshold = LocalDateTime.now().plusMonths(5);
+        LocalDateTime pastThreshold = LocalDate.now().atStartOfDay();
+        LocalDateTime futureThreshold = LocalDate.now().plusMonths(5).atStartOfDay();
         String events = R.calendarEvent().findAll().stream()
                 .flatMap(ce -> applyRRule(ce).stream()) // for HTML we need to generate the actual events
                 .filter(ce -> pastThreshold.isBefore(ce.startDateTime()) && futureThreshold.isAfter(ce.startDateTime()))

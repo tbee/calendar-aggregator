@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -32,10 +33,25 @@ public class CalendarAggregateApplication {
 	private static final AtomicBoolean hsqldbStarted = new AtomicBoolean(false);
 
 	public static void main(String[] args) {
+		printStackTraces();
 		Locale.setDefault(new Locale("NL"));
 		System.setProperty("liquibase.secureParsing", "false");
 		startHsqldbServer();
 		SpringApplication.run(CalendarAggregateApplication.class, args);
+	}
+
+	private static void printStackTraces() {
+		LOG.info("printStackTraces");
+		Map<Thread, StackTraceElement[]> allStackTraces = Thread.getAllStackTraces();
+		for (Thread thread : allStackTraces.keySet()) {
+			StackTraceElement[] stackTraceElements = allStackTraces.get(thread);
+			if (stackTraceElements.length > 0) {
+				LOG.info("==========");
+			}
+			for (java.lang.StackTraceElement stackTraceElement : stackTraceElements) {
+				LOG.info("[" + thread.getName() + "] " + stackTraceElement.toString());
+			}
+		}
 	}
 
 	@Bean
