@@ -177,6 +177,7 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 			+ ",startDateTime=" + startDateTime
 			+ ",endDateTime=" + endDateTime
 			+ ",rrule=" + rrule
+			+ ",subject=" + subject
 		    ;
 	}
 

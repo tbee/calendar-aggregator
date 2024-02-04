@@ -3,23 +3,20 @@ package nl.softworks.calendarAggregator.domain.entity;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
+import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.SaxonApiException;
+import net.sf.saxon.s9api.XPathCompiler;
+import net.sf.saxon.s9api.XdmItem;
+import net.sf.saxon.s9api.XdmNode;
+import net.sf.saxon.s9api.XdmValue;
+import net.sf.saxon.trans.XPathException;
 import org.json.JSONObject;
 import org.json.XML;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -219,23 +216,21 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
                 if (stringBuilder != null) stringBuilder.append("XML ").append(content).append("\n");
             }
 
-            // Apply json
+            // Apply xpath (using saxon api because Java's API defaults to XPath 1.0)
             if (stringBuilder != null) stringBuilder.append(xpath).append("\n");
-            DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = builderFactory.newDocumentBuilder();
-            Document xmlDocument = builder.parse(new ByteArrayInputStream(content.getBytes()));
-            XPath xPath = XPathFactory.newInstance().newXPath();
-            NodeList nodeList = (NodeList) xPath.compile(xpath).evaluate(xmlDocument, XPathConstants.NODESET);
-            for (int i = 0; i < nodeList.getLength(); i++) {
-                Node node = nodeList.item(i);
-                if (stringBuilder != null) stringBuilder.append("---\nEvent node: ").append(describe(node)).append("\n");
+            Processor processor = new Processor(false);
+            XdmNode rootXdmNode = processor.newDocumentBuilder().build(new StreamSource(new StringReader(content)));
+            XPathCompiler xPathCompiler = processor.newXPathCompiler();
+            XdmValue xdmValue = xPathCompiler.evaluate(xpath, rootXdmNode);
+            for (XdmItem eventXdmItem : xdmValue) {
+                if (stringBuilder != null) stringBuilder.append("---\nEvent node: ").append(describe(eventXdmItem)).append("\n");
 
                 // get strings
-                String startDateString = solveXpath("startdate", node, startdateXpath, stringBuilder);
-                String endDateString = solveXpath("enddate", node, enddateXpath, stringBuilder);
-                String starttimeString = starttimeXpath.isBlank() ? startTimeDefault : solveXpath("starttime", node, starttimeXpath, stringBuilder);
-                String endtimeString = endtimeXpath.isBlank() ? endTimeDefault : solveXpath("endtime", node, endtimeXpath, stringBuilder);
-                String subject = subjectXpath.isBlank() ? "" : solveXpath("subject", node, subjectXpath, stringBuilder);
+                String startDateString = solveXpath("startdate", eventXdmItem, startdateXpath, xPathCompiler, stringBuilder);
+                String endDateString = solveXpath("enddate", eventXdmItem, enddateXpath, xPathCompiler, stringBuilder);
+                String starttimeString = starttimeXpath.isBlank() ? startTimeDefault : solveXpath("starttime", eventXdmItem, starttimeXpath, xPathCompiler, stringBuilder);
+                String endtimeString = endtimeXpath.isBlank() ? endTimeDefault : solveXpath("endtime", eventXdmItem, endtimeXpath, xPathCompiler, stringBuilder);
+                String subject = subjectXpath.isBlank() ? "" : solveXpath("subject", eventXdmItem, subjectXpath, xPathCompiler, stringBuilder);
 
                 try {
                     LocalDate startLocalDate = parseLocalDate(startDateString, dateFormatter, stringBuilder);
@@ -307,7 +302,7 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
 
             return calendarEvents();
         }
-        catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException e) {
+        catch (XPathExpressionException | SaxonApiException | XPathException e) {
             throw new RuntimeException(e);
         }
         catch (RuntimeException e) {
@@ -321,11 +316,10 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
         }
     }
 
-    private String solveXpath(String id, Node basenode, String xpath, StringBuilder stringBuilder) throws XPathExpressionException {
-        XPath xPath = XPathFactory.newInstance().newXPath();
-        Node node = (Node) xPath.compile(xpath).evaluate(basenode, XPathConstants.NODE);
-        if (stringBuilder != null) stringBuilder.append(id + " node: ").append(describe(node)).append("\n");
-        String str = node.getTextContent();
+    private String solveXpath(String id, XdmItem basenode, String xpath, XPathCompiler xPathCompiler, StringBuilder stringBuilder) throws XPathExpressionException, SaxonApiException, XPathException {
+        XdmValue xdmValue = xPathCompiler.evaluate(xpath, basenode);
+        if (stringBuilder != null) stringBuilder.append(id + " node: ").append(describe(xdmValue)).append("\n");
+        String str = xdmValue.getUnderlyingValue().getStringValue();
         if (stringBuilder != null) stringBuilder.append(id + " string: ").append(str).append("\n");
         return str;
     }
@@ -350,14 +344,22 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
         return localDate;
     }
 
-    private static String describe(Node node) {
+    private String describe(XdmItem xdmItem) {
+        return describe((XdmNode)xdmItem);
+    }
+
+    private String describe(XdmValue xdmValue) {
+        return describe((XdmNode)xdmValue);
+    }
+
+    private String describe(XdmNode node) {
         if (node == null) {
             return "null";
         }
-        Node parent = node.getParentNode();
+        XdmNode parent = node.getParent();
         if (parent == null) {
-            return node.getNodeName();
+            return ""; // do not toString the root, it will print the whole XML
         }
-        return describe(parent) + "/" + node.getNodeName();
+        return describe(parent) + (node.getNodeName() == null ? "" : "/" + node.getNodeName());
     }
 }

@@ -109,7 +109,7 @@ public class CalendarSourcesTest {
     public void danshotspot_20240203() {
         StringBuilder stringBuilder = new StringBuilder();
         List<CalendarEvent> calendarEvents = new CalendarSourceXmlScraper()
-                .xpath("//event/name/text/text()[contains(., 'Vrijdansen')]")
+                .xpath("//event/name/text/text()[contains(., 'Vrijdansen') or ends-with(., 'bal')]")
                 .startdateXpath("../../../start/local")
                 .enddateXpath("../../../end/local")
                 .starttimeXpath("../../../start/local")
@@ -124,7 +124,7 @@ public class CalendarSourcesTest {
         System.out.println(stringBuilder);
         System.out.println(calendarEvents);
 
-        Assertions.assertEquals(4, calendarEvents.size());
+        Assertions.assertEquals(7, calendarEvents.size());
         Assertions.assertEquals("Vrijdansen, stijldansavond", calendarEvents.get(0).subject());
         assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 5, 16, 19, 0, 0), calendarEvents.get(0).startDateTime());
         assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 5, 16, 22, 0, 0), calendarEvents.get(0).endDateTime());

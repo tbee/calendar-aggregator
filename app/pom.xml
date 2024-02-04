@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>org.tbee</groupId>
 	<artifactId>calendarAggregator</artifactId>
-	<version>1.18.0</version>
+	<version>1.19.0</version>
 	<name>Calendar Aggregator</name>
 	<description>Merge all kinds of calendar sources into one calendar</description>
 	
@@ -91,12 +91,19 @@
 			<artifactId>commons-lang3</artifactId>
 			<version>3.14.0</version>
 		</dependency>
-		<!-- form JSON to XML conversion -->
+		<!-- for JSON to XML conversion -->
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20231013</version>
 		</dependency>
+		<!-- XPath 3.0 implementation -->
+		<dependency>
+			<groupId>net.sf.saxon</groupId>
+			<artifactId>Saxon-HE</artifactId>
+			<version>12.4</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.mnode.ical4j</groupId>
