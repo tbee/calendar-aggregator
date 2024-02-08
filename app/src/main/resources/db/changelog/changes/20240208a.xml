@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- https://xenovation.com/blog/development/java/java-professional-developer/liquibase-related-sql-java-types -->
+
+    <changeSet id="20240208a" author="tom">
+        <createTable tableName="calendar_location">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lazylock" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="location" type="nvarchar(500)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="url" type="nvarchar(1000)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="lon" type="double">
+                <constraints nullable="false"/>
+            </column>
+            <column name="lat" type="double">
+                <constraints nullable="false"/>
+            </column>
+            <column name="timezone_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="nvarchar(4000)" defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="boolean" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_run" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <sql>
+            insert into calendar_location(id, lazylock, name, location, url, lon, lat, timezone_id, status)
+            select id, 1, name, location, url, lon, lat, timezone_id, status from calendar_source;
+        </sql>
+        <addColumn tableName="calendar_source" >
+            <column name="calendar_location_id" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <sql>
+            update calendar_source set calendar_location_id = id;
+        </sql>
+        <addNotNullConstraint tableName="calendar_source"
+                              columnName="calendar_location_id"
+                              validate="true"/>
+        <addForeignKeyConstraint  constraintName="calendar_source__location"
+                                  baseTableName="calendar_source"
+                                  baseColumnNames="calendar_location_id"
+                                  referencedTableName="calendar_location"
+                                  referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>
