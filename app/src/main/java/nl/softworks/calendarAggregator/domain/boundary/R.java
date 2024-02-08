@@ -26,6 +26,12 @@ public class R {
     }
 
     @Autowired
+    CalendarLocationRepo calendarLocationRepo;
+    static public CalendarLocationRepo calendarLocation() {
+        return R.singleton.calendarLocationRepo;
+    }
+
+    @Autowired
     CalendarSourceRepo calendarSourceRepo;
     static public CalendarSourceRepo calendarSource() {
         return R.singleton.calendarSourceRepo;

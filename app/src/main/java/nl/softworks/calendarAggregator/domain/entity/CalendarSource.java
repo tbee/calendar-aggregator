@@ -55,6 +55,14 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 		return "Manual";
 	}
 
+	@ManyToOne
+	@NotNull
+	CalendarLocation calendarLocation;
+	public CalendarLocation calendarLocation() {
+		return calendarLocation;
+	}
+
+
 	@Column(unique=true) // prevent the same name to occur
 	@NotNull
 	protected String name;
