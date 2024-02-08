@@ -46,7 +46,7 @@ import java.util.regex.Matcher;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING, name = "type")
-@DiscriminatorValue("manual")
+@DiscriminatorValue("dummy")
 public class CalendarSource extends EntityBase<CalendarSource> {
 	private static final Logger LOG = LoggerFactory.getLogger(CalendarSource.class);
 	protected static final String OK = "ok";

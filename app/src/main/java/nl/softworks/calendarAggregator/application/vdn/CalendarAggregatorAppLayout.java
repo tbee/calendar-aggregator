@@ -19,7 +19,7 @@ import com.vaadin.flow.router.HasDynamicTitle;
 import com.vaadin.flow.server.VaadinSession;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import nl.softworks.calendarAggregator.application.vdn.view.CalendarSourceAndEventView;
+import nl.softworks.calendarAggregator.application.vdn.view.CalendarLocationAndSourceView;
 import nl.softworks.calendarAggregator.application.vdn.view.PersonView;
 import nl.softworks.calendarAggregator.application.vdn.view.SettingsView;
 import nl.softworks.calendarAggregator.application.vdn.view.TimezoneView;
@@ -106,7 +106,7 @@ implements HasDynamicTitle {
 		tabs.setOrientation(Tabs.Orientation.VERTICAL);
 		tabs.addSelectedChangeListener(event -> {
 			if (event.getSelectedTab().equals(overviewTab)) {
-				UI.getCurrent().navigate(CalendarSourceAndEventView.class);
+				UI.getCurrent().navigate(CalendarLocationAndSourceView.class);
 			}
 			if (event.getSelectedTab().equals(timezoneTab)) {
 				UI.getCurrent().navigate(TimezoneView.class);
