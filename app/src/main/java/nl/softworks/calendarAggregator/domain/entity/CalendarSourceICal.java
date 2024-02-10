@@ -128,9 +128,9 @@ public class CalendarSourceICal extends CalendarSource {
 				TimeZone timeZone = startDate.getTimeZone();
 				if (timeZone != null) {
 					String timezoneName = timeZone.getVTimeZone().getTimeZoneId().getValue();
-					if (!timezone().name().equals(timezoneName)) {
-						throw new RuntimeException("Source's timezone is not equal to " + timezoneName);
-					}
+//					if (!timezone().name().equals(timezoneName)) {
+//						throw new RuntimeException("Source's timezone is not equal to " + timezoneName);
+//					}
 				}
 
 				// Create event

@@ -22,5 +22,12 @@
                 <constraints nullable="false"/>
             </column>
         </addColumn>
+        <sql>
+            insert into calendar_source(lazylock, type, calendar_location_id, start_date_time, end_date_time, subject, rrule)
+            select 1, 'manual', calendar_source_id, start_date_time, end_date_time, subject, rrule from calendar_event where generated = false;
+            delete from calendar_event_exdate;
+            delete from calendar_event;
+            delete from calendar_source where type = 'manual' and start_date_time is null;
+        </sql>
     </changeSet>
 </databaseChangeLog>
