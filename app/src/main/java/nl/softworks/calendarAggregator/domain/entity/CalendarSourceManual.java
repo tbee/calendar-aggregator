@@ -116,8 +116,11 @@ public class CalendarSourceManual extends CalendarSource {
 			}
 
 			// Nothing in the distant past
-			LocalDateTime aFewDaysBack = now.minusDays(3).toLocalDate().atStartOfDay();
+			LocalDateTime aFewDaysBack = now.minusDays(1).toLocalDate().atStartOfDay();
 			calendarEvents.removeIf(ce -> ce.endDateTime().isBefore(aFewDaysBack));
+			if (calendarEvents.isEmpty()) {
+				status("No events");
+			}
 
 			return calendarEvents;
 		}

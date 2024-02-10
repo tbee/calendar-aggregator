@@ -24,17 +24,20 @@ public class CalendarSourceForm extends FormLayout {
 
 	private final Binder<CalendarSource> binder = new Binder<>();
 
+	private final TextField descriptionTextfield = new TextField("Description");
 	private final TextField statusTextField = new TextField("Status");
 
 	private CalendarSource calendarSource;
 	public CalendarSourceForm() {
+		setColspan(descriptionTextfield, 2);
 		setColspan(statusTextField, 2);
-		add(statusTextField);
+		add(descriptionTextfield, statusTextField);
 
 		Button generateButton = new Button("Generate", evt -> generate());
 		setColspan(generateButton, 2);
 		add(generateButton);
 
+		binder.forField(descriptionTextfield).bind(CalendarSource::description, CalendarSource::description);
 		binder.forField(statusTextField).bind(CalendarSource::status, CalendarSource::status);
 	}
 

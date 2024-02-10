@@ -51,6 +51,9 @@
             <column name="calendar_location_id" type="bigint">
                 <constraints nullable="true"/>
             </column>
+            <column name="description" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
         </addColumn>
         <sql>
             update calendar_source set calendar_location_id = id;
@@ -63,5 +66,13 @@
                                   baseColumnNames="calendar_location_id"
                                   referencedTableName="calendar_location"
                                   referencedColumnNames="id"/>
+        <dropColumn tableName="calendar_source">
+            <column name="name"/>
+            <column name="location"/>
+            <column name="url"/>
+            <column name="lon"/>
+            <column name="lat"/>
+            <column name="timezone_id"/>
+        </dropColumn>
     </changeSet>
 </databaseChangeLog>

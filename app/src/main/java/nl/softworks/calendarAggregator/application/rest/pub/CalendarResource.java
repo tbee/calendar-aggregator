@@ -40,7 +40,7 @@ public class CalendarResource {
         LocalDateTime futureThreshold = LocalDateTime.now().plusMonths(4);
         String events = R.calendarEvent().findAll().stream()
                 .filter(ce -> ce.hasRrule() || (pastThreshold.isBefore(ce.startDateTime()) && futureThreshold.isAfter(ce.startDateTime())))
-                .filter(ce -> d == 0 || d > (int)calculateDistance(lat, lon, ce.calendarSource().lat(), ce.calendarSource().lon()))
+//                .filter(ce -> d == 0 || d > (int)calculateDistance(lat, lon, ce.calendarSource().lat(), ce.calendarSource().lon()))
                 .map(this::ical)
                 .collect(Collectors.joining());
 
@@ -75,7 +75,7 @@ public class CalendarResource {
         String events = R.calendarEvent().findAll().stream()
                 .flatMap(ce -> applyRRule(ce).stream()) // for HTML we need to generate the actual events
                 .filter(ce -> pastThreshold.isBefore(ce.startDateTime()) && futureThreshold.isAfter(ce.startDateTime()))
-                .filter(ce -> d == 0 || d > (int)calculateDistance(lat, lon, ce.calendarSource().lat(), ce.calendarSource().lon()))
+//                .filter(ce -> d == 0 || d > (int)calculateDistance(lat, lon, ce.calendarSource().lat(), ce.calendarSource().lon()))
                 .sorted(Comparator.comparing(CalendarEvent::startDateTime))
                 .map(this::tr)
                 .collect(Collectors.joining());
@@ -202,15 +202,15 @@ public class CalendarResource {
 				%exdate%
 				END:VEVENT
 				"""
-                .replace("%uid%", calendarEvent.id() + "@dancemoments.softworks.nl")
-                .replace("%tzid%", calendarEvent.calendarSource().timezone().name())
-                .replace("%dtStart%", dateTimeFormatter.format(calendarEvent.startDateTime()))
-                .replace("%dtEnd%", dateTimeFormatter.format(calendarEvent.endDateTime()))
-                .replace("%summary%", (calendarEvent.calendarSource().name() + " " + calendarEvent.subject()).trim())
-                .replace("%location%", calendarEvent.calendarSource().location().replace("\n", ", "))
-                .replace("%description%", calendarEvent.calendarSource().url() + "\\n\\n" + settings.disclaimer())
-                .replace("%rrule%", (calendarEvent.rrule().isBlank() ? "" : "RRULE:" + calendarEvent.rrule()))
-                .replace("%exdate%", (exdate.isBlank() ? "" : "EXDATE:" + exdate))
+//                .replace("%uid%", calendarEvent.id() + "@dancemoments.softworks.nl")
+//                .replace("%tzid%", calendarEvent.calendarSource().timezone().name())
+//                .replace("%dtStart%", dateTimeFormatter.format(calendarEvent.startDateTime()))
+//                .replace("%dtEnd%", dateTimeFormatter.format(calendarEvent.endDateTime()))
+//                .replace("%summary%", (calendarEvent.calendarSource().name() + " " + calendarEvent.subject()).trim())
+//                .replace("%location%", calendarEvent.calendarSource().location().replace("\n", ", "))
+//                .replace("%description%", calendarEvent.calendarSource().url() + "\\n\\n" + settings.disclaimer())
+//                .replace("%rrule%", (calendarEvent.rrule().isBlank() ? "" : "RRULE:" + calendarEvent.rrule()))
+//                .replace("%exdate%", (exdate.isBlank() ? "" : "EXDATE:" + exdate))
                 .replaceAll("(?m)^[ \t]*\r?\n", ""); // strip empty lines
     }
 
@@ -221,7 +221,7 @@ public class CalendarResource {
                 + " - "
                 + (calendarEvent.startDateTime().toLocalDate().equals(calendarEvent.endDateTime().toLocalDate()) ? timeFormatter : dateTimeFormatter).format(calendarEvent.endDateTime());
 
-        String what = calendarEvent.calendarSource().name() + (calendarEvent.subject().isBlank() ? "" : " - " + calendarEvent.subject());
+//        String what = calendarEvent.calendarSource().name() + (calendarEvent.subject().isBlank() ? "" : " - " + calendarEvent.subject());
 
         return 	"""
 				<tr>
@@ -230,9 +230,9 @@ public class CalendarResource {
 				<td><a href="%url%" target="_blank">check here</a></td>
 				</tr>
 				"""
-                .replace("%when%", when)
-                .replace("%what%", what)
-                .replace("%url%", calendarEvent.calendarSource().url())
+//                .replace("%when%", when)
+//                .replace("%what%", what)
+//                .replace("%url%", calendarEvent.calendarSource().url())
                 ;
     }
 

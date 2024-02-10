@@ -74,14 +74,14 @@ implements AfterNavigationObserver
 
 		// calendarSourceAndEventTreeGrid
 		treeGrid.addHierarchyColumn(TreeNode::text).setHeader("Name").setFlexGrow(100);
-		treeGrid.addComponentColumn((ValueProvider<TreeNode, Icon>) tn -> createEnabledIcon(tn)).setHeader("Enabled").setFlexGrow(5);
 		treeGrid.addComponentColumn((ValueProvider<TreeNode, NativeLabel>) tn -> createTypeLabel(tn)).setHeader("Type").setFlexGrow(10);
+		treeGrid.addComponentColumn((ValueProvider<TreeNode, Icon>) tn -> createEnabledIcon(tn)).setHeader("Enabled").setFlexGrow(5);
 		treeGrid.addComponentColumn((ValueProvider<TreeNode, Anchor>) tn -> createAnchor(tn.url())).setHeader("Website").setFlexGrow(5);
-		treeGrid.addColumn(TreeNode::startDate).setHeader("Start").setFlexGrow(50);
-		treeGrid.addColumn(TreeNode::endDate).setHeader("End").setFlexGrow(50);
-		treeGrid.addComponentColumn((ValueProvider<TreeNode, Button>) tn -> createShowLogButton(tn)).setHeader("Status").setFlexGrow(50);
-		treeGrid.addColumn(TreeNode::updated).setHeader("Updated").setFlexGrow(50);
-		treeGrid.addColumn(TreeNode::childrenCount).setHeader("Events").setFlexGrow(10);
+//		treeGrid.addColumn(TreeNode::startDate).setHeader("Start").setFlexGrow(50);
+//		treeGrid.addColumn(TreeNode::endDate).setHeader("End").setFlexGrow(50);
+		treeGrid.addComponentColumn((ValueProvider<TreeNode, Button>) tn -> createShowLogButton(tn)).setHeader("Status").setFlexGrow(30);
+		treeGrid.addColumn(TreeNode::updated).setHeader("Updated").setFlexGrow(30);
+		treeGrid.addColumn(TreeNode::childrenCount).setHeader("Children").setFlexGrow(10);
 		treeGrid.addItemDoubleClickListener(e -> edit());
 
 		// buttonbar
@@ -111,6 +111,9 @@ implements AfterNavigationObserver
 	}
 
 	private Anchor createAnchor(String url) {
+		if (url == null) {
+			return null;
+		}
 		Anchor anchor = new Anchor(url, "⇒");
 		anchor.setTarget("_blank");
 		return anchor;
@@ -298,7 +301,7 @@ implements AfterNavigationObserver
 
 		@Override
 		public String type() {
-			return calendarLocation.calendarSources().size() != 1 ? "Mix" : calendarLocation.calendarSources().get(0).type();
+			return calendarLocation.calendarSources().stream().map(cs -> cs.type()).distinct().count() > 1 ? "Mix" : calendarLocation.calendarSources().get(0).type();
 		}
 		@Override
 		public String url() {
@@ -367,7 +370,7 @@ implements AfterNavigationObserver
 	record TreeNodeCalendarSource(TreeNodeCalendarLocation treeNodeCalendarSource, CalendarSource calendarSource) implements TreeNode {
 		@Override
 		public String text() {
-			return type();
+			return calendarSource.description() == null ? hint() : calendarSource.description();
 		}
 		@Override
 		public Boolean enabled() {
@@ -379,7 +382,7 @@ implements AfterNavigationObserver
 		}
 		@Override
 		public String url() {
-			return calendarSource().url();
+			return null;
 		}
 
 		@Override
@@ -464,7 +467,7 @@ implements AfterNavigationObserver
 				return calendarSourceXmlScraper.xpath();
 			}
 			if (calendarSource instanceof CalendarSourceManual calendarSourceManual) {
-				return calendarSourceManual.rrule() == null ? "" : calendarSourceManual.rrule();
+				return calendarSourceManual.startDateTime().toString() + " " + (calendarSourceManual.rrule() == null ? "" : calendarSourceManual.rrule());
 			}
 			return "";
 		}
@@ -473,7 +476,7 @@ implements AfterNavigationObserver
 	public List<TreeNode> getTreeNodeChildren(TreeNode treeNode) {
 		if (treeNode instanceof TreeNodeCalendarLocation treeNodeCalendarLocation) {
 			List<CalendarSource> calendarSources = new ArrayList<>(treeNodeCalendarLocation.calendarLocation().calendarSources());
-			calendarSources.sort(Comparator.comparing(CalendarSource::name));
+//			calendarSources.sort(Comparator.comparing(CalendarSource::name));
 			return treeNodes(calendarSources, ce -> new TreeNodeCalendarSource(treeNodeCalendarLocation, ce));
 		}
 		return List.of();
