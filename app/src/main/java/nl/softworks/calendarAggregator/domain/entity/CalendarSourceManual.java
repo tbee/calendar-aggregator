@@ -99,25 +99,29 @@ public class CalendarSourceManual extends CalendarSource {
 	@Override
 	public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
 		try {
-			status(OK);
-
-			// Remove all generated events (keep the manual ones)
-			calendarEvents.removeIf(ce -> ce.generated);
+			super.generateEvents(stringBuilder);
+			if (!isEnabled()) {
+				return calendarEvents;
+			}
 
 			LocalDateTime now = LocalDateTime.now();
 			if (rrule.isBlank()) {
+				if (stringBuilder != null) stringBuilder.append("No RRule, creating single event\n");
 				calendarEvents.add(new CalendarEvent(CalendarSourceManual.this)
 						.startDateTime(startDateTime)
 						.endDateTime(endDateTime)
 						.subject(subject));
 			}
 			else {
-				applyRRule(now);
+				if (stringBuilder != null) stringBuilder.append("Applying RRule\n");
+				calendarEvents.addAll(applyRRule(now));
+				if (stringBuilder != null) stringBuilder.append("Applied RRule: ").append(calendarEvents.size()).append(" events created\n");
 			}
 
 			// Nothing in the distant past
 			LocalDateTime aFewDaysBack = now.minusDays(1).toLocalDate().atStartOfDay();
 			calendarEvents.removeIf(ce -> ce.endDateTime().isBefore(aFewDaysBack));
+			if (stringBuilder != null) stringBuilder.append("Filtered on after ").append(aFewDaysBack).append(", ").append(calendarEvents.size()).append(" events remaining\n");
 			if (calendarEvents.isEmpty()) {
 				status("No events");
 			}

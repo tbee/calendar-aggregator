@@ -77,8 +77,8 @@ implements AfterNavigationObserver
 		treeGrid.addComponentColumn((ValueProvider<TreeNode, NativeLabel>) tn -> createTypeLabel(tn)).setHeader("Type").setFlexGrow(10);
 		treeGrid.addComponentColumn((ValueProvider<TreeNode, Icon>) tn -> createEnabledIcon(tn)).setHeader("Enabled").setFlexGrow(5);
 		treeGrid.addComponentColumn((ValueProvider<TreeNode, Anchor>) tn -> createAnchor(tn.url())).setHeader("Website").setFlexGrow(5);
-//		treeGrid.addColumn(TreeNode::startDate).setHeader("Start").setFlexGrow(50);
-//		treeGrid.addColumn(TreeNode::endDate).setHeader("End").setFlexGrow(50);
+		treeGrid.addColumn(TreeNode::startDate).setHeader("Start").setFlexGrow(50);
+		treeGrid.addColumn(TreeNode::endDate).setHeader("End").setFlexGrow(50);
 		treeGrid.addComponentColumn((ValueProvider<TreeNode, Button>) tn -> createShowLogButton(tn)).setHeader("Status").setFlexGrow(30);
 		treeGrid.addColumn(TreeNode::updated).setHeader("Updated").setFlexGrow(30);
 		treeGrid.addColumn(TreeNode::childrenCount).setHeader("Children").setFlexGrow(10);
@@ -120,15 +120,16 @@ implements AfterNavigationObserver
 	}
 
 	private Button createShowLogButton(TreeNode treeNode) {
-		if (treeNode instanceof TreeNodeCalendarLocation) {
-			return null;
-		}
 		Button button = new Button(treeNode.status(), evt -> showLogInDialog(treeNode.calendarSource()));
+		button.setEnabled(treeNode.calendarSource() != null);
 		button.addThemeVariants(ButtonVariant.LUMO_SMALL);
 		return button;
 	}
 
 	private void showLogInDialog(CalendarSource calendarSource) {
+		if (calendarSource == null) {
+			return;
+		}
 		TextArea textArea = new TextArea("Result", calendarSource.log(), "");
 		textArea.setSizeFull();
 
@@ -193,11 +194,6 @@ implements AfterNavigationObserver
 			CalendarSourceXmlScraperForm.showInsertDialog(calendarSourceXmlScraper, () -> reloadTreeGrid());
 		}).withIsPrimary(calendarSource instanceof CalendarSourceXmlScraper));
 
-//		horizontalLayout.add(new VerticalLayout(new VButton("Manual Event", e -> {
-//			addSelectionDialog.close();
-//			CalendarEventForm.showInsertDialog(calendarSource, () -> reloadTreeGrid());
-//		})));
-
 		addSelectionDialog.open();
 	}
 
@@ -255,7 +251,7 @@ implements AfterNavigationObserver
 			}
 			return 1;
 		};
-		Comparator<CalendarLocation> compareByName = Comparator.comparing(CalendarLocation::name);
+		Comparator<CalendarLocation> compareByName = Comparator.comparing(CalendarLocation::name, String.CASE_INSENSITIVE_ORDER);
 		calendarLocations.sort(compareByStatus.thenComparing(compareByName));
 		List<TreeNode> treeNodes = treeNodes(calendarLocations, TreeNodeCalendarLocation::new);
 		treeGrid.setItems(treeNodes, this::getTreeNodeChildren);
@@ -301,7 +297,8 @@ implements AfterNavigationObserver
 
 		@Override
 		public String type() {
-			return calendarLocation.calendarSources().stream().map(cs -> cs.type()).distinct().count() > 1 ? "Mix" : calendarLocation.calendarSources().get(0).type();
+			long count = calendarLocation.calendarSources().stream().map(cs -> cs.type()).distinct().count();
+			return count == 0 ? "" : (count > 1 ? "Mix" : calendarLocation.calendarSources().get(0).type());
 		}
 		@Override
 		public String url() {
@@ -348,7 +345,7 @@ implements AfterNavigationObserver
 
 		@Override
 		public String status() {
-			return "";
+			return calendarLocation().status();
 		}
 
 		@Override
@@ -370,7 +367,7 @@ implements AfterNavigationObserver
 	record TreeNodeCalendarSource(TreeNodeCalendarLocation treeNodeCalendarSource, CalendarSource calendarSource) implements TreeNode {
 		@Override
 		public String text() {
-			return calendarSource.description() == null ? hint() : calendarSource.description();
+			return calendarSource.description() == null || calendarSource.description().isBlank() ? hint() : calendarSource.description();
 		}
 		@Override
 		public Boolean enabled() {
@@ -387,11 +384,17 @@ implements AfterNavigationObserver
 
 		@Override
 		public String startDate() {
+			if (calendarSource instanceof CalendarSourceManual calendarSourceManual) {
+				return calendarSourceManual.startDateTime().toString();
+			}
 			return null;
 		}
 
 		@Override
 		public String endDate() {
+			if (calendarSource instanceof CalendarSourceManual calendarSourceManual) {
+				return calendarSourceManual.startDateTime().toString();
+			}
 			return null;
 		}
 
@@ -405,7 +408,7 @@ implements AfterNavigationObserver
 			}
 			else if (calendarSource instanceof CalendarSourceManual) {
 				calendarSourceForm = new CalendarSourceManualForm().populateWith(calendarSource);
-				title = "Regexp source";
+				title = "Manual source";
 			}
 			else if (calendarSource instanceof CalendarSourceMultipleDaysScraper) {
 				calendarSourceForm = new CalendarSourceMultipleDaysScraperForm().populateWith(calendarSource);
@@ -420,8 +423,7 @@ implements AfterNavigationObserver
 				title = "XML/JSON source";
 			}
 			else {
-				calendarSourceForm = new CalendarSourceForm().populateWith(calendarSource);
-				title = "Manual source";
+				throw new IllegalStateException("Unknown CalendarSource " + calendarSource.getClass().getSimpleName());
 			}
 			new OkCancelDialog(title, calendarSourceForm)
 					.okLabel("Save")

@@ -3,7 +3,6 @@ package nl.softworks.calendarAggregator.domain.entity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
-import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Inheritance;
@@ -43,10 +42,9 @@ import java.util.regex.Matcher;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING, name = "type")
-@DiscriminatorValue("dummy")
-public class CalendarSource extends EntityBase<CalendarSource> {
+abstract public class CalendarSource extends EntityBase<CalendarSource> {
 	private static final Logger LOG = LoggerFactory.getLogger(CalendarSource.class);
-	protected static final String OK = "ok";
+	public static final String OK = "ok";
 
 	public String type() {
 		return "Manual";
@@ -81,7 +79,7 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 		return this;
 	}
 	public boolean statusIsOk() {
-		return OK.equals(status) || !enabled;
+		return OK.equals(status) || !isEnabled();
 	}
 
 	@NotNull
@@ -93,6 +91,9 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 	public CalendarSource enabled(boolean v) {
 		this.enabled = v;
 		return this;
+	}
+	public boolean isEnabled() {
+		return enabled && calendarLocation.enabled;
 	}
 
 	private LocalDateTime lastRun;
@@ -193,7 +194,8 @@ public class CalendarSource extends EntityBase<CalendarSource> {
 
 	public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
 		status(OK);
-		return calendarEvents();
+		calendarEvents.clear();
+		return calendarEvents;
 	}
 
 	protected void logMatcherInStringBuilder(Matcher matcher, String content, StringBuilder stringBuilder) {

@@ -59,10 +59,10 @@ public class CalendarSourceICal extends CalendarSource {
 	@Override
 	public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
 		try {
-			status("");
-
-			// Remove all generated events (keep the manual ones)
-			calendarEvents.removeIf(ce -> ce.generated);
+			super.generateEvents(stringBuilder);
+			if (!isEnabled()) {
+				return calendarEvents;
+			}
 
 			// Get ical as string
 			String url = resolveUrl(icalUrl, stringBuilder);
@@ -147,7 +147,6 @@ public class CalendarSourceICal extends CalendarSource {
 				return List.of();
 			}
 
-			status(OK);
 			return calendarEvents();
 		}
 		catch (RuntimeException | IOException | ParserException | InterruptedException e) {

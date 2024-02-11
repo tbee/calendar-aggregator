@@ -29,5 +29,9 @@
             delete from calendar_event;
             delete from calendar_source where type = 'manual' and start_date_time is null;
         </sql>
+        <dropColumn tableName="calendar_event">
+            <column name="rrule"/>
+            <column name="generated"/>
+        </dropColumn>
     </changeSet>
 </databaseChangeLog>

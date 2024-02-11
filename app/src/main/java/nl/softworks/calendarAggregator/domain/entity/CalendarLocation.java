@@ -56,18 +56,18 @@ public class CalendarLocation extends EntityBase<CalendarLocation> {
 		return this;
 	}
 
-	@NotNull
-	protected String status = "";
-	static public final String STATUS_PROPERTYID = "status";
 	public String status() {
-		return status;
+		String notOkStatus = calendarSources.stream()
+				.filter(cs -> !cs.statusIsOk())
+				.map(cs -> cs.status)
+				.findFirst().orElse(null);
+		return notOkStatus != null ? notOkStatus : CalendarSource.OK;
 	}
-	public CalendarLocation status(String v) {
-		this.status = v;
-		return this;
-	}
+
 	public boolean statusIsOk() {
-		return CalendarSource.OK.equals(status) || !enabled;
+		return calendarSources.stream()
+				.filter(cs -> !cs.statusIsOk())
+				.count() == 0;
 	}
 
 	@NotNull
@@ -137,26 +137,22 @@ public class CalendarLocation extends EntityBase<CalendarLocation> {
 	public List<CalendarSource> calendarSources() {
 		return Collections.unmodifiableList(calendarSources);
 	}
-	public void addCalendarEvent(CalendarSource calendarSource) {
+	public void addCalendarSource(CalendarSource calendarSource) {
 		calendarSources.add(calendarSource);
 		calendarSource.calendarLocation = this;
 	}
-	public void removeCalendarEvent(CalendarSource calendarSource) {
+	public void removeCalendarSource(CalendarSource calendarSource) {
 		calendarSources.remove(calendarSource);
 		calendarSource.calendarLocation = null;
 	}
 
 	public List<CalendarEvent> generateEvents() {
-		status(CalendarSource.OK);
 
 		List<CalendarEvent> calendarEvents = new ArrayList<>();
 		for (CalendarSource calendarSource : calendarSources) {
 			StringBuilder stringBuilder = new StringBuilder();
 			calendarEvents.addAll(calendarSource.generateEvents(stringBuilder));
 			calendarSource.log(stringBuilder.toString());
-			if (!calendarSource.statusIsOk()) {
-				status(calendarSource.status());
-			}
 		}
 		return calendarEvents;
 	}
