@@ -190,10 +190,10 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
     @Override
     public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
         try {
-            status("");
-
-            // Remove all generated events (keep the manual ones)
-            calendarEvents.removeIf(ce -> ce.generated);
+            super.generateEvents(stringBuilder);
+            if (!isEnabled()) {
+                return calendarEvents;
+            }
 
             // Create formatters
             Locale locale = new Locale(dateTimeLocale);
@@ -298,7 +298,6 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
                 status("No events");
                 return List.of();
             }
-            status(OK);
 
             return calendarEvents();
         }

@@ -37,7 +37,6 @@ public class CalendarLocationForm extends FormLayout {
 	private final NumberField lonNumberField = new NumberField("LON");
 	private final Checkbox enabledCheckbox = new Checkbox("Enabled");
 	private final ComboBox<Timezone> timezoneComboBox = new ComboBox<>("Timezone");
-	private final TextField statusTextField = new TextField("Status");
 
 	private CalendarLocation calendarLocation;
 	public CalendarLocationForm() {
@@ -47,8 +46,7 @@ public class CalendarLocationForm extends FormLayout {
 			return nameSpan;
 		}));
 		setColspan(urlTextField, 2);
-		setColspan(statusTextField, 2);
-		add(nameTextField, enabledCheckbox, urlTextField, locationTextField, timezoneComboBox, latNumberField, lonNumberField, statusTextField);
+		add(nameTextField, enabledCheckbox, urlTextField, locationTextField, timezoneComboBox, latNumberField, lonNumberField);
 
 		Button generateButton = new Button("Generate", evt -> generate());
 		setColspan(generateButton, 2);
@@ -61,7 +59,6 @@ public class CalendarLocationForm extends FormLayout {
 		binder.forField(lonNumberField).bind(CalendarLocation::lon, CalendarLocation::lon);
 		binder.forField(enabledCheckbox).bind(CalendarLocation::enabled, CalendarLocation::enabled);
 		binder.forField(timezoneComboBox).bind(CalendarLocation::timezone, CalendarLocation::timezone);
-		binder.forField(statusTextField).bind(CalendarLocation::status, CalendarLocation::status);
 	}
 
 	public CalendarLocationForm populateWith(CalendarLocation calendarLocation) {
@@ -91,6 +88,9 @@ public class CalendarLocationForm extends FormLayout {
 			populateWith(calendarLocation);
 
 			String calendarEventsString = calendarEvents.stream().map(s -> s + "\n").collect(Collectors.joining());
+			if (calendarEventsString.isBlank()) {
+				calendarEventsString = "No events were generated";
+			}
 			stringBuilder.append("\n\n").append(calendarEventsString);
 		}
 		catch (ValidationException | RuntimeException e) {

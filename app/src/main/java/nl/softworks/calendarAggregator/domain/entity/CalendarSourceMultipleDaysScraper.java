@@ -113,9 +113,11 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
     @Override
     public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
         try {
-            calendarEvents.removeIf(ce -> ce.generated);
+            super.generateEvents(stringBuilder);
+            if (!isEnabled()) {
+                return calendarEvents;
+            }
 
-            status("");
             Locale locale = new Locale(dateTimeLocale);
             if (stringBuilder != null) stringBuilder.append("Locale ").append(locale).append("\n");
 
@@ -205,7 +207,6 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
                 status("No events");
                 return List.of();
             }
-            status(OK);
             return calendarEvents();
         }
         catch (RuntimeException e) {
