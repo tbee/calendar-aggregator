@@ -15,10 +15,10 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import nl.softworks.calendarAggregator.application.vdn.component.CrudButtonbar;
 import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.domain.boundary.R;
-import nl.softworks.calendarAggregator.domain.entity.CalendarEventExdate;
 import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceManual;
+import nl.softworks.calendarAggregator.domain.entity.CalendarSourceManualExdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +35,8 @@ public class CalendarSourceManualForm extends CalendarSourceForm {
 	private final DateTimePicker startDateTimePicker = new DateTimePicker("Start date");
 	private final DateTimePicker endDateTimePicker = new DateTimePicker("End date");
 	private final TextField rruleTextField = new TextField("RRule");
-	private final MultiSelectListBox<CalendarEventExdate> calendarEventExdateListBox = new MultiSelectListBox<>();
-	protected final List<CalendarEventExdate> calendarEventExdates = new ArrayList<>();
+	private final MultiSelectListBox<CalendarSourceManualExdate> calendarEventExdateListBox = new MultiSelectListBox<>();
+	protected final List<CalendarSourceManualExdate> calendarSourceManualExdates = new ArrayList<>();
 	private final TextField subjectTextField = new TextField("Subject");
 	private final DatePicker.DatePickerI18n datePickerIsoFormat = new DatePicker.DatePickerI18n();
 	private final Anchor rruleHelpAnchor = new Anchor("https://freetools.textmagic.com/rrule-generator", "RRule builder", AnchorTarget.BLANK);
@@ -73,33 +73,33 @@ public class CalendarSourceManualForm extends CalendarSourceForm {
 	}
 
 	private void deleteExdate() {
-		Set<CalendarEventExdate> selectedItems = calendarEventExdateListBox.getSelectedItems();
+		Set<CalendarSourceManualExdate> selectedItems = calendarEventExdateListBox.getSelectedItems();
 		if (selectedItems.isEmpty()) {
 			return;
 		}
 		new OkCancelDialog("Remove", new NativeLabel("Remove " + selectedItems.size() + " date(s). Are you sure?"))
 				.okLabel("Remove")
 				.onOk(() -> {
-					calendarEventExdates.removeAll(selectedItems);
-					calendarEventExdateListBox.setItems(calendarEventExdates);
+					calendarSourceManualExdates.removeAll(selectedItems);
+					calendarEventExdateListBox.setItems(calendarSourceManualExdates);
 				})
 				.open();
 	}
 
 	private void editExdate() {
-		Set<CalendarEventExdate> selectedItems = calendarEventExdateListBox.getSelectedItems();
+		Set<CalendarSourceManualExdate> selectedItems = calendarEventExdateListBox.getSelectedItems();
 		if (selectedItems.isEmpty()) {
 			return;
 		}
-		CalendarEventExdate calendarEventExdate = selectedItems.iterator().next();
-		DatePicker datePicker = new DatePicker(calendarEventExdate.excludedDate());
+		CalendarSourceManualExdate calendarSourceManualExdate = selectedItems.iterator().next();
+		DatePicker datePicker = new DatePicker(calendarSourceManualExdate.excludedDate());
 		datePicker.setI18n(datePickerIsoFormat);
 		new OkCancelDialog("Modify", datePicker)
 				.okLabel("Modify")
 				.onOk(() -> {
 					LocalDate localDate = datePicker.getValue();
-					calendarEventExdate.excludedDate(localDate);
-					calendarEventExdateListBox.setItems(calendarEventExdates);
+					calendarSourceManualExdate.excludedDate(localDate);
+					calendarEventExdateListBox.setItems(calendarSourceManualExdates);
 				})
 				.open();
 	}
@@ -111,8 +111,8 @@ public class CalendarSourceManualForm extends CalendarSourceForm {
 				.okLabel("Add")
 				.onOk(() -> {
 					LocalDate localDate = datePicker.getValue();
-					calendarEventExdates.add(new CalendarEventExdate().excludedDate(localDate));
-					calendarEventExdateListBox.setItems(calendarEventExdates);
+					calendarSourceManualExdates.add(new CalendarSourceManualExdate().excludedDate(localDate));
+					calendarEventExdateListBox.setItems(calendarSourceManualExdates);
 				})
 				.open();
 	}
@@ -120,9 +120,9 @@ public class CalendarSourceManualForm extends CalendarSourceForm {
 	public CalendarSourceManualForm populateWith(CalendarSource calendarSource) {
 		super.populateWith(calendarSource);
 		binder.readBean((CalendarSourceManual) calendarSource);
-		calendarEventExdates.clear();
-		calendarEventExdates.addAll(List.of()); //calendarSource == null ? List.of() : calendarSource.calendarEventExdates());
-		calendarEventExdateListBox.setItems(calendarEventExdates);
+		calendarSourceManualExdates.clear();
+		calendarSourceManualExdates.addAll(List.of()); //calendarSource == null ? List.of() : calendarSource.calendarEventExdates());
+		calendarEventExdateListBox.setItems(calendarSourceManualExdates);
 		return this;
 	}
 
