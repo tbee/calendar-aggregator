@@ -1,7 +1,10 @@
 package nl.softworks.calendarAggregator.domain.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.ValidationException;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
@@ -18,6 +21,8 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Entity
@@ -80,21 +85,21 @@ public class CalendarSourceManual extends CalendarSource {
 		return !rrule.isBlank();
 	}
 
-//	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarEvent", fetch = FetchType.EAGER)
-//	protected final List<CalendarEventExdate> calendarEventExdates = new ArrayList<>();
-//	public List<CalendarEventExdate> calendarEventExdates() {
-//		return Collections.unmodifiableList(calendarEventExdates);
-//	}
-//	public CalendarSourceManual calendarEventExdates(List<CalendarEventExdate> calendarEventExdates) {
-//		this.calendarEventExdates.clear();
-//		calendarEventExdates.forEach(cee -> cee.calendarEvent = this);
-//		this.calendarEventExdates.addAll(calendarEventExdates);
-//		return this;
-//	}
-//	public void addCalendarEventExdate(CalendarEventExdate rosterDate) {
-//		calendarEventExdates.add(rosterDate);
-//		rosterDate.calendarEvent = this;
-//	}
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.EAGER)
+	protected final List<CalendarSourceManualExdate> calendarSourceManualExdates = new ArrayList<>();
+	public List<CalendarSourceManualExdate> exdates() {
+		return Collections.unmodifiableList(calendarSourceManualExdates);
+	}
+	public CalendarSourceManual exdates(List<CalendarSourceManualExdate> calendarEventExdates) {
+		this.calendarSourceManualExdates.clear();
+		calendarEventExdates.forEach(cee -> cee.calendarSource = this);
+		this.calendarSourceManualExdates.addAll(calendarEventExdates);
+		return this;
+	}
+	public void addExdate(CalendarSourceManualExdate rosterDate) {
+		calendarSourceManualExdates.add(rosterDate);
+		rosterDate.calendarSource = this;
+	}
 
 	@Override
 	public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
@@ -142,7 +147,7 @@ public class CalendarSourceManual extends CalendarSource {
 	List<CalendarEvent> applyRRule(LocalDateTime now) { // Needed for testing
 
 		// Exclude dates
-		List<LocalDate> excludedLocalDates = List.of(); //calendarEventExdates().stream().map(CalendarEventExdate::excludedDate).toList();
+		List<LocalDate> excludedLocalDates = calendarSourceManualExdates.stream().map(CalendarSourceManualExdate::excludedDate).toList();
 
 		// Duration is needed to calculate end from start
 		Duration duration = Duration.between(startDateTime, endDateTime);

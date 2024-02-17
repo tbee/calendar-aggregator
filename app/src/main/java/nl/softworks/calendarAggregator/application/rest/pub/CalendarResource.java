@@ -3,7 +3,6 @@ package nl.softworks.calendarAggregator.application.rest.pub;
 import jakarta.servlet.http.HttpServletRequest;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
-import nl.softworks.calendarAggregator.domain.entity.CalendarEventExdate;
 import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.Settings;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -169,14 +167,6 @@ public class CalendarResource {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss");
         Settings settings = Settings.get();
 
-        // Create EXDATE value
-        // EXDATE:19960402T010000Z,19960403T010000Z,19960404T010000Z
-        String exdate = calendarEvent.calendarEventExdates().stream()
-                .map(CalendarEventExdate::excludedDate)
-                .map(ld -> LocalDateTime.of(ld, calendarEvent.startDateTime().toLocalTime()))
-                .map(ldt -> dateTimeFormatter.format(ldt) + "Z")
-                .collect(Collectors.joining(","));
-
         // https://www.kanzaki.com/docs/ical/location.html
         CalendarSource calendarSource = calendarEvent.calendarSource();
         CalendarLocation calendarLocation = calendarSource.calendarLocation();
@@ -201,7 +191,6 @@ public class CalendarResource {
                 .replace("%summary%", (calendarLocation.name() + " " + calendarEvent.subject()).trim())
                 .replace("%location%", calendarLocation.location().replace("\n", ", "))
                 .replace("%description%", calendarLocation.url() + "\\n\\n" + settings.disclaimer())
-                .replace("%exdate%", (exdate.isBlank() ? "" : "EXDATE:" + exdate))
                 .replaceAll("(?m)^[ \t]*\r?\n", ""); // strip empty lines
     }
 

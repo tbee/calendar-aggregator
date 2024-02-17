@@ -5,19 +5,18 @@ import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
-public class CalendarEventExdate extends EntityBase<CalendarEventExdate> {
+public class CalendarSourceManualExdate extends EntityBase<CalendarSourceManualExdate> {
 
-	public CalendarEventExdate() {
+	public CalendarSourceManualExdate() {
 	}
 
 	@ManyToOne
 	@NotNull
-	CalendarEvent calendarEvent;
-	public @NotNull CalendarEvent calendarEvent() {
-		return calendarEvent;
+	CalendarSource calendarSource;
+	public @NotNull CalendarSource calendarSource() {
+		return calendarSource;
 	}
 
 	@NotNull
@@ -26,7 +25,7 @@ public class CalendarEventExdate extends EntityBase<CalendarEventExdate> {
 	public LocalDate excludedDate() {
 		return excludedDate;
 	}
-	public CalendarEventExdate excludedDate(LocalDate v) {
+	public CalendarSourceManualExdate excludedDate(LocalDate v) {
 		this.excludedDate = v;
 		return this;
 	}
