@@ -19,6 +19,7 @@ import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.theme.lumo.LumoIcon;
 import jakarta.annotation.security.RolesAllowed;
 import nl.softworks.calendarAggregator.application.vdn.CalendarAggregatorAppLayout;
 import nl.softworks.calendarAggregator.application.vdn.component.CancelDialog;
@@ -74,6 +75,7 @@ implements AfterNavigationObserver
 
 		// calendarSourceAndEventTreeGrid
 		treeGrid.addHierarchyColumn(TreeNode::text).setHeader("Name").setFlexGrow(100);
+		treeGrid.addComponentColumn((ValueProvider<TreeNode, Button>) tn -> createEditButton(tn)).setHeader("").setFlexGrow(30);
 		treeGrid.addComponentColumn((ValueProvider<TreeNode, NativeLabel>) tn -> createTypeLabel(tn)).setHeader("Type").setFlexGrow(10);
 		treeGrid.addComponentColumn((ValueProvider<TreeNode, Icon>) tn -> createEnabledIcon(tn)).setHeader("Enabled").setFlexGrow(5);
 		treeGrid.addComponentColumn((ValueProvider<TreeNode, Anchor>) tn -> createAnchor(tn.url())).setHeader("Website").setFlexGrow(5);
@@ -96,6 +98,12 @@ implements AfterNavigationObserver
 		VerticalLayout verticalLayout = new VerticalLayout(crudButtonbar, treeGrid);
 		verticalLayout.setSizeFull();
 		setContent(verticalLayout);
+	}
+
+	private Button createEditButton(TreeNode treeNode) {
+		Button button = new Button(LumoIcon.EDIT.create(), evt -> treeNode.edit(() -> reloadTreeGrid()));
+		button.addThemeVariants(ButtonVariant.LUMO_SMALL);
+		return button;
 	}
 
 	private NativeLabel createTypeLabel(TreeNode tn) {
