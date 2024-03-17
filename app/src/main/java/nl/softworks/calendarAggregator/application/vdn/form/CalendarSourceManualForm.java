@@ -126,8 +126,10 @@ public class CalendarSourceManualForm extends CalendarSourceForm {
 		return this;
 	}
 
-	public CalendarSourceManualForm writeTo(CalendarSourceManual calendarSourceManual) throws ValidationException {
-		binder.writeBean(calendarSourceManual);
+	@Override
+	public CalendarSourceManualForm writeTo(CalendarSource calendarSource) throws ValidationException {
+		super.writeTo(calendarSource);
+		binder.writeBean((CalendarSourceManual)calendarSource);
 		//calendarSourceManual.calendarEventExdates(calendarEventExdates);
 		return this;
 	}
