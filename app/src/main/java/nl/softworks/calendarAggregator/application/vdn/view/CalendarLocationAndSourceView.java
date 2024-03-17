@@ -401,7 +401,7 @@ implements AfterNavigationObserver
 		@Override
 		public String endDate() {
 			if (calendarSource instanceof CalendarSourceManual calendarSourceManual) {
-				return calendarSourceManual.startDateTime().toString();
+				return calendarSourceManual.endDateTime().toString();
 			}
 			return null;
 		}
