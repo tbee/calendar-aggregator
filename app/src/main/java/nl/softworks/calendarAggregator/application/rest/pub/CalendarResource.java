@@ -21,21 +21,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/pub")
+@RequestMapping("/")
 public class CalendarResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(CalendarResource.class);
 
     private static int EARTH_RADIUS = 6371;
 
-    // example http://localhost:8080/pub/calendar
-    @Deprecated
-    @GetMapping(path = "/calendar", produces = {"text/calendar"})
-    public String calendar(HttpServletRequest request) {
-        return ical(request, 0.0, 0.0, 0);
-    }
-
-    // example http://localhost:8080/pub/ical
+    // example http://localhost:8080/ical
     @GetMapping(path = "/ical", produces = {"text/calendar"})
     public String ical(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d) {
 
@@ -73,8 +66,8 @@ public class CalendarResource {
     }
 
 
-    // example http://localhost:8080/pub/html
-    @GetMapping(path = "/html", produces = {"text/html"})
+    // example http://localhost:8080/
+    @GetMapping(path = "/", produces = {"text/html"})
     public String html(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d) {
 
         LocalDateTime pastThreshold = LocalDate.now().atStartOfDay();
@@ -117,7 +110,7 @@ public class CalendarResource {
                           You can add it to, for example, Google calendar by adding an external URL calendar using the following URL:
                         </p>
                         <p style="margin-top:5px;">
-                          <a href="%baseurl%/pub/ical" target="_blank">%baseurl%/pub/ical</a>
+                          <a href="%baseurl%/ical" target="_blank">%baseurl%/ical</a>
                         </p>
                       </div>
                       <div class="notification" style="max-width:1000px">
@@ -128,7 +121,7 @@ public class CalendarResource {
                           For example:
                         </p>
                         <p style="margin-top:5px;">
-                          <a href="%baseurl%/pub/html?lat=51.9214012&lon=6.5761531&d=40" target="_blank">%baseurl%/pub/html?lat=51.9214012&lon=6.5761531&d=40</a>
+                          <a href="%baseurl%/?lat=51.9214012&lon=6.5761531&d=40" target="_blank">%baseurl%/?lat=51.9214012&lon=6.5761531&d=40</a>
                         </p>
                         <p style="margin-top:5px;">
                           The same parameters can be set on the URL for the calendar.

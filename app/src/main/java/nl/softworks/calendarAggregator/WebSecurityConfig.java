@@ -40,15 +40,13 @@ public class WebSecurityConfig extends VaadinWebSecurity {
     @Bean(name = "VaadinSecurityFilterChainBean")
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http.authorizeHttpRequests() //
-            .requestMatchers("/pub/**").permitAll()
+        http.authorizeHttpRequests().requestMatchers("/app/**").authenticated()
             .and()
-            .authorizeHttpRequests() //
-            .requestMatchers("**").authenticated()
+            .authorizeHttpRequests().requestMatchers("/**").permitAll()
             .and() //
             .headers().frameOptions().sameOrigin() // needed for iframe
             .and()
-            .formLogin().defaultSuccessUrl("/", true) //
+            .formLogin().defaultSuccessUrl("/app/", true) //
             .and()
             .httpBasic()
             .and() //
