@@ -1,5 +1,7 @@
 package nl.softworks.calendarAggregator.application.vdn.view;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -50,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
@@ -197,16 +200,26 @@ implements AfterNavigationObserver
 		treeGrid.setItems(treeNodes, TreeNode::getChildren);
 
 		// Reselect NODE
-		// TODO: make sure the select node is one from the treeNodes collection, not the old node, otherwise lazy lock goes wrong
-//		if (selectedTreeNode != null) {
-//			if (selectedTreeNode instanceof TreeNodeCalendarEvent treeNodeCalendarEvent) {
-//				calendarSourceAndEventTreeGrid.expand(treeNodeCalendarEvent.treeNodeCalendarLocation());
-//			}
-//			calendarSourceAndEventTreeGrid.select(selectedTreeNode);
-//		}
+		if (selectedTreeNode != null) {
+			List<String> path = selectedTreeNode.path();
+			for (int idx = 0; idx < path.size(); idx++) {
+				int i = idx;
+				TreeNode treeNode = treeNodes.stream().filter(tn -> tn.path().get(i).equals(path.get(i))).findFirst().orElse(null);
+				if (treeNode == null) {
+					break;
+				}
+
+				treeNodes = new ArrayList<>(treeNode.getChildren());
+				if (!treeNodes.isEmpty()) {
+					treeGrid.expand(treeNode);
+				}
+				treeGrid.select(treeNode);
+			};
+		}
 	}
 
 	sealed interface TreeNode permits TreeNodeCalendarLocation, TreeNodeCalendarSource, TreeNodeCalendarEvent {
+		List<String> path();
 		String text();
 		Icon enabled();
 		String type();
@@ -214,6 +227,7 @@ implements AfterNavigationObserver
 		String startDate();
 		String endDate();
 		CalendarSource calendarSource();
+		TreeNode parent();
 
 		Component status();
 		LocalDateTime updated();
@@ -229,8 +243,20 @@ implements AfterNavigationObserver
 
 	final class TreeNodeCalendarLocation implements TreeNode {
 		private final CalendarLocation calendarLocation;
+		private final List<String> path;
+
 		public TreeNodeCalendarLocation(CalendarLocation calendarLocation) {
 			this.calendarLocation = calendarLocation;
+			this.path = List.of("CL" + calendarLocation.id());
+		}
+
+		@Override
+		public List<String> path() {
+			return path;
+		}
+		@Override
+		public boolean equals(Object o) {
+			return o != null && Objects.equals(path(), ((TreeNode)o).path());
 		}
 
 		@Override
@@ -264,6 +290,10 @@ implements AfterNavigationObserver
 
 		@Override
 		public CalendarSource calendarSource() {
+			return null;
+		}
+		@Override
+		public TreeNode parent() {
 			return null;
 		}
 
@@ -315,9 +345,21 @@ implements AfterNavigationObserver
 
 		private final TreeNodeCalendarLocation treeNodeCalendarLocation;
 		private final CalendarSource calendarSource;
+		private final List<String> path;
+
 		public TreeNodeCalendarSource(TreeNodeCalendarLocation treeNodeCalendarLocation, CalendarSource calendarSource) {
 			this.treeNodeCalendarLocation = treeNodeCalendarLocation;
 			this.calendarSource = calendarSource;
+			this.path = Lists.newArrayList(Iterables.concat(treeNodeCalendarLocation.path(), List.of("CS" + calendarSource.id())));
+		}
+
+		@Override
+		public List<String> path() {
+			return path;
+		}
+		@Override
+		public boolean equals(Object o) {
+			return o != null && Objects.equals(path(), ((TreeNode)o).path());
 		}
 
 		@Override
@@ -355,7 +397,11 @@ implements AfterNavigationObserver
 
 		@Override
 		public CalendarSource calendarSource() {
-			return null;
+			return calendarSource;
+		}
+		@Override
+		public TreeNode parent() {
+			return treeNodeCalendarLocation;
 		}
 
 		@Override
@@ -403,7 +449,7 @@ implements AfterNavigationObserver
 		public Collection<TreeNode> getChildren() {
 			List<CalendarEvent> calendarEvents = new ArrayList<>(calendarSource.calendarEvents());
 			calendarEvents.sort(Comparator.comparing(CalendarEvent::startDateTime));
-			return treeNodes(calendarEvents, ce -> new TreeNodeCalendarEvent(this.treeNodeCalendarLocation, this, ce));
+			return treeNodes(calendarEvents, ce -> new TreeNodeCalendarEvent(this, ce));
 		}
 
 		@Override
@@ -449,26 +495,40 @@ implements AfterNavigationObserver
 
 	final class TreeNodeCalendarEvent implements TreeNode {
 
-		private final TreeNodeCalendarLocation treeNodeCalendarLocation;
 		private final TreeNodeCalendarSource treeNodeCalendarSource;
 		private final CalendarEvent calendarEvent;
-		public TreeNodeCalendarEvent(TreeNodeCalendarLocation treeNodeCalendarLocation, TreeNodeCalendarSource treeNodeCalendarSource, CalendarEvent calendarEvent) {
-			this.treeNodeCalendarLocation = treeNodeCalendarLocation;
+		private final List<String> path;
+
+		public TreeNodeCalendarEvent(TreeNodeCalendarSource treeNodeCalendarSource, CalendarEvent calendarEvent) {
 			this.treeNodeCalendarSource = treeNodeCalendarSource;
 			this.calendarEvent = calendarEvent;
+			this.path = Lists.newArrayList(Iterables.concat(treeNodeCalendarSource.path(), List.of("CE" + calendarEvent.id())));
 		}
 
+		@Override
+		public List<String> path() {
+			return path;
+		}
+		@Override
+		public boolean equals(Object o) {
+			return o != null && Objects.equals(path(), ((TreeNode)o).path());
+		}
+
+		@Override
 		public String text() {
 			return calendarEvent.startDateTime().toString();
 		}
+
 		@Override
 		public Icon enabled() {
 			return null;
 		}
+
 		@Override
 		public String type() {
 			return null;
 		}
+
 		@Override
 		public Anchor url() {
 			return null;
@@ -487,6 +547,10 @@ implements AfterNavigationObserver
 		@Override
 		public CalendarSource calendarSource() {
 			return treeNodeCalendarSource.calendarSource();
+		}
+		@Override
+		public TreeNode parent() {
+			return treeNodeCalendarSource;
 		}
 
 		@Override
