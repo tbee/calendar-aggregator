@@ -387,10 +387,13 @@ implements AfterNavigationObserver
 			if (calendarSource instanceof CalendarSourceRegexScraper calendarSourceRegexScraper) {
 				return calendarSourceRegexScraper.regex();
 			}
-			if (calendarSource instanceof CalendarSourceXmlScraper calendarSourceXmlScraper) {
+			else if (calendarSource instanceof CalendarSourceICal calendarSourceICal) {
+				return calendarSourceICal.regex();
+			}
+			else if (calendarSource instanceof CalendarSourceXmlScraper calendarSourceXmlScraper) {
 				return calendarSourceXmlScraper.xpath();
 			}
-			if (calendarSource instanceof CalendarSourceManual calendarSourceManual) {
+			else if (calendarSource instanceof CalendarSourceManual calendarSourceManual) {
 				return calendarSourceManual.startDateTime().toString() + " " + (calendarSourceManual.rrule() == null ? "" : calendarSourceManual.rrule());
 			}
 			return "";

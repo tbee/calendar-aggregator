@@ -66,8 +66,8 @@ public class CalendarSourceManualForm extends CalendarSourceForm {
 		binder.forField(subjectTextField).bind(CalendarSourceManual::subject, CalendarSourceManual::subject);
 
 		startDateTimePicker.addValueChangeListener(event -> {
-			if (endDateTimePicker.isEmpty()) {
-				endDateTimePicker.setValue(startDateTimePicker.getValue());
+			if (startDateTimePicker.getValue() != null && endDateTimePicker.isEmpty()) {
+				endDateTimePicker.setValue(startDateTimePicker.getValue().plusHours(2));
 			}
         });
 	}
