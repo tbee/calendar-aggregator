@@ -124,9 +124,7 @@ public class CalendarSourceManual extends CalendarSource {
 			}
 
 			// Nothing in the distant past
-			LocalDateTime aFewDaysBack = now.minusDays(1).toLocalDate().atStartOfDay();
-			calendarEvents.removeIf(ce -> ce.endDateTime().isBefore(aFewDaysBack));
-			if (stringBuilder != null) stringBuilder.append("Filtered on after ").append(aFewDaysBack).append(", ").append(calendarEvents.size()).append(" events remaining\n");
+			dropHistoricEvents(stringBuilder);
 			if (calendarEvents.isEmpty()) {
 				status("No events");
 			}

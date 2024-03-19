@@ -8,6 +8,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.domain.boundary.R;
+import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceRegexScraper;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceScraperBase;
@@ -57,7 +58,9 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 	}
 
 	private void test() {
-		generateAndShowTrace(new CalendarSourceRegexScraper());
+		CalendarSourceRegexScraper calendarSource = new CalendarSourceRegexScraper();
+		new CalendarLocation().enabled(true).addCalendarSource(calendarSource);
+		generateAndShowTrace(calendarSource);
 	}
 
 	@Override

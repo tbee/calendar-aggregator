@@ -202,6 +202,7 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
                 }
                 lastMatchEnd = matcher.end();
             }
+            dropHistoricEvents(stringBuilder);
             if (stringBuilder != null) stringBuilder.append("Done\n");
             if (calendarEvents().isEmpty()) {
                 status("No events");

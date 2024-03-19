@@ -258,6 +258,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
                     throw e;
                 }
             }
+            dropHistoricEvents(stringBuilder);
             if (stringBuilder != null) stringBuilder.append("Done\n");
 
             // set status

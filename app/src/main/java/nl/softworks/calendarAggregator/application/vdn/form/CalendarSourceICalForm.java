@@ -6,6 +6,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.domain.boundary.R;
+import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceICal;
 import org.slf4j.Logger;
@@ -32,7 +33,9 @@ public class CalendarSourceICalForm extends CalendarSourceForm {
 	}
 
 	private void test() {
-		generateAndShowTrace(new CalendarSourceICal());
+		CalendarSourceICal calendarSource = new CalendarSourceICal();
+		new CalendarLocation().enabled(true).addCalendarSource(calendarSource);
+		generateAndShowTrace(calendarSource);
 	}
 
 	@Override

@@ -291,6 +291,7 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
                     throw e;
                 }
             }
+            dropHistoricEvents(stringBuilder);
             if (stringBuilder != null) stringBuilder.append("Done\n");
 
             // set status

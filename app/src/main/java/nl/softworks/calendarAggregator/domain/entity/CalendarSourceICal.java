@@ -141,6 +141,8 @@ public class CalendarSourceICal extends CalendarSource {
 				addCalendarEvent(calendarEvent);
 			}
 
+			dropHistoricEvents(stringBuilder);
+
 			if (stringBuilder != null) stringBuilder.append("Done\n");
 			if (calendarEvents().isEmpty()) {
 				status("No events");

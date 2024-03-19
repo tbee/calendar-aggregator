@@ -198,6 +198,12 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 		return calendarEvents;
 	}
 
+	protected void dropHistoricEvents(StringBuilder stringBuilder) {
+		LocalDateTime aBitBack = LocalDateTime.now().minusDays(1);
+		calendarEvents.removeIf(ce -> ce.startDateTime().isBefore(aBitBack));
+		if (stringBuilder != null) stringBuilder.append("Dropped events before ").append(aBitBack).append(", ").append(calendarEvents.size()).append(" events remaining\n");
+	}
+
 	protected void logMatcherInStringBuilder(Matcher matcher, String content, StringBuilder stringBuilder) {
 		if (stringBuilder != null) {
 			stringBuilder.append("---\n");
