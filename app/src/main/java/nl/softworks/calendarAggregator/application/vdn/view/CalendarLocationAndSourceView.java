@@ -456,7 +456,11 @@ implements AfterNavigationObserver
 		public Component crudButtons() {
 			return new CrudButtonbar()
 					.onEdit(() -> edit())
-					.onDelete(() -> confirmDelete(this, () -> R.calendarSource().delete(calendarSource)));
+					.onDelete(() -> confirmDelete(this, () -> {
+						CalendarLocation calendarLocation = calendarSource.calendarLocation();
+						calendarLocation.removeCalendarSource(calendarSource);
+						R.calendarLocation().save(calendarLocation);
+					}));
 		}
 
 		private void edit() {
