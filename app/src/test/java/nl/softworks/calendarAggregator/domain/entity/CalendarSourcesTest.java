@@ -12,7 +12,7 @@ public class CalendarSourcesTest {
     @Test
     public void citydance_20231127a_regexPlusTime() {
         StringBuilder stringBuilder = new StringBuilder();
-        List<CalendarEvent> calendarEvents = new CalendarSourceRegexScraper()
+        CalendarSourceScraperBase calendarSource = new CalendarSourceRegexScraper()
                 .regex("([a-zA-Z]*) +[a-z]{2}\\. ([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december) +[0-9]{4}) +van ([0-9]+:[0-9]+) tot ([0-9]+:[0-9]+)")
                 .subjectGroupIdx(1)
                 .startDateGroupIdx(2)
@@ -22,9 +22,9 @@ public class CalendarSourcesTest {
                 .endTimeGroupIdx(5)
                 .timePattern("HH:mm")
                 .dateTimeLocale("NL")
-                .scrapeUrl(this.getClass().getResource("/webSnapshots/citydance_20231127a.html").toExternalForm())
-                .generateEvents(stringBuilder);
-
+                .scrapeUrl(this.getClass().getResource("/webSnapshots/citydance_20231127a.html").toExternalForm());
+        new CalendarLocation().addCalendarSource(calendarSource);
+        List<CalendarEvent> calendarEvents = calendarSource.generateEvents(stringBuilder);
         Assertions.assertEquals(1, calendarEvents.size());
         Assertions.assertEquals("Kerstgala", calendarEvents.get(0).subject());
         Assertions.assertEquals(LocalDateTime.of(2023, 12, 16, 20, 30, 0), calendarEvents.get(0).startDateTime());
@@ -34,7 +34,7 @@ public class CalendarSourcesTest {
     @Test
     public void deDanssalon_20231127a_deBilt_regexDateOnly() {
         StringBuilder stringBuilder = new StringBuilder();
-        List<CalendarEvent> calendarEvents = new CalendarSourceRegexScraper()
+        CalendarSourceScraperBase calendarSource = new CalendarSourceRegexScraper()
                 .regex("([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december) +[0-9]{4})")
                 .startDateGroupIdx(1)
                 .endDateGroupIdx(1)
@@ -45,8 +45,9 @@ public class CalendarSourcesTest {
                 .dateTimeLocale("NL")
                 .scrapeUrl(this.getClass().getResource("/webSnapshots/deDanssalon_20231127a.html").toExternalForm())
                 .scrapeBlockStart("Locatie de Bilt")
-                .scrapeBlockEnd("Entree:")
-                .generateEvents(stringBuilder);
+                .scrapeBlockEnd("Entree:");
+        new CalendarLocation().addCalendarSource(calendarSource);
+        List<CalendarEvent> calendarEvents = calendarSource.generateEvents(stringBuilder);
 
         Assertions.assertEquals(13, calendarEvents.size());
         Assertions.assertEquals("", calendarEvents.get(0).subject());
@@ -57,7 +58,7 @@ public class CalendarSourcesTest {
     @Test
     public void verhoeven_20231127a_2024_multipleDays() {
         StringBuilder stringBuilder = new StringBuilder();
-        List<CalendarEvent> calendarEvents = new CalendarSourceMultipleDaysScraper()
+        CalendarSourceScraperBase calendarSource = new CalendarSourceMultipleDaysScraper()
                 .regex("[0-9][0-9]? (januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december)")
                 .nearestYear(true)
                 .datePattern("d MMMM")
@@ -68,8 +69,9 @@ public class CalendarSourcesTest {
                 .removeChars("*,")
                 .scrapeUrl(this.getClass().getResource("/webSnapshots/verhoeven_20231127a.html").toExternalForm())
                 .scrapeBlockStart("2024:")
-                .scrapeBlockEnd("Zie agenda")
-                .generateEvents(stringBuilder);
+                .scrapeBlockEnd("Zie agenda");
+        new CalendarLocation().addCalendarSource(calendarSource);
+        List<CalendarEvent> calendarEvents = calendarSource.generateEvents(stringBuilder);
 
         Assertions.assertEquals(13, calendarEvents.size());
         Assertions.assertEquals("", calendarEvents.get(0).subject());
@@ -80,7 +82,7 @@ public class CalendarSourcesTest {
     @Test
     public void wijgers_20231201a_shortDateNotation() {
         StringBuilder stringBuilder = new StringBuilder();
-        List<CalendarEvent> calendarEvents = new CalendarSourceRegexScraper()
+        CalendarSourceScraperBase calendarSource = new CalendarSourceRegexScraper()
                 .regex("([0-9][0-9]? (jan|feb|mrt|apr|mei|jun|jul|aug|sep|okt|nov|dec)) (Vrije Dansavond)")
                 .subjectGroupIdx(3)
                 .nearestYear(true)
@@ -94,8 +96,9 @@ public class CalendarSourcesTest {
                 .dateTimeLocale("NL")
                 .removeChars("'")
                 .scrapeUrl(this.getClass().getResource("/webSnapshots/wijgers_20231201a.html").toExternalForm())
-                .scrapeBlockStart("Agenda")
-                .generateEvents(stringBuilder);
+                .scrapeBlockStart("Agenda");
+        new CalendarLocation().addCalendarSource(calendarSource);
+        List<CalendarEvent> calendarEvents = calendarSource.generateEvents(stringBuilder);
         System.out.println(stringBuilder);
         System.out.println(calendarEvents);
 
@@ -108,7 +111,7 @@ public class CalendarSourcesTest {
     @Test
     public void danshotspot_20240203() {
         StringBuilder stringBuilder = new StringBuilder();
-        List<CalendarEvent> calendarEvents = new CalendarSourceXmlScraper()
+        CalendarSourceScraperBase calendarSource = new CalendarSourceXmlScraper()
                 .xpath("//event/name/text/text()[contains(., 'Vrijdansen') or ends-with(., 'bal')]")
                 .startdateXpath("../../../start/local")
                 .enddateXpath("../../../end/local")
@@ -119,8 +122,9 @@ public class CalendarSourcesTest {
                 .datePattern("yyyy-MM-dd'T'HH:mm:ss")
                 .timePattern("yyyy-MM-dd'T'HH:mm:ss")
                 .dateTimeLocale("NL")
-                .scrapeUrl(this.getClass().getResource("/webSnapshots/danshotspot_20240203.html").toExternalForm())
-                .generateEvents(stringBuilder);
+                .scrapeUrl(this.getClass().getResource("/webSnapshots/danshotspot_20240203.html").toExternalForm());
+        new CalendarLocation().addCalendarSource(calendarSource);
+        List<CalendarEvent> calendarEvents = calendarSource.generateEvents(stringBuilder);
         System.out.println(stringBuilder);
         System.out.println(calendarEvents);
 
