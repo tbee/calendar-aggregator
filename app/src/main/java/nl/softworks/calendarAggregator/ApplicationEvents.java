@@ -2,7 +2,7 @@ package nl.softworks.calendarAggregator;
 
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.Person;
-import nl.softworks.calendarAggregator.domain.service.CalendarSourceService;
+import nl.softworks.calendarAggregator.domain.service.GenerateEventsService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ public class ApplicationEvents {
     private final ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
 
     @Autowired
-    private CalendarSourceService calendarSourceService;
+    private GenerateEventsService generateEventsService;
 
     @EventListener(ApplicationReadyEvent.class)
     public void startApp() {
@@ -66,7 +66,7 @@ public class ApplicationEvents {
     private void generateEvents() {
         try {
             if (LOG.isInfoEnabled()) LOG.info("Scheduled task runs generate events");
-            calendarSourceService.generateEvents();
+            generateEventsService.generateEvents();
         } catch (RuntimeException e) {
             LOG.error("Problem generating events in scheduled task", e);
         }

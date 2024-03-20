@@ -111,30 +111,30 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
     }
 
     @Override
-    public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
+    public List<CalendarEvent> generateEvents() {
         try {
-            super.generateEvents(stringBuilder);
+            super.generateEvents();
             if (!isEnabled()) {
                 return calendarEvents;
             }
 
             Locale locale = new Locale(dateTimeLocale);
-            if (stringBuilder != null) stringBuilder.append("Locale ").append(locale).append("\n");
+            logAppend("Locale " + locale + "\n");
 
-            String content = readScrapeUrl(stringBuilder);
+            String content = readScrapeUrl();
             if (content.isBlank()) {
                 status("No contents");
                 return List.of();
             }
-            content = sanatizeContent(content, stringBuilder);
+            content = sanatizeContent(content);
 
-            DateTimeFormatter dateFormatter = createDateFormatter(datePattern, shortMonthNotation, locale, stringBuilder);
-            DateTimeFormatter timeFormatter = createTimeFormatter(timePattern, locale, stringBuilder);
-            if (stringBuilder != null) stringBuilder.append(regex).append("\n");
+            DateTimeFormatter dateFormatter = createDateFormatter(datePattern, shortMonthNotation, locale);
+            DateTimeFormatter timeFormatter = createTimeFormatter(timePattern, locale);
+            logAppend(regex + "\n");
             Matcher matcher = Pattern.compile(regex).matcher(content);
             int lastMatchEnd = -1;
             while (matcher.find()) {
-                logMatcherInStringBuilder(matcher, content, stringBuilder);
+                logMatcher(matcher, content);
 
                 // Extract strings
                 String matchedString = content.substring(matcher.start(), matcher.end());
@@ -144,14 +144,14 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
                 LocalDate localDate;
                 if (nearestYear) {
                     MonthDay monthDay = MonthDay.parse(matchedString, dateFormatter);
-                    localDate = determineDateByNearestYear(MonthDay.of(monthDay.getMonth(), monthDay.getDayOfMonth()), stringBuilder);
+                    localDate = determineDateByNearestYear(MonthDay.of(monthDay.getMonth(), monthDay.getDayOfMonth()));
                 }
                 else {
-                    if (stringBuilder != null) stringBuilder.append("Parsing '").append(matchedString).append("' with '").append(datePattern).append("'\n");
+                    logAppend("Parsing '" + matchedString + "' with '" + datePattern + "'\n");
                     localDate = LocalDate.parse(matchedString, dateFormatter);
                 }
                 if (localDate == null) {
-                    if (stringBuilder != null) stringBuilder.append("Not able to determine a date for ").append(matchedString);
+                    logAppend("Not able to determine a date for " + matchedString);
                     continue;
                 }
 
@@ -159,24 +159,22 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
                 Matcher dayMatcher = Pattern.compile("[0-9][0-9]? ").matcher(wholeString);
                 while (dayMatcher.find()) {
                     String matchedDayString = wholeString.substring(dayMatcher.start(), dayMatcher.end());
-                    if (stringBuilder != null) {
-                        stringBuilder.append("---\n");
-                        stringBuilder.append("> Start index: ").append(matcher.start()).append("\n");
-                        stringBuilder.append("> End index: ").append(matcher.end()).append("\n");
-                        stringBuilder.append("> Matched string: ").append(matchedDayString).append("\n");
-                    }
+                     logAppend("---\n");
+                     logAppend("> Start index: " + matcher.start() + "\n");
+                     logAppend("> End index: " + matcher.end() + "\n");
+                     logAppend("> Matched string: " + matchedDayString + "\n");
                     int dayOfMonth = Integer.parseInt(matchedDayString.trim());
 
                     // Create a date out of the matched number
                     LocalDate startLocalDate;
                     if (nearestYear) {
-                        startLocalDate = determineDateByNearestYear(MonthDay.of(localDate.getMonth(), dayOfMonth), stringBuilder);
+                        startLocalDate = determineDateByNearestYear(MonthDay.of(localDate.getMonth(), dayOfMonth));
                     }
                     else {
                         startLocalDate = LocalDate.of(localDate.getYear(), localDate.getMonth(), dayOfMonth);
                     }
                     if (startLocalDate == null) {
-                        if (stringBuilder != null) stringBuilder.append("Not able to determine a date for ").append(matchedDayString);
+                        logAppend("Not able to determine a date for " + matchedDayString);
                         continue;
                     }
 
@@ -186,12 +184,12 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
                     LocalTime endLocalTime = LocalTime.parse(endTimeDefault(), timeFormatter);
 
                     LocalDateTime startLocalDateTime = LocalDateTime.of(startLocalDate, startLocalTime);
-                    if (stringBuilder != null) stringBuilder.append("startLocalDateTime: ").append(startLocalDateTime).append("\n");
+                    logAppend("startLocalDateTime: " + startLocalDateTime + "\n");
 
                     LocalDateTime endLocalDateTime = LocalDateTime.of(endLocalDate, endLocalTime);
-                    if (stringBuilder != null) stringBuilder.append("endLocalDateTime: ").append(endLocalDateTime).append("\n");
+                    logAppend("endLocalDateTime: " + endLocalDateTime + "\n");
 
-                    endLocalDateTime = makeSureEndIsAfterStart(startLocalDateTime, endLocalDateTime, stringBuilder);
+                    endLocalDateTime = makeSureEndIsAfterStart(startLocalDateTime, endLocalDateTime);
 
                     // Create event
                     CalendarEvent calendarEvent = new CalendarEvent()
@@ -202,8 +200,8 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
                 }
                 lastMatchEnd = matcher.end();
             }
-            dropHistoricEvents(stringBuilder);
-            if (stringBuilder != null) stringBuilder.append("Done\n");
+            dropExpiredEvents();
+            logAppend("Done\n");
             if (calendarEvents().isEmpty()) {
                 status("No events");
                 return List.of();
@@ -212,11 +210,9 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
         }
         catch (RuntimeException e) {
             status(e.getMessage());
-            if (stringBuilder != null) {
-                StringWriter stringWriter = new StringWriter();
-                e.printStackTrace(new PrintWriter(stringWriter));
-                stringBuilder.append(stringWriter.toString());
-            }
+            StringWriter stringWriter = new StringWriter();
+            e.printStackTrace(new PrintWriter(stringWriter));
+            logAppend(stringWriter.toString());
             throw e;
         }
     }

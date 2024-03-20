@@ -43,7 +43,7 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 	}
 	@AssertTrue(message = "Scraper URL is not a valid URL")
 	public boolean isValidScraperURL() {
-		return scrapeUrl == null || scrapeUrl.isBlank() || UrlValidatorImpl.isValid(resolveUrl(scrapeUrl, null));
+		return scrapeUrl == null || scrapeUrl.isBlank() || UrlValidatorImpl.isValid(resolveUrl(scrapeUrl));
 	}
 
 	protected String scrapeBlockStart;
@@ -78,36 +78,36 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 	}
 
 
-	protected String readScrapeUrl(StringBuilder stringBuilder) {
+	protected String readScrapeUrl() {
 		try {
 
 			// Get URL
-			String url = resolveUrl(scrapeUrl, stringBuilder);
-			if (stringBuilder != null) stringBuilder.append("Reading: " + url + "\n");
+			String url = resolveUrl(scrapeUrl);
+			logAppend("Reading: " + url + "\n");
 			String html = getUrl(url);
 
 			// Extract text information
 			Document doc = Jsoup.parse(html);
 			String text = doc.text();
-			if (stringBuilder != null) stringBuilder.append("Content: " + text.length() + "\n");
+			logAppend("Content: " + text.length() + "\n");
 
 			// special handling for certain elements: <eventbrite-modal :events="html escaped string"
 			for (Element eventbrightModalElement : doc.selectXpath("//eventbrite-modal")) {
 				Attribute eventsAttribute = eventbrightModalElement.attribute(":events");
 				if (eventsAttribute != null) {
 					text = "{\"event\":" + HtmlUtils.htmlUnescape(eventsAttribute.getValue()) + "}";
-					if (stringBuilder != null) stringBuilder.append("Content, added eventbrite-modal\n");
+					logAppend("Content, added eventbrite-modal\n");
 				}
 			}
 
 			// extract block
 			if (scrapeBlockStart != null && !scrapeBlockStart.isBlank()) {
 				text = text.substring(text.indexOf(scrapeBlockStart.trim()));
-				if (stringBuilder != null) stringBuilder.append("Content after block start: " + text.length() + "\n");
+				logAppend("Content after block start: " + text.length() + "\n");
 			}
 			if (scrapeBlockEnd != null && !scrapeBlockEnd.isBlank()) {
 				text = text.substring(0, text.indexOf(scrapeBlockEnd.trim()));
-				if (stringBuilder != null) stringBuilder.append("Content after block end: " + text.length() + "\n");
+				logAppend("Content after block end: " + text.length() + "\n");
 			}
 			return text;
 		} catch (IOException | InterruptedException e) {
@@ -115,9 +115,9 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 		}
 	}
 
-	protected String sanatizeContent(String content, StringBuilder stringBuilder) {
+	protected String sanatizeContent(String content) {
 		content = content.replace("\n", " ");
-		if (stringBuilder != null) stringBuilder.append("Removing characters: ").append(removeChars).append("\n");
+		logAppend("Removing characters: "+ removeChars + "\n");
 		for (int i = 0; i < removeChars.length(); i++) {
 			String removeChar = removeChars.substring(i, i+1);
 			content = content.replace(removeChar, " ");
@@ -125,12 +125,12 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 		while (content.contains("  ")) {
 			content = content.replace("  ", " ");
 		}
-		if (stringBuilder != null) stringBuilder.append(content).append("\n---\n");
+		logAppend(content + "\n---\n");
 		return content;
 	}
 
-	protected DateTimeFormatter createDateFormatter(String datePattern, String shortMonthNotation, Locale locale, StringBuilder stringBuilder) {
-		if (stringBuilder != null) stringBuilder.append("datePattern ").append(datePattern).append("\n");
+	protected DateTimeFormatter createDateFormatter(String datePattern, String shortMonthNotation, Locale locale) {
+		logAppend("datePattern " + datePattern + "\n");
 
 		// Default setting
 		DateTimeFormatterBuilder dateTimeFormatterBuilder = new DateTimeFormatterBuilder().parseCaseInsensitive();
@@ -164,22 +164,22 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 		return lookup;
 	}
 
-	protected DateTimeFormatter createTimeFormatter(String timePattern, Locale locale, StringBuilder stringBuilder) {
-		if (stringBuilder != null) stringBuilder.append("timePattern ").append(timePattern).append("\n");
+	protected DateTimeFormatter createTimeFormatter(String timePattern, Locale locale) {
+		logAppend("timePattern " + timePattern + "\n");
         return new DateTimeFormatterBuilder()
 				.parseCaseInsensitive()
 				.appendPattern(timePattern)
 				.toFormatter(locale);
 	}
 
-	protected LocalDate determineDateByNearestYear(MonthDay monthDay, StringBuilder stringBuilder) {
+	protected LocalDate determineDateByNearestYear(MonthDay monthDay) {
 		LocalDate now = LocalDate.now();
 
 		// Calculate the three options
 		int year = now.getYear();
-		LocalDate lastYearsDate = toLocalDate(year - 1, monthDay.getMonth(), monthDay.getDayOfMonth(), stringBuilder);
-		LocalDate thisYearsDate = toLocalDate(year, monthDay.getMonth(), monthDay.getDayOfMonth(), stringBuilder);
-		LocalDate nextYearsDate = toLocalDate(year + 1, monthDay.getMonth(), monthDay.getDayOfMonth(), stringBuilder);
+		LocalDate lastYearsDate = toLocalDate(year - 1, monthDay.getMonth(), monthDay.getDayOfMonth());
+		LocalDate thisYearsDate = toLocalDate(year, monthDay.getMonth(), monthDay.getDayOfMonth());
+		LocalDate nextYearsDate = toLocalDate(year + 1, monthDay.getMonth(), monthDay.getDayOfMonth());
 
 		// Determine the distance (period) from now
 		int lastYearsPeriod = lastYearsDate == null ? Integer.MAX_VALUE : asDays(abs(Period.between(now, lastYearsDate)));
@@ -209,13 +209,13 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 		return (p.getYears() * 12 + p.getMonths()) * 30 + p.getDays();
 	}
 
-	private LocalDate toLocalDate(int year, Month month, int dayOfMonth, StringBuilder stringBuilder) {
+	private LocalDate toLocalDate(int year, Month month, int dayOfMonth) {
 		try {
 			return LocalDate.of(year, month, dayOfMonth);
 		}
 		catch (DateTimeException e) {
-			if (stringBuilder != null) stringBuilder.append("For " + year + "-" + month.getValue() + "-" + dayOfMonth + ": " + e.getMessage());
-			else LOG.warn("Problems creating a LocalDate " + year + "-" + month.getValue() + "-" + dayOfMonth, e);
+			logAppend("For " + year + "-" + month.getValue() + "-" + dayOfMonth + ": " + e.getMessage());
+//			else LOG.warn("Problems creating a LocalDate " + year + "-" + month.getValue() + "-" + dayOfMonth, e);
 			return null;
 		}
 	}

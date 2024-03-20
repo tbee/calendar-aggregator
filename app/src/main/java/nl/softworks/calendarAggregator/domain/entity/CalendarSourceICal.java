@@ -57,21 +57,19 @@ public class CalendarSourceICal extends CalendarSource {
 	}
 
 	@Override
-	public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
+	public List<CalendarEvent> generateEvents() {
 		try {
-			super.generateEvents(stringBuilder);
+			super.generateEvents();
 			if (!isEnabled()) {
 				return calendarEvents;
 			}
 
 			// Get ical as string
-			String url = resolveUrl(icalUrl, stringBuilder);
-			if (stringBuilder != null) stringBuilder.append("url = ").append(url);
+			String url = resolveUrl(icalUrl);
+			logAppend("url = " + url);
 			String icalContent = getUrl(url);
-			if (stringBuilder != null) {
-				String logContent = (icalContent.length() > 10000 ? icalContent.substring(0, 10000) + "\n...\n" : icalContent);
-				stringBuilder.append(logContent).append("\n");
-			}
+			String logContent = (icalContent.length() > 10000 ? icalContent.substring(0, 10000) + "\n...\n" : icalContent);
+			logAppend(logContent + "\n");
 			if (icalContent.isBlank()) {
 				status("No contents");
 				return List.of();
@@ -79,49 +77,49 @@ public class CalendarSourceICal extends CalendarSource {
 
 			// Parse ical
 			LocalDateTime pastThreshold = LocalDateTime.now().minusMonths(1);
-			if (stringBuilder != null) stringBuilder.append("pastThreshold = ").append(pastThreshold);
+			logAppend("pastThreshold = " + pastThreshold);
 			LocalDateTime futureThreshold = LocalDateTime.now().plusMonths(6);
-			if (stringBuilder != null) stringBuilder.append("futureThreshold = ").append(futureThreshold);
+			logAppend("futureThreshold = " + futureThreshold);
 			CalendarBuilder builder = new CalendarBuilder();
 			Calendar calendar = builder.build(new StringReader(icalContent));
 
 			// Prepare regex for summary
-			if (stringBuilder != null) stringBuilder.append("regex = ").append(regex).append("\n");
+			logAppend("regex = " + regex + "\n");
 			Pattern pattern = regex == null || regex.isEmpty() ? null : Pattern.compile(regex);
 
 			// Loop over components and find events
 			ComponentList<CalendarComponent> components = calendar.getComponents();
-			if (stringBuilder != null) stringBuilder.append("#components = ").append(components.size()).append("\n");
+			logAppend("#components = " + components.size() + "\n");
 			for (Component component : components) {
 				if (!(component instanceof VEvent vEvent)) {
 					continue;
 				}
-				if (stringBuilder != null) stringBuilder.append("---").append("\n");
+				logAppend("---" + "\n");
 
 				// Validate startDate
 				DtStart startDate = vEvent.getStartDate();
-				if (stringBuilder != null) stringBuilder.append("startDate = ").append(startDate);
+				logAppend("startDate = " + startDate);
 				LocalDateTime startLocalDateTime = LocalDateTime.ofInstant(startDate.getDate().toInstant(), ZoneId.systemDefault());
 				if (startLocalDateTime.isBefore(pastThreshold) || startLocalDateTime.isAfter(futureThreshold)) {
-					if (stringBuilder != null) stringBuilder.append("Outside threshold\n");
+					logAppend("Outside threshold\n");
 					continue;
 				}
 
 				// Get endDate
 				DtEnd endDate = vEvent.getEndDate();
-				if (stringBuilder != null) stringBuilder.append("endDate = ").append(endDate);
+				logAppend("endDate = " + endDate);
 				LocalDateTime endLocalDateTime = LocalDateTime.ofInstant(endDate.getDate().toInstant(), ZoneId.systemDefault());
 
 				// Validate summary
 				String summary = vEvent.getSummary().getValue();
-				if (stringBuilder != null) stringBuilder.append("summary = ").append(summary).append("\n");
+				logAppend("summary = " + summary + "\n");
 				if (pattern != null) {
 					Matcher matcher = pattern.matcher(summary);
 					if (!matcher.matches()) {
-						if (stringBuilder != null) stringBuilder.append("Does not match the regexp\n");
+						logAppend("Does not match the regexp\n");
 						continue;
 					}
-					logMatcherInStringBuilder(matcher, summary, stringBuilder);
+					logMatcher(matcher, summary);
 				}
 
 				// Determine timezone
@@ -141,9 +139,9 @@ public class CalendarSourceICal extends CalendarSource {
 				addCalendarEvent(calendarEvent);
 			}
 
-			dropHistoricEvents(stringBuilder);
+			dropExpiredEvents();
 
-			if (stringBuilder != null) stringBuilder.append("Done\n");
+			logAppend("Done\n");
 			if (calendarEvents().isEmpty()) {
 				status("No events");
 				return List.of();
@@ -153,11 +151,9 @@ public class CalendarSourceICal extends CalendarSource {
 		}
 		catch (RuntimeException | IOException | ParserException | InterruptedException e) {
 			status(e.getMessage());
-			if (stringBuilder != null) {
-				StringWriter stringWriter = new StringWriter();
-				e.printStackTrace(new PrintWriter(stringWriter));
-				stringBuilder.append(stringWriter);
-			}
+			StringWriter stringWriter = new StringWriter();
+			e.printStackTrace(new PrintWriter(stringWriter));
+			logAppend(stringWriter.toString());
 			throw new RuntimeException(e);
 		}
 	}

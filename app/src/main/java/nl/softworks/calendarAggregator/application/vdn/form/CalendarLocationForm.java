@@ -77,27 +77,22 @@ public class CalendarLocationForm extends FormLayout {
 	 * This uses the actual source, so it can be saved
 	 */
 	private void generate() {
-		generateAndShowTrace(calendarLocation);
-	}
-
-	protected void generateAndShowTrace(CalendarLocation calendarLocation) {
-		StringBuilder stringBuilder = new StringBuilder();
+		String calendarEventsString = "";
 		try {
 			writeTo(calendarLocation);
 			List<CalendarEvent> calendarEvents = calendarLocation.generateEvents();
 			populateWith(calendarLocation);
 
-			String calendarEventsString = calendarEvents.stream().map(s -> s + "\n").collect(Collectors.joining());
+			calendarEventsString = calendarEvents.stream().map(s -> s + "\n").collect(Collectors.joining());
 			if (calendarEventsString.isBlank()) {
 				calendarEventsString = "No events were generated";
 			}
-			stringBuilder.append("\n\n").append(calendarEventsString);
 		}
 		catch (ValidationException | RuntimeException e) {
 			Notification.show(e.toString(), 5000, Notification.Position.BOTTOM_CENTER);
 		}
 
-		TextArea textArea = new TextArea("Result", stringBuilder.toString(), "");
+		TextArea textArea = new TextArea("Result", calendarEventsString, "");
 		textArea.setSizeFull();
 
 		CancelDialog cancelDialog = new CancelDialog("Result", textArea);

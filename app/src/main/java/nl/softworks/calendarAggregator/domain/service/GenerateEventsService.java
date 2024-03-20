@@ -13,8 +13,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 @Service
-public class CalendarSourceService {
-    private static final Logger LOG = LoggerFactory.getLogger(CalendarSourceService.class);
+public class GenerateEventsService {
+    private static final Logger LOG = LoggerFactory.getLogger(GenerateEventsService.class);
 
     private static final ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -49,9 +49,7 @@ public class CalendarSourceService {
             CalendarSource calendarSource = R.calendarSource().findById(calendarSourceId).orElseThrow();
             try {
                 if (LOG.isInfoEnabled()) LOG.info("Generating events for " + calendarSource.calendarLocation().name() + " in " + Thread.currentThread().getName());
-                StringBuilder stringBuilder = new StringBuilder();
-                calendarSource.generateEvents(stringBuilder);
-                calendarSource.log(stringBuilder.toString());
+                calendarSource.generateEvents();
                 if (LOG.isInfoEnabled()) LOG.info("Generating events for " + calendarSource.calendarLocation().name() + " in " + Thread.currentThread().getName() + " finished");
             } catch (RuntimeException e) {
                 LOG.error("Problem generating events for " + calendarSource.calendarLocation().name(), e);

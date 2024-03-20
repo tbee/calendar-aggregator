@@ -147,12 +147,9 @@ public class CalendarLocation extends EntityBase<CalendarLocation> {
 	}
 
 	public List<CalendarEvent> generateEvents() {
-
 		List<CalendarEvent> calendarEvents = new ArrayList<>();
 		for (CalendarSource calendarSource : calendarSources) {
-			StringBuilder stringBuilder = new StringBuilder();
-			calendarEvents.addAll(calendarSource.generateEvents(stringBuilder));
-			calendarSource.log(stringBuilder.toString());
+			calendarEvents.addAll(calendarSource.generateEvents());
 		}
 		return calendarEvents;
 	}

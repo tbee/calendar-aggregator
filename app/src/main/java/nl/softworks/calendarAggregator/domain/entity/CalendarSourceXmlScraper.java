@@ -188,82 +188,82 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
     }
 
     @Override
-    public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
+    public List<CalendarEvent> generateEvents() {
         try {
-            super.generateEvents(stringBuilder);
+            super.generateEvents();
             if (!isEnabled()) {
                 return calendarEvents;
             }
 
             // Create formatters
             Locale locale = new Locale(dateTimeLocale);
-            if (stringBuilder != null) stringBuilder.append("Locale ").append(locale).append("\n");
-            DateTimeFormatter dateFormatter = createDateFormatter(datePattern, shortMonthNotation, locale, stringBuilder);
-            DateTimeFormatter timeFormatter = createTimeFormatter(timePattern, locale, stringBuilder);
+            logAppend("Locale " + locale + "\n");
+            DateTimeFormatter dateFormatter = createDateFormatter(datePattern, shortMonthNotation, locale);
+            DateTimeFormatter timeFormatter = createTimeFormatter(timePattern, locale);
 
             // Get contents
-            String content = readScrapeUrl(stringBuilder);
+            String content = readScrapeUrl();
             if (content.isBlank()) {
                 status("No contents");
                 return List.of();
             }
-            content = sanatizeContent(content, stringBuilder);
+            content = sanatizeContent(content);
 
             // Json to XML conversion?
             if (jsonToXml) {
                 JSONObject json = new JSONObject(content);
                 content = XML.toString(json, "root");
-                if (stringBuilder != null) stringBuilder.append("XML ").append(content).append("\n");
+                logAppend("XML " + content + "\n");
             }
 
             // Apply xpath (using saxon api because Java's API defaults to XPath 1.0)
-            if (stringBuilder != null) stringBuilder.append(xpath).append("\n");
+            logAppend(xpath + "\n");
             Processor processor = new Processor(false);
             XdmNode rootXdmNode = processor.newDocumentBuilder().build(new StreamSource(new StringReader(content)));
             XPathCompiler xPathCompiler = processor.newXPathCompiler();
             XdmValue xdmValue = xPathCompiler.evaluate(xpath, rootXdmNode);
             for (XdmItem eventXdmItem : xdmValue) {
-                if (stringBuilder != null) stringBuilder.append("---\nEvent node: ").append(describe(eventXdmItem)).append("\n");
+                logAppend("---\nEvent node: " + describe(eventXdmItem) + "\n");
 
                 // get strings
-                String startDateString = solveXpath("startdate", eventXdmItem, startdateXpath, xPathCompiler, stringBuilder);
-                String endDateString = solveXpath("enddate", eventXdmItem, enddateXpath, xPathCompiler, stringBuilder);
-                String starttimeString = starttimeXpath.isBlank() ? startTimeDefault : solveXpath("starttime", eventXdmItem, starttimeXpath, xPathCompiler, stringBuilder);
-                String endtimeString = endtimeXpath.isBlank() ? endTimeDefault : solveXpath("endtime", eventXdmItem, endtimeXpath, xPathCompiler, stringBuilder);
-                String subject = subjectXpath.isBlank() ? "" : solveXpath("subject", eventXdmItem, subjectXpath, xPathCompiler, stringBuilder);
+                String startDateString = solveXpath("startdate", eventXdmItem, startdateXpath, xPathCompiler);
+                String endDateString = solveXpath("enddate", eventXdmItem, enddateXpath, xPathCompiler);
+                String starttimeString = starttimeXpath.isBlank() ? startTimeDefault : solveXpath("starttime", eventXdmItem, starttimeXpath, xPathCompiler);
+                String endtimeString = endtimeXpath.isBlank() ? endTimeDefault : solveXpath("endtime", eventXdmItem, endtimeXpath, xPathCompiler);
+                String subject = subjectXpath.isBlank() ? "" : solveXpath("subject", eventXdmItem, subjectXpath, xPathCompiler);
 
                 try {
-                    LocalDate startLocalDate = parseLocalDate(startDateString, dateFormatter, stringBuilder);
+                    LocalDate startLocalDate = parseLocalDate(startDateString, dateFormatter);
                     if (startLocalDate == null) {
-                        if (stringBuilder != null) stringBuilder.append("Not able to determine a startdate for ").append(startDateString);
+                        logAppend("Not able to determine a startdate for " + startDateString);
                         continue;
                     }
 
-                    LocalDate endLocalDate = parseLocalDate(endDateString, dateFormatter, stringBuilder);
+                    LocalDate endLocalDate = parseLocalDate(endDateString, dateFormatter);
                     if (endLocalDate == null) {
-                        if (stringBuilder != null) stringBuilder.append("Not able to determine an enddate for ").append(endDateString);
+                        logAppend("Not able to determine an enddate for " + endDateString);
                         continue;
                     }
 
-                    LocalTime startLocalTime = parseLocalTime(starttimeString, timeFormatter, stringBuilder);
+                    LocalTime startLocalTime = parseLocalTime(starttimeString, timeFormatter);
                     if (startLocalTime == null) {
-                        if (stringBuilder != null) stringBuilder.append("Not able to determine a starttime for ").append(starttimeString);
+                        logAppend("Not able to determine a starttime for " + starttimeString);
                         continue;
                     }
 
-                    LocalTime endLocalTime = parseLocalTime(endtimeString, timeFormatter, stringBuilder);
+                    LocalTime endLocalTime = parseLocalTime(endtimeString, timeFormatter);
                     if (endLocalTime == null) {
-                        if (stringBuilder != null) stringBuilder.append("Not able to determine an endtime for ").append(endtimeString);
+                        logAppend("Not able to determine an endtime for " + endtimeString);
                         continue;
                     }
 
                     LocalDateTime startLocalDateTime = LocalDateTime.of(startLocalDate, startLocalTime);
-                    if (stringBuilder != null) stringBuilder.append("startLocalDateTime: ").append(startLocalDateTime).append("\n");
+                    logAppend("startLocalDateTime: " + startLocalDateTime + "\n");
 
                     LocalDateTime endLocalDateTime = LocalDateTime.of(endLocalDate, endLocalTime);
-                    if (stringBuilder != null) stringBuilder.append("endLocalDateTime: ").append(endLocalDateTime).append("\n");
+                    logAppend("endLocalDateTime: " + endLocalDateTime + "\n");
 
-                    endLocalDateTime = makeSureEndIsAfterStart(startLocalDateTime, endLocalDateTime, stringBuilder);
+                    endLocalDateTime = makeSureEndIsAfterStart(startLocalDateTime, endLocalDateTime);
 
                     // Create event
                     CalendarEvent calendarEvent = new CalendarEvent()
@@ -273,26 +273,24 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
                     addCalendarEvent(calendarEvent);
                 }
                 catch (DateTimeParseException e) {
-                    if (stringBuilder != null) {
-                        try {
-                            String example = LocalDate.of(2023, 12, 31).format(dateFormatter);
-                            stringBuilder.append("Date example: ").append(example).append("\n");
-                        } catch (RuntimeException e2) {
-                            // ignore
-                        }
+                    try {
+                        String example = LocalDate.of(2023, 12, 31).format(dateFormatter);
+                         logAppend("Date example: " + example + "\n");
+                    } catch (RuntimeException e2) {
+                        // ignore
+                    }
 
-                        try {
-                            String example = LocalTime.of(12, 23, 45).format(timeFormatter);
-                            stringBuilder.append("Time example: ").append(example).append("\n");
-                        } catch (RuntimeException e2) {
-                            // ignore
-                        }
+                    try {
+                        String example = LocalTime.of(12, 23, 45).format(timeFormatter);
+                         logAppend("Time example: " + example + "\n");
+                    } catch (RuntimeException e2) {
+                        // ignore
                     }
                     throw e;
                 }
             }
-            dropHistoricEvents(stringBuilder);
-            if (stringBuilder != null) stringBuilder.append("Done\n");
+            dropExpiredEvents();
+            logAppend("Done\n");
 
             // set status
             if (calendarEvents().isEmpty()) {
@@ -307,39 +305,37 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
         }
         catch (RuntimeException e) {
             status(e.getMessage());
-            if (stringBuilder != null) {
-                StringWriter stringWriter = new StringWriter();
-                e.printStackTrace(new PrintWriter(stringWriter));
-                stringBuilder.append(stringWriter.toString());
-            }
+            StringWriter stringWriter = new StringWriter();
+            e.printStackTrace(new PrintWriter(stringWriter));
+            logAppend(stringWriter.toString());
             throw e;
         }
     }
 
-    private String solveXpath(String id, XdmItem basenode, String xpath, XPathCompiler xPathCompiler, StringBuilder stringBuilder) throws XPathExpressionException, SaxonApiException, XPathException {
+    private String solveXpath(String id, XdmItem basenode, String xpath, XPathCompiler xPathCompiler) throws XPathExpressionException, SaxonApiException, XPathException {
         XdmValue xdmValue = xPathCompiler.evaluate(xpath, basenode);
-        if (stringBuilder != null) stringBuilder.append(id + " node: ").append(describe(xdmValue)).append("\n");
+        logAppend(id + " node: " + describe(xdmValue) + "\n");
         String str = xdmValue.getUnderlyingValue().getStringValue();
-        if (stringBuilder != null) stringBuilder.append(id + " string: ").append(str).append("\n");
+        logAppend(id + " string: " + str + "\n");
         return str;
     }
 
-    private LocalTime parseLocalTime(String timeString, DateTimeFormatter timeFormatter, StringBuilder stringBuilder) {
-        if (stringBuilder != null) stringBuilder.append("Parsing '").append(timeString).append("' with '").append(timePattern).append("'\n");
+    private LocalTime parseLocalTime(String timeString, DateTimeFormatter timeFormatter) {
+        logAppend("Parsing '" + timeString + "' with '" + timePattern + "'\n");
         LocalTime localTime = LocalTime.parse(timeString, timeFormatter);
-        if (stringBuilder != null) stringBuilder.append("Parsed as ").append(localTime).append("\n");
+        logAppend("Parsed as " + localTime + "\n");
         return localTime;
     }
 
-    private LocalDate parseLocalDate(String dateString, DateTimeFormatter dateFormatter, StringBuilder stringBuilder) {
+    private LocalDate parseLocalDate(String dateString, DateTimeFormatter dateFormatter) {
         LocalDate localDate;
         if (nearestYear) {
             MonthDay monthDay = MonthDay.parse(dateString, dateFormatter);
-            localDate = determineDateByNearestYear(monthDay, stringBuilder);
+            localDate = determineDateByNearestYear(monthDay);
         } else {
-            if (stringBuilder != null) stringBuilder.append("Parsing '").append(dateString).append("' with '").append(datePattern).append("'\n");
+            logAppend("Parsing '" + dateString + "' with '" + datePattern + "'\n");
             localDate = LocalDate.parse(dateString, dateFormatter);
-            if (stringBuilder != null) stringBuilder.append("Parsed as ").append(localDate).append("\n");
+            logAppend("Parsed as " + localDate + "\n");
         }
         return localDate;
     }

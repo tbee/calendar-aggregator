@@ -41,7 +41,7 @@ import nl.softworks.calendarAggregator.domain.entity.CalendarSourceManual;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceMultipleDaysScraper;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceRegexScraper;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceXmlScraper;
-import nl.softworks.calendarAggregator.domain.service.CalendarSourceService;
+import nl.softworks.calendarAggregator.domain.service.GenerateEventsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +69,7 @@ implements AfterNavigationObserver
 	private final TreeGrid<TreeNode> treeGrid = new TreeGrid<>();
 
 	@Autowired
-	private CalendarSourceService calendarSourceService;
+	private GenerateEventsService generateEventsService;
 
 	public CalendarLocationAndSourceView() {
 		super("Overview");
@@ -108,7 +108,7 @@ implements AfterNavigationObserver
 	}
 
 	private void generate() {
-		calendarSourceService.generateEvents(() -> {
+		generateEventsService.generateEvents(() -> {
 			reloadTreeGrid();
 			showSuccessNotification("Generating");
 		});

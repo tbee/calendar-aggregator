@@ -57,22 +57,20 @@ abstract public class CalendarSourceForm extends FormLayout {
 	}
 
 	protected void generateAndShowTrace(CalendarSource calendarSource) {
-		StringBuilder stringBuilder = new StringBuilder();
 		try {
 			writeTo(calendarSource);
-			List<CalendarEvent> calendarEvents = calendarSource.generateEvents(stringBuilder);
-			calendarSource.log(stringBuilder.toString());
+			List<CalendarEvent> calendarEvents = calendarSource.generateEvents();
 			populateWith(calendarSource);
 
 			String calendarEventsString = calendarEvents.stream().map(s -> s + "\n").collect(Collectors.joining());
-			stringBuilder.append("\n\n").append(calendarEventsString);
+			calendarSource.logAppend("\n\n" + calendarEventsString);
 		}
 		catch (ValidationException | RuntimeException e) {
 			calendarSource.log(e.toString());
 			Notification.show(e.toString(), 5000, Notification.Position.BOTTOM_CENTER);
 		}
 
-		TextArea textArea = new TextArea("Result", stringBuilder.toString(), "");
+		TextArea textArea = new TextArea("Result", calendarSource.log(), "");
 		textArea.setSizeFull();
 
 		CancelDialog cancelDialog = new CancelDialog("Result", textArea);

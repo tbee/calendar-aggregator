@@ -102,29 +102,29 @@ public class CalendarSourceManual extends CalendarSource {
 	}
 
 	@Override
-	public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
+	public List<CalendarEvent> generateEvents() {
 		try {
-			super.generateEvents(stringBuilder);
+			super.generateEvents();
 			if (!isEnabled()) {
 				return calendarEvents;
 			}
 
 			LocalDateTime now = LocalDateTime.now();
 			if (rrule.isBlank()) {
-				if (stringBuilder != null) stringBuilder.append("No RRule, creating single event\n");
+				logAppend("No RRule, creating single event\n");
 				calendarEvents.add(new CalendarEvent(CalendarSourceManual.this)
 						.startDateTime(startDateTime)
 						.endDateTime(endDateTime)
 						.subject(subject));
 			}
 			else {
-				if (stringBuilder != null) stringBuilder.append("Applying RRule\n");
+				logAppend("Applying RRule\n");
 				calendarEvents.addAll(applyRRule(now));
-				if (stringBuilder != null) stringBuilder.append("Applied RRule: ").append(calendarEvents.size()).append(" events created\n");
+				logAppend("Applied RRule: " + calendarEvents.size() + " events created\n");
 			}
 
 			// Nothing in the distant past
-			dropHistoricEvents(stringBuilder);
+			dropExpiredEvents();
 			if (calendarEvents.isEmpty()) {
 				status("No events");
 			}
@@ -133,11 +133,9 @@ public class CalendarSourceManual extends CalendarSource {
 		}
 		catch (RuntimeException e) {
 			status(e.getMessage());
-			if (stringBuilder != null) {
-				StringWriter stringWriter = new StringWriter();
-				e.printStackTrace(new PrintWriter(stringWriter));
-				stringBuilder.append(stringWriter);
-			}
+			StringWriter stringWriter = new StringWriter();
+			e.printStackTrace(new PrintWriter(stringWriter));
+			logAppend(stringWriter.toString());
 			throw new RuntimeException(e);
 		}
 	}

@@ -116,6 +116,9 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 		this.log = v;
 		return this;
 	}
+	public void logAppend(String s) {
+		log += s;
+	}
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.EAGER)
     protected final List<CalendarEvent> calendarEvents = new ArrayList<>();
@@ -138,8 +141,8 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 	 * @param stringBuilder
 	 * @return
 	 */
-	protected String resolveUrl(String url, StringBuilder stringBuilder) {
-		if (stringBuilder != null) stringBuilder.append("URL before: " + url + "\n");
+	protected String resolveUrl(String url) {
+		logAppend("URL before: " + url + "\n");
 
 		// Predefined custom functions
 		String functions =
@@ -163,7 +166,7 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 		vars.put("now", LocalDateTime.now());
 		vars.put("yyyy_MM_dd", DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 		String newUrl = (String) TemplateRuntime.execute(compiledExpression, vars);
-		if (stringBuilder != null) stringBuilder.append("URL after: " + newUrl + "\n");
+		logAppend("URL after: " + newUrl + "\n");
 		return newUrl;
 	}
 
@@ -192,34 +195,33 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 		}
 	}
 
-	public List<CalendarEvent> generateEvents(StringBuilder stringBuilder) {
+	public List<CalendarEvent> generateEvents() {
+		log = "";
 		status(OK);
 		calendarEvents.clear();
 		return calendarEvents;
 	}
 
-	protected void dropHistoricEvents(StringBuilder stringBuilder) {
+	protected void dropExpiredEvents() {
 		LocalDateTime aBitBack = LocalDateTime.now().minusDays(1);
 		calendarEvents.removeIf(ce -> ce.startDateTime().isBefore(aBitBack));
-		if (stringBuilder != null) stringBuilder.append("Dropped events before ").append(aBitBack).append(", ").append(calendarEvents.size()).append(" events remaining\n");
+		logAppend("Dropped events before " + aBitBack + ", " + calendarEvents.size() + " events remaining\n");
 	}
 
-	protected void logMatcherInStringBuilder(Matcher matcher, String content, StringBuilder stringBuilder) {
-		if (stringBuilder != null) {
-			stringBuilder.append("---\n");
-			stringBuilder.append("Start index: ").append(matcher.start()).append("\n");
-			stringBuilder.append("End index: ").append(matcher.end()).append("\n");
-			stringBuilder.append("Matched string: ").append(content, matcher.start(), matcher.end()).append("\n");
-			for (int i = 0; i < matcher.groupCount() + 1; i++) {
-				stringBuilder.append("Group ").append(i).append(" = ").append(matcher.group(i)).append("\n");
-			}
+	protected void logMatcher(Matcher matcher, String content) {
+		 logAppend("---\n");
+		 logAppend("Start index: " + matcher.start() + "\n");
+		 logAppend("End index: " + matcher.end() + "\n");
+		 logAppend("Matched string: " + content + "," + matcher.start() + "," + matcher.end() + "\n");
+		for (int i = 0; i < matcher.groupCount() + 1; i++) {
+			 logAppend("Group " + i + " = " + matcher.group(i) + "\n");
 		}
 	}
 
-	protected LocalDateTime makeSureEndIsAfterStart(LocalDateTime startLocalDateTime, LocalDateTime endLocalDateTime, StringBuilder stringBuilder) {
+	protected LocalDateTime makeSureEndIsAfterStart(LocalDateTime startLocalDateTime, LocalDateTime endLocalDateTime) {
 		if (endLocalDateTime.isBefore(startLocalDateTime)) {
 			endLocalDateTime = endLocalDateTime.plusDays(1); // This is to correct an end time that is on or after midnight
-			if (stringBuilder != null) stringBuilder.append("End moment < start moment, added one day: ").append(endLocalDateTime).append("\n");
+			logAppend("End moment < start moment, added one day: " + endLocalDateTime + "\n");
 		}
 		if (endLocalDateTime.isBefore(startLocalDateTime)) {
 			throw new RuntimeException("End date should be after start: " + startLocalDateTime + " < " + endLocalDateTime);
