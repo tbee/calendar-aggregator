@@ -213,10 +213,10 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 
 	protected void logMatcher(Matcher matcher, String content) {
-		 logAppend("---\n");
-		 logAppend("Start index: " + matcher.start() + "\n");
-		 logAppend("End index: " + matcher.end() + "\n");
-		 logAppend("Matched string: " + content + "," + matcher.start() + "," + matcher.end() + "\n");
+		logAppend("---\n");
+		logAppend("Start index: " + matcher.start() + "\n");
+		logAppend("End index: " + matcher.end() + "\n");
+		logAppend("Matched string: " + content.substring(matcher.start(), matcher.end()) + "\n");
 		for (int i = 0; i < matcher.groupCount() + 1; i++) {
 			 logAppend("Group " + i + " = " + matcher.group(i) + "\n");
 		}
