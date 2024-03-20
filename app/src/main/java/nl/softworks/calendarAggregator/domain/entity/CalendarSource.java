@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import java.util.regex.Matcher;
 
 @Entity
@@ -45,6 +46,9 @@ import java.util.regex.Matcher;
 abstract public class CalendarSource extends EntityBase<CalendarSource> {
 	private static final Logger LOG = LoggerFactory.getLogger(CalendarSource.class);
 	public static final String OK = "ok";
+
+	transient protected Supplier<LocalDateTime> localDateTimeNowSupplier = () -> LocalDateTime.now();
+
 
 	public String type() {
 		return "Manual";
@@ -203,7 +207,7 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 
 	protected void dropExpiredEvents() {
-		LocalDateTime aBitBack = LocalDateTime.now().minusDays(1);
+		LocalDateTime aBitBack = localDateTimeNowSupplier.get().minusDays(1);
 		calendarEvents.removeIf(ce -> ce.startDateTime().isBefore(aBitBack));
 		logAppend("Dropped events before " + aBitBack + ", " + calendarEvents.size() + " events remaining\n");
 	}

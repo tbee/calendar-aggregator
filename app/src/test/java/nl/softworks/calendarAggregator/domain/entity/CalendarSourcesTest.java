@@ -11,7 +11,6 @@ public class CalendarSourcesTest {
 
     @Test
     public void citydance_20231127a_regexPlusTime() {
-        StringBuilder stringBuilder = new StringBuilder();
         CalendarSourceScraperBase calendarSource = new CalendarSourceRegexScraper()
                 .regex("([a-zA-Z]*) +[a-z]{2}\\. ([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december) +[0-9]{4}) +van ([0-9]+:[0-9]+) tot ([0-9]+:[0-9]+)")
                 .subjectGroupIdx(1)
@@ -23,8 +22,9 @@ public class CalendarSourcesTest {
                 .timePattern("HH:mm")
                 .dateTimeLocale("NL")
                 .scrapeUrl(this.getClass().getResource("/webSnapshots/citydance_20231127a.html").toExternalForm());
+        calendarSource.localDateTimeNowSupplier = () -> LocalDateTime.of(2023, 12, 01, 12, 34, 56);
         new CalendarLocation().addCalendarSource(calendarSource);
-        List<CalendarEvent> calendarEvents = calendarSource.generateEvents(stringBuilder);
+        List<CalendarEvent> calendarEvents = calendarSource.generateEvents();
         Assertions.assertEquals(1, calendarEvents.size());
         Assertions.assertEquals("Kerstgala", calendarEvents.get(0).subject());
         Assertions.assertEquals(LocalDateTime.of(2023, 12, 16, 20, 30, 0), calendarEvents.get(0).startDateTime());
@@ -33,7 +33,6 @@ public class CalendarSourcesTest {
 
     @Test
     public void deDanssalon_20231127a_deBilt_regexDateOnly() {
-        StringBuilder stringBuilder = new StringBuilder();
         CalendarSourceScraperBase calendarSource = new CalendarSourceRegexScraper()
                 .regex("([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december) +[0-9]{4})")
                 .startDateGroupIdx(1)
@@ -46,8 +45,9 @@ public class CalendarSourcesTest {
                 .scrapeUrl(this.getClass().getResource("/webSnapshots/deDanssalon_20231127a.html").toExternalForm())
                 .scrapeBlockStart("Locatie de Bilt")
                 .scrapeBlockEnd("Entree:");
+        calendarSource.localDateTimeNowSupplier = () -> LocalDateTime.of(2023, 10, 01, 12, 34, 56);
         new CalendarLocation().addCalendarSource(calendarSource);
-        List<CalendarEvent> calendarEvents = calendarSource.generateEvents(stringBuilder);
+        List<CalendarEvent> calendarEvents = calendarSource.generateEvents();
 
         Assertions.assertEquals(13, calendarEvents.size());
         Assertions.assertEquals("", calendarEvents.get(0).subject());
@@ -57,8 +57,7 @@ public class CalendarSourcesTest {
 
     @Test
     public void verhoeven_20231127a_2024_multipleDays() {
-        StringBuilder stringBuilder = new StringBuilder();
-        CalendarSourceScraperBase calendarSource = new CalendarSourceMultipleDaysScraper()
+        CalendarSourceScraperBase calendarSource = new CalendarSourceMultipleDaysScraper() {}
                 .regex("[0-9][0-9]? (januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december)")
                 .nearestYear(true)
                 .datePattern("d MMMM")
@@ -70,8 +69,9 @@ public class CalendarSourcesTest {
                 .scrapeUrl(this.getClass().getResource("/webSnapshots/verhoeven_20231127a.html").toExternalForm())
                 .scrapeBlockStart("2024:")
                 .scrapeBlockEnd("Zie agenda");
+        calendarSource.localDateTimeNowSupplier = () -> LocalDateTime.of(2023, 12, 01, 12, 34, 56);
         new CalendarLocation().addCalendarSource(calendarSource);
-        List<CalendarEvent> calendarEvents = calendarSource.generateEvents(stringBuilder);
+        List<CalendarEvent> calendarEvents = calendarSource.generateEvents();
 
         Assertions.assertEquals(13, calendarEvents.size());
         Assertions.assertEquals("", calendarEvents.get(0).subject());
@@ -81,7 +81,6 @@ public class CalendarSourcesTest {
 
     @Test
     public void wijgers_20231201a_shortDateNotation() {
-        StringBuilder stringBuilder = new StringBuilder();
         CalendarSourceScraperBase calendarSource = new CalendarSourceRegexScraper()
                 .regex("([0-9][0-9]? (jan|feb|mrt|apr|mei|jun|jul|aug|sep|okt|nov|dec)) (Vrije Dansavond)")
                 .subjectGroupIdx(3)
@@ -97,9 +96,10 @@ public class CalendarSourcesTest {
                 .removeChars("'")
                 .scrapeUrl(this.getClass().getResource("/webSnapshots/wijgers_20231201a.html").toExternalForm())
                 .scrapeBlockStart("Agenda");
+        calendarSource.localDateTimeNowSupplier = () -> LocalDateTime.of(2023, 10, 01, 12, 34, 56);
         new CalendarLocation().addCalendarSource(calendarSource);
-        List<CalendarEvent> calendarEvents = calendarSource.generateEvents(stringBuilder);
-        System.out.println(stringBuilder);
+        List<CalendarEvent> calendarEvents = calendarSource.generateEvents();
+        System.out.println(calendarSource.log());
         System.out.println(calendarEvents);
 
         Assertions.assertEquals(6, calendarEvents.size());
@@ -110,7 +110,6 @@ public class CalendarSourcesTest {
 
     @Test
     public void danshotspot_20240203() {
-        StringBuilder stringBuilder = new StringBuilder();
         CalendarSourceScraperBase calendarSource = new CalendarSourceXmlScraper()
                 .xpath("//event/name/text/text()[contains(., 'Vrijdansen') or ends-with(., 'bal')]")
                 .startdateXpath("../../../start/local")
@@ -123,9 +122,10 @@ public class CalendarSourcesTest {
                 .timePattern("yyyy-MM-dd'T'HH:mm:ss")
                 .dateTimeLocale("NL")
                 .scrapeUrl(this.getClass().getResource("/webSnapshots/danshotspot_20240203.html").toExternalForm());
+        calendarSource.localDateTimeNowSupplier = () -> LocalDateTime.of(2023, 12, 01, 12, 34, 56);
         new CalendarLocation().addCalendarSource(calendarSource);
-        List<CalendarEvent> calendarEvents = calendarSource.generateEvents(stringBuilder);
-        System.out.println(stringBuilder);
+        List<CalendarEvent> calendarEvents = calendarSource.generateEvents();
+        System.out.println(calendarSource.log());
         System.out.println(calendarEvents);
 
         Assertions.assertEquals(7, calendarEvents.size());
