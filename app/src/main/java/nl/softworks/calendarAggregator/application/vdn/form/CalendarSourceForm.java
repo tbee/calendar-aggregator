@@ -2,7 +2,6 @@ package nl.softworks.calendarAggregator.application.vdn.form;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -13,6 +12,8 @@ import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -66,8 +67,9 @@ abstract public class CalendarSourceForm extends FormLayout {
 			calendarSource.logAppend("\n\n" + calendarEventsString);
 		}
 		catch (ValidationException | RuntimeException e) {
-			calendarSource.log(e.toString());
-			Notification.show(e.toString(), 5000, Notification.Position.BOTTOM_CENTER);
+			StringWriter stringWriter = new StringWriter();
+			e.printStackTrace(new PrintWriter(stringWriter));
+			calendarSource.logAppend(stringWriter.toString());
 		}
 
 		TextArea textArea = new TextArea("Result", calendarSource.log(), "");

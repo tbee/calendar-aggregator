@@ -213,6 +213,7 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
             if (jsonToXml) {
                 JSONObject json = new JSONObject(content);
                 content = XML.toString(json, "root");
+                // TODO: sanitize XML tags: no "-", start with letter
                 logAppend("XML " + content + "\n");
             }
 
