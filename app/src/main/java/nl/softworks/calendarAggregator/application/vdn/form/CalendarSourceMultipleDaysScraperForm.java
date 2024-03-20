@@ -8,6 +8,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.domain.boundary.R;
+import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceMultipleDaysScraper;
 import org.slf4j.Logger;
@@ -63,7 +64,7 @@ public class CalendarSourceMultipleDaysScraperForm extends CalendarSourceScraper
 		return this;
 	}
 
-	public static void showInsertDialog(CalendarSource selectedCalendarSource, Runnable onInsert) {
+	public static void showInsertDialog(CalendarLocation calendarLocation, CalendarSource selectedCalendarSource, Runnable onInsert) {
 		CalendarSourceMultipleDaysScraper calendarSource = new CalendarSourceMultipleDaysScraper();
 		CalendarSourceMultipleDaysScraperForm calendarSourceForm = new CalendarSourceMultipleDaysScraperForm().populateWith(selectedCalendarSource != null ? selectedCalendarSource : calendarSource);
 		new OkCancelDialog("Source", calendarSourceForm)
@@ -71,7 +72,8 @@ public class CalendarSourceMultipleDaysScraperForm extends CalendarSourceScraper
 				.onOk(() -> {
 					try {
 						calendarSourceForm.writeTo(calendarSource);
-						R.calendarSource().save(calendarSource);
+						calendarLocation.addCalendarSource(calendarSource);
+						R.calendarLocation().save(calendarLocation);
 						onInsert.run();
 					} catch (ValidationException e) {
 						throw new RuntimeException(e);

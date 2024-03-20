@@ -78,7 +78,7 @@ public class CalendarSourceXmlScraperForm extends CalendarSourceScraperBaseForm 
 		return this;
 	}
 
-	public static void showInsertDialog(CalendarSource selectedCalendarSource, Runnable onInsert) {
+	public static void showInsertDialog(CalendarLocation calendarLocation, CalendarSource selectedCalendarSource, Runnable onInsert) {
 		CalendarSourceXmlScraper calendarSource = new CalendarSourceXmlScraper();
 		CalendarSourceXmlScraperForm calendarSourceForm = new CalendarSourceXmlScraperForm().populateWith(selectedCalendarSource != null ? selectedCalendarSource : calendarSource);
 		new OkCancelDialog("Source", calendarSourceForm)
@@ -86,7 +86,8 @@ public class CalendarSourceXmlScraperForm extends CalendarSourceScraperBaseForm 
 				.onOk(() -> {
 					try {
 						calendarSourceForm.writeTo(calendarSource);
-						R.calendarSource().save(calendarSource);
+						calendarLocation.addCalendarSource(calendarSource);
+						R.calendarLocation().save(calendarLocation);
 						onInsert.run();
 					} catch (ValidationException e) {
 						throw new RuntimeException(e);

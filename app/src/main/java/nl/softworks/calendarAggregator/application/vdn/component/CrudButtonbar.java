@@ -19,7 +19,7 @@ public class CrudButtonbar extends HorizontalLayout {
         this(false);
     }
     public CrudButtonbar(boolean vertical) {
-        add(reloadButton, insertButton, editButton, deleteButton);
+        add(reloadButton, editButton, deleteButton, insertButton);
         setState();
     }
 

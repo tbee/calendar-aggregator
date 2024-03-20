@@ -134,7 +134,7 @@ public class CalendarSourceManualForm extends CalendarSourceForm {
 		return this;
 	}
 
-	public static void showInsertDialog(CalendarLocation calendarLocation, Runnable onInsert) {
+	public static void showInsertDialog(CalendarLocation calendarLocation, CalendarSource calendarSource, Runnable onInsert) {
 		CalendarSourceManual calendarSourceManual = new CalendarSourceManual();
 		CalendarSourceManualForm calendarSourceManualForm = new CalendarSourceManualForm().populateWith(calendarSourceManual);
 		new OkCancelDialog("Event", calendarSourceManualForm)
@@ -142,7 +142,7 @@ public class CalendarSourceManualForm extends CalendarSourceForm {
 				.onOk(() -> {
 					try {
 						calendarSourceManualForm.writeTo(calendarSourceManual);
-						//calendarLocation.addCalendarSource(calendarSourceManual);
+						calendarLocation.addCalendarSource(calendarSourceManual);
 						R.calendarLocation().save(calendarLocation);
 						onInsert.run();
 					} catch (ValidationException e) {

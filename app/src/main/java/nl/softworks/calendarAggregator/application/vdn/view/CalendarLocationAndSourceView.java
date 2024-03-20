@@ -12,7 +12,6 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -121,50 +120,7 @@ implements AfterNavigationObserver
 	}
 
 	private void insert() {
-		TreeNode treeNode = getSelectedTreeNode();
-		CalendarSource calendarSource = (treeNode == null ? null : treeNode.calendarSource());
-
-		HorizontalLayout horizontalLayout = new HorizontalLayout();
-		CancelDialog addSelectionDialog = new CancelDialog("Add", horizontalLayout);
-
-		horizontalLayout.add(new VerticalLayout(new VButton("Location", e -> {
-			addSelectionDialog.close();
-			CalendarLocationForm.showInsertDialog(null, () -> reloadTreeGrid());
-		})));
-
-		VerticalLayout verticalLayout = new VerticalLayout();
-		horizontalLayout.add(verticalLayout);
-
-		verticalLayout.add(new VButton("Manual Source", e -> {
-			addSelectionDialog.close();
-			CalendarSourceManualForm.showInsertDialog(calendarSource, () -> reloadTreeGrid());
-		}).withIsPrimary(calendarSource != null));
-
-		verticalLayout.add(new VButton("Regex Source", e -> {
-			addSelectionDialog.close();
-			CalendarSourceRegexScraper calendarSourceRegexScraper = (calendarSource instanceof CalendarSourceRegexScraper ? (CalendarSourceRegexScraper)calendarSource : null);
-			CalendarSourceRegexScraperForm.showInsertDialog(calendarSourceRegexScraper, () -> reloadTreeGrid());
-		}).withIsPrimary(calendarSource instanceof CalendarSourceRegexScraper));
-
-		verticalLayout.add(new VButton("Multiple days Source", e -> {
-			addSelectionDialog.close();
-			CalendarSourceMultipleDaysScraper calendarSourceMultipleDaysScraper = (calendarSource instanceof CalendarSourceMultipleDaysScraper ? (CalendarSourceMultipleDaysScraper)calendarSource : null);
-			CalendarSourceMultipleDaysScraperForm.showInsertDialog(calendarSourceMultipleDaysScraper, () -> reloadTreeGrid());
-		}).withIsPrimary(calendarSource instanceof CalendarSourceMultipleDaysScraper));
-
-		verticalLayout.add(new VButton("ICal Source", e -> {
-			addSelectionDialog.close();
-			CalendarSourceICal calendarSourceICal = (calendarSource instanceof CalendarSourceICal ? (CalendarSourceICal)calendarSource : null);
-			CalendarSourceICalForm.showInsertDialog(calendarSourceICal, () -> reloadTreeGrid());
-		}).withIsPrimary(calendarSource instanceof CalendarSourceICal));
-
-		verticalLayout.add(new VButton("XML/JSON Source", e -> {
-			addSelectionDialog.close();
-			CalendarSourceXmlScraper calendarSourceXmlScraper = (calendarSource instanceof CalendarSourceXmlScraper ? (CalendarSourceXmlScraper)calendarSource : null);
-			CalendarSourceXmlScraperForm.showInsertDialog(calendarSourceXmlScraper, () -> reloadTreeGrid());
-		}).withIsPrimary(calendarSource instanceof CalendarSourceXmlScraper));
-
-		addSelectionDialog.open();
+		CalendarLocationForm.showInsertDialog(null, () -> reloadTreeGrid());
 	}
 
 	private TreeNode getSelectedTreeNode() {
@@ -327,8 +283,48 @@ implements AfterNavigationObserver
 		@Override
 		public Component crudButtons() {
 			return new CrudButtonbar()
-					.onEdit(() -> edit())
+					.onInsert(this::insert)
+					.onEdit(this::edit)
 					.onDelete(() -> confirmDelete(this, () -> R.calendarLocation().delete(calendarLocation)));
+		}
+
+		private void insert() {
+			TreeNode treeNode = getSelectedTreeNode();
+			CalendarSource calendarSource = this.calendarSource(); // default
+
+			VerticalLayout verticalLayout = new VerticalLayout();
+			CancelDialog addSelectionDialog = new CancelDialog("Add", verticalLayout);
+
+			verticalLayout.add(new VButton("Manual Source", e -> {
+				addSelectionDialog.close();
+				CalendarSourceManualForm.showInsertDialog(this.calendarLocation, calendarSource, () -> reloadTreeGrid());
+			}).withIsPrimary(calendarSource != null));
+
+			verticalLayout.add(new VButton("Regex Source", e -> {
+				addSelectionDialog.close();
+				CalendarSourceRegexScraper calendarSourceRegexScraper = (calendarSource instanceof CalendarSourceRegexScraper ? (CalendarSourceRegexScraper)calendarSource : null);
+				CalendarSourceRegexScraperForm.showInsertDialog(this.calendarLocation, calendarSourceRegexScraper, () -> reloadTreeGrid());
+			}).withIsPrimary(calendarSource instanceof CalendarSourceRegexScraper));
+
+			verticalLayout.add(new VButton("Multiple days Source", e -> {
+				addSelectionDialog.close();
+				CalendarSourceMultipleDaysScraper calendarSourceMultipleDaysScraper = (calendarSource instanceof CalendarSourceMultipleDaysScraper ? (CalendarSourceMultipleDaysScraper)calendarSource : null);
+				CalendarSourceMultipleDaysScraperForm.showInsertDialog(this.calendarLocation, calendarSourceMultipleDaysScraper, () -> reloadTreeGrid());
+			}).withIsPrimary(calendarSource instanceof CalendarSourceMultipleDaysScraper));
+
+			verticalLayout.add(new VButton("ICal Source", e -> {
+				addSelectionDialog.close();
+				CalendarSourceICal calendarSourceICal = (calendarSource instanceof CalendarSourceICal ? (CalendarSourceICal)calendarSource : null);
+				CalendarSourceICalForm.showInsertDialog(this.calendarLocation, calendarSourceICal, () -> reloadTreeGrid());
+			}).withIsPrimary(calendarSource instanceof CalendarSourceICal));
+
+			verticalLayout.add(new VButton("XML/JSON Source", e -> {
+				addSelectionDialog.close();
+				CalendarSourceXmlScraper calendarSourceXmlScraper = (calendarSource instanceof CalendarSourceXmlScraper ? (CalendarSourceXmlScraper)calendarSource : null);
+				CalendarSourceXmlScraperForm.showInsertDialog(this.calendarLocation, calendarSourceXmlScraper, () -> reloadTreeGrid());
+			}).withIsPrimary(calendarSource instanceof CalendarSourceXmlScraper));
+
+			addSelectionDialog.open();
 		}
 
 		private void edit() {
@@ -368,7 +364,11 @@ implements AfterNavigationObserver
 		}
 		@Override
 		public Icon enabled() {
-			return calendarSource.enabled() ? ENABLED_ICON.create() : DISABLED_ICON.create();
+			Icon icon = calendarSource.enabled() ? ENABLED_ICON.create() : DISABLED_ICON.create();
+			Tooltip.forComponent(icon)
+					.withText(hint())
+					.withPosition(Tooltip.TooltipPosition.TOP_START);
+			return icon;
 		}
 		@Override
 		public String type() {
