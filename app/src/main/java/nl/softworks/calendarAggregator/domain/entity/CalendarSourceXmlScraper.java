@@ -10,8 +10,6 @@ import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
 import net.sf.saxon.trans.XPathException;
-import org.json.JSONObject;
-import org.json.XML;
 
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathExpressionException;
@@ -26,8 +24,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Entity
 @DiscriminatorValue("json")
@@ -213,10 +209,7 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
 
             // Json to XML conversion?
             if (jsonToXml) {
-                JSONObject json = new JSONObject(content);
-                content = XML.toString(json, "root");
-                // TODO: sanitize XML tags: no "-", start with letter
-                content = sanitizeXML(content);
+                content = JsonToXml.ofUnformatted().convert(content);
                 logAppend("XML " + content + "\n");
             }
 
@@ -314,40 +307,6 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
             logAppend(stringWriter.toString());
             throw e;
         }
-    }
-
-    private String sanitizeXML(String content) {
-        Matcher matcher = Pattern.compile("<[^>]*>").matcher(content);
-        String newContent = "";
-        int lastIndex = 0;
-        while (matcher.find()) {
-            //logMatcher(matcher, content);
-
-            // append stuff until now
-            if (lastIndex < matcher.start()) {
-                newContent += content.substring(lastIndex, matcher.start());
-            }
-            lastIndex = matcher.end();
-
-            // extract tag and sanitize
-            String oriTag = content.substring(matcher.start(), matcher.end());
-            String tag = oriTag;
-            tag = tag.replace("-", "");
-            if (Character.isDigit(tag.charAt(1))) {
-                tag = "<X" + tag.substring(1);
-            }
-            if (tag.startsWith("</") && Character.isDigit(tag.charAt(2))) {
-                tag = "</X" + tag.substring(2);
-            }
-            if (!tag.equals(oriTag)) {
-                logAppend(oriTag + " -> " + tag + "\n");
-            }
-            newContent += tag;
-        }
-        if (lastIndex < content.length()) {
-            newContent += content.substring(lastIndex, content.length());
-        }
-        return newContent;
     }
 
     private String solveXpath(String id, XdmItem basenode, String xpath, XPathCompiler xPathCompiler) throws XPathExpressionException, SaxonApiException, XPathException {
