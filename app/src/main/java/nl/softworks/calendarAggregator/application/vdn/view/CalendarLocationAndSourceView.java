@@ -285,10 +285,16 @@ implements AfterNavigationObserver
 			return new CrudButtonbar()
 					.onInsert(this::insert)
 					.onEdit(this::edit)
-					.onDelete(() -> confirmDelete(this, () -> R.calendarLocation().delete(calendarLocation)));
+					.onDelete(() -> delete());
+		}
+
+		private void delete() {
+			treeGrid.select(this); // for reselect after reload
+			confirmDelete(this, () -> R.calendarLocation().delete(calendarLocation));
 		}
 
 		private void insert() {
+			treeGrid.select(this); // for reselect after reload
 			TreeNode treeNode = getSelectedTreeNode();
 			CalendarSource calendarSource = this.calendarSource(); // default
 
@@ -328,6 +334,7 @@ implements AfterNavigationObserver
 		}
 
 		private void edit() {
+			treeGrid.select(this); // for reselect after reload
 			CalendarLocationForm calendarLocationForm = new CalendarLocationForm().populateWith(calendarLocation);
 			showEditForm(calendarLocationForm, () -> {
 				calendarLocationForm.writeTo(calendarLocation);
@@ -455,15 +462,21 @@ implements AfterNavigationObserver
 		@Override
 		public Component crudButtons() {
 			return new CrudButtonbar()
-					.onEdit(() -> edit())
-					.onDelete(() -> confirmDelete(this, () -> {
-						CalendarLocation calendarLocation = calendarSource.calendarLocation();
-						calendarLocation.removeCalendarSource(calendarSource);
-						R.calendarLocation().save(calendarLocation);
-					}));
+					.onEdit(this::edit)
+					.onDelete(this::delete);
+		}
+
+		private void delete() {
+			treeGrid.select(this); // for reselect after reload
+			confirmDelete(this, () -> {
+				CalendarLocation calendarLocation = calendarSource.calendarLocation();
+				calendarLocation.removeCalendarSource(calendarSource);
+				R.calendarLocation().save(calendarLocation);
+			});
 		}
 
 		private void edit() {
+			treeGrid.select(this); // for reselect after reload
 			final CalendarSourceForm calendarSourceForm;
 			final String title;
 			if (calendarSource instanceof CalendarSourceRegexScraper) {
