@@ -40,7 +40,7 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 
 		Button testButton = new Button("Test", evt -> test());
 		setColspan(testButton, 2);
-		add(regexTextField, testButton,subjectGroupIdxIntegerField, datePatternTextField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, shortMonthNotationTextField, nearestYearCheckbox, startTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeGroupIdxIntegerField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
+		add(regexTextField, testButton,subjectGroupIdxIntegerField, datePatternTextField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, shortMonthNotationTextField, nearestYearCheckbox, dateTimeLocaleTextField, timePatternTextField, startTimeGroupIdxIntegerField, endTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeDefaultTextField);
 
 		binder.forField(regexTextField).bind(CalendarSourceRegexScraper::regex, CalendarSourceRegexScraper::regex);
 		binder.forField(subjectGroupIdxIntegerField).bind(CalendarSourceRegexScraper::subjectGroupIdx, CalendarSourceRegexScraper::subjectGroupIdx);

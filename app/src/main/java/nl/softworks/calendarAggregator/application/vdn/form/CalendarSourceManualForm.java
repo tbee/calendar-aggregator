@@ -55,10 +55,10 @@ public class CalendarSourceManualForm extends CalendarSourceForm {
 			return excludedDateSpan;
 		}));
 
+		add(subjectTextField, 2);
 		add(startDateTimePicker, endDateTimePicker, rruleTextField, rruleHelpAnchor);
 		HorizontalLayout exdateGroup = new HorizontalLayout(calendarEventExdateListBox, crudButtonbar);
 		addFormItem(exdateGroup, "Exdates");
-		add(subjectTextField, 2);
 
 		binder.forField(startDateTimePicker).bind(CalendarSourceManual::startDateTime, CalendarSourceManual::startDateTime);
 		binder.forField(endDateTimePicker).bind(CalendarSourceManual::endDateTime, CalendarSourceManual::endDateTime);

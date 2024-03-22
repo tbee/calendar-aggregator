@@ -40,7 +40,7 @@ public class CalendarSourceXmlScraperForm extends CalendarSourceScraperBaseForm 
 
 		Button testButton = new Button("Test", evt -> test());
 		setColspan(testButton, 2);
-		add(xpathTextField, testButton, subjectXpatjField, datePatternTextField, startDateXpathField, endDateXpathField, shortMonthNotationTextField, nearestYearCheckbox, startTimeXpathField, startTimeDefaultTextField, endTimeXpathField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField, jsonToXmlCheckbox);
+		add(jsonToXmlCheckbox, xpathTextField, testButton, subjectXpatjField, datePatternTextField, startDateXpathField, endDateXpathField, shortMonthNotationTextField, nearestYearCheckbox, dateTimeLocaleTextField, timePatternTextField, startTimeXpathField,  endTimeXpathField, startTimeDefaultTextField, endTimeDefaultTextField);
 
 		binder.forField(xpathTextField).bind(CalendarSourceXmlScraper::xpath, CalendarSourceXmlScraper::xpath);
 		binder.forField(subjectXpatjField).bind(CalendarSourceXmlScraper::subjectXpath, CalendarSourceXmlScraper::subjectXpath);
