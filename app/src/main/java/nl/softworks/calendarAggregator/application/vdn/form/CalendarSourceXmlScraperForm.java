@@ -5,8 +5,6 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
-import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
-import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceScraperBase;
@@ -67,32 +65,18 @@ public class CalendarSourceXmlScraperForm extends CalendarSourceScraperBaseForm 
 	@Override
 	public CalendarSourceXmlScraperForm populateWith(CalendarSource calendarSource) {
 		super.populateWith(calendarSource);
-		binder.readBean((CalendarSourceXmlScraper)calendarSource);
+		if (calendarSource instanceof CalendarSourceXmlScraper calendarSourceXmlScraper) {
+			binder.readBean(calendarSourceXmlScraper);
+		}
 		return this;
 	}
 
 	@Override
 	public CalendarSourceXmlScraperForm writeTo(CalendarSource calendarSource) throws ValidationException {
 		super.writeTo(calendarSource);
-		binder.writeBean((CalendarSourceXmlScraper)calendarSource);
+		if (calendarSource instanceof CalendarSourceXmlScraper calendarSourceXmlScraper) {
+			binder.writeBean(calendarSourceXmlScraper);
+		}
 		return this;
-	}
-
-	public static void showInsertDialog(CalendarLocation calendarLocation, CalendarSource selectedCalendarSource, Runnable onInsert) {
-		CalendarSourceXmlScraper calendarSource = new CalendarSourceXmlScraper();
-		CalendarSourceXmlScraperForm calendarSourceForm = new CalendarSourceXmlScraperForm().populateWith(selectedCalendarSource != null ? selectedCalendarSource : calendarSource);
-		new OkCancelDialog("Source", calendarSourceForm)
-				.okLabel("Save")
-				.onOk(() -> {
-					try {
-						calendarSourceForm.writeTo(calendarSource);
-						calendarLocation.addCalendarSource(calendarSource);
-						R.calendarLocation().save(calendarLocation);
-						onInsert.run();
-					} catch (ValidationException e) {
-						throw new RuntimeException(e);
-					}
-				})
-				.open();
 	}
 }

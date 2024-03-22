@@ -14,8 +14,6 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import nl.softworks.calendarAggregator.application.vdn.component.CrudButtonbar;
 import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
-import nl.softworks.calendarAggregator.domain.boundary.R;
-import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceManual;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceManualExdate;
@@ -119,38 +117,22 @@ public class CalendarSourceManualForm extends CalendarSourceForm {
 
 	public CalendarSourceManualForm populateWith(CalendarSource calendarSource) {
 		super.populateWith(calendarSource);
-		CalendarSourceManual calendarSourceManual = (CalendarSourceManual) calendarSource;
-		binder.readBean(calendarSourceManual);
-		calendarSourceManualExdates.clear();
-		calendarSourceManualExdates.addAll(calendarSource == null ? List.of() : calendarSourceManual.exdates());
-		calendarEventExdateListBox.setItems(calendarSourceManualExdates);
+		if (calendarSource instanceof CalendarSourceManual calendarSourceManual) {
+			binder.readBean(calendarSourceManual);
+			calendarSourceManualExdates.clear();
+			calendarSourceManualExdates.addAll(calendarSource == null ? List.of() : calendarSourceManual.exdates());
+			calendarEventExdateListBox.setItems(calendarSourceManualExdates);
+		}
 		return this;
 	}
 
 	@Override
 	public CalendarSourceManualForm writeTo(CalendarSource calendarSource) throws ValidationException {
 		super.writeTo(calendarSource);
-		CalendarSourceManual calendarSourceManual = (CalendarSourceManual) calendarSource;
-		binder.writeBean(calendarSourceManual);
-		calendarSourceManual.exdates(calendarSourceManualExdates);
+		if (calendarSource instanceof CalendarSourceManual calendarSourceManual) {
+			binder.writeBean(calendarSourceManual);
+			calendarSourceManual.exdates(calendarSourceManualExdates);
+		}
 		return this;
-	}
-
-	public static void showInsertDialog(CalendarLocation calendarLocation, CalendarSource calendarSource, Runnable onInsert) {
-		CalendarSourceManual calendarSourceManual = new CalendarSourceManual();
-		CalendarSourceManualForm calendarSourceManualForm = new CalendarSourceManualForm().populateWith(calendarSourceManual);
-		new OkCancelDialog("Event", calendarSourceManualForm)
-				.okLabel("Save")
-				.onOk(() -> {
-					try {
-						calendarSourceManualForm.writeTo(calendarSourceManual);
-						calendarLocation.addCalendarSource(calendarSourceManual);
-						R.calendarLocation().save(calendarLocation);
-						onInsert.run();
-					} catch (ValidationException e) {
-						throw new RuntimeException(e);
-					}
-				})
-				.open();
 	}
 }

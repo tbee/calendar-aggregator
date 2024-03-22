@@ -33,14 +33,18 @@ public class CalendarSourceScraperBaseForm extends CalendarSourceForm {
 	@Override
 	public CalendarSourceScraperBaseForm populateWith(CalendarSource calendarSource) {
 		super.populateWith(calendarSource);
-		binder.readBean((CalendarSourceScraperBase)calendarSource);
+		if (calendarSource instanceof CalendarSourceScraperBase calendarSourceScraperBase) {
+			binder.readBean(calendarSourceScraperBase);
+		}
 		return this;
 	}
 
 	@Override
 	public CalendarSourceScraperBaseForm writeTo(CalendarSource calendarSource) throws ValidationException {
 		super.writeTo(calendarSource);
-		binder.writeBean((CalendarSourceScraperBase)calendarSource);
+		if (calendarSource instanceof CalendarSourceScraperBase calendarSourceScraperBase) {
+			binder.writeBean(calendarSourceScraperBase);
+		}
 		return this;
 	}
 }

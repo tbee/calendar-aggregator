@@ -6,9 +6,6 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
-import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
-import nl.softworks.calendarAggregator.domain.boundary.R;
-import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceMultipleDaysScraper;
 import org.slf4j.Logger;
@@ -53,32 +50,18 @@ public class CalendarSourceMultipleDaysScraperForm extends CalendarSourceScraper
 	@Override
 	public CalendarSourceMultipleDaysScraperForm populateWith(CalendarSource calendarSource) {
 		super.populateWith(calendarSource);
-		binder.readBean((CalendarSourceMultipleDaysScraper)calendarSource);
+		if (calendarSource instanceof CalendarSourceMultipleDaysScraper calendarSourceMultipleDaysScraper) {
+			binder.readBean(calendarSourceMultipleDaysScraper);
+		}
 		return this;
 	}
 
 	@Override
 	public CalendarSourceMultipleDaysScraperForm writeTo(CalendarSource calendarSource) throws ValidationException {
 		super.writeTo(calendarSource);
-		binder.writeBean((CalendarSourceMultipleDaysScraper)calendarSource);
+		if (calendarSource instanceof CalendarSourceMultipleDaysScraper calendarSourceMultipleDaysScraper) {
+			binder.writeBean(calendarSourceMultipleDaysScraper);
+		}
 		return this;
-	}
-
-	public static void showInsertDialog(CalendarLocation calendarLocation, CalendarSource selectedCalendarSource, Runnable onInsert) {
-		CalendarSourceMultipleDaysScraper calendarSource = new CalendarSourceMultipleDaysScraper();
-		CalendarSourceMultipleDaysScraperForm calendarSourceForm = new CalendarSourceMultipleDaysScraperForm().populateWith(selectedCalendarSource != null ? selectedCalendarSource : calendarSource);
-		new OkCancelDialog("Source", calendarSourceForm)
-				.okLabel("Save")
-				.onOk(() -> {
-					try {
-						calendarSourceForm.writeTo(calendarSource);
-						calendarLocation.addCalendarSource(calendarSource);
-						R.calendarLocation().save(calendarLocation);
-						onInsert.run();
-					} catch (ValidationException e) {
-						throw new RuntimeException(e);
-					}
-				})
-				.open();
 	}
 }

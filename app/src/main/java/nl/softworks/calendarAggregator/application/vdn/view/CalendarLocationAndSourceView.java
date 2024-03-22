@@ -16,6 +16,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.treegrid.TreeGrid;
+import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.Route;
@@ -284,43 +285,34 @@ implements AfterNavigationObserver
 		}
 
 		private void insert() {
+			TreeNode selectedTreeNode = getSelectedTreeNode();
+			CalendarSource calendarSource = selectedTreeNode == null ? null : selectedTreeNode.calendarSource(); // default
+
 			treeGrid.select(this); // for reselect after reload
-			TreeNode treeNode = getSelectedTreeNode();
-			CalendarSource calendarSource = this.calendarSource(); // default
 
 			VerticalLayout verticalLayout = new VerticalLayout();
 			CancelDialog addSelectionDialog = new CancelDialog("Add", verticalLayout);
 
-			verticalLayout.add(new VButton("Manual Source", e -> {
-				addSelectionDialog.close();
-				CalendarSourceManualForm.showInsertDialog(this.calendarLocation, calendarSource, () -> reloadTreeGrid());
-			}).withIsPrimary(calendarSource != null));
+			verticalLayout.add(new VButton("Manual Source", e -> showInsertForm(addSelectionDialog, new CalendarSourceManual(), new CalendarSourceManualForm(), calendarSource))
+					.withIsPrimary(calendarSource != null));
 
-			verticalLayout.add(new VButton("Regex Source", e -> {
-				addSelectionDialog.close();
-				CalendarSourceRegexScraper calendarSourceRegexScraper = (calendarSource instanceof CalendarSourceRegexScraper ? (CalendarSourceRegexScraper)calendarSource : null);
-				CalendarSourceRegexScraperForm.showInsertDialog(this.calendarLocation, calendarSourceRegexScraper, () -> reloadTreeGrid());
-			}).withIsPrimary(calendarSource instanceof CalendarSourceRegexScraper));
+			verticalLayout.add(new VButton("Regex Source", e -> showInsertForm(addSelectionDialog, new CalendarSourceRegexScraper(), new CalendarSourceRegexScraperForm(), calendarSource))
+					.withIsPrimary(calendarSource instanceof CalendarSourceRegexScraper));
 
-			verticalLayout.add(new VButton("Multiple days Source", e -> {
-				addSelectionDialog.close();
-				CalendarSourceMultipleDaysScraper calendarSourceMultipleDaysScraper = (calendarSource instanceof CalendarSourceMultipleDaysScraper ? (CalendarSourceMultipleDaysScraper)calendarSource : null);
-				CalendarSourceMultipleDaysScraperForm.showInsertDialog(this.calendarLocation, calendarSourceMultipleDaysScraper, () -> reloadTreeGrid());
-			}).withIsPrimary(calendarSource instanceof CalendarSourceMultipleDaysScraper));
+			verticalLayout.add(new VButton("Multiple days Source", e -> showInsertForm(addSelectionDialog, new CalendarSourceMultipleDaysScraper(), new CalendarSourceMultipleDaysScraperForm(), calendarSource))
+					.withIsPrimary(calendarSource instanceof CalendarSourceMultipleDaysScraper));
 
-			verticalLayout.add(new VButton("ICal Source", e -> {
-				addSelectionDialog.close();
-				CalendarSourceICal calendarSourceICal = (calendarSource instanceof CalendarSourceICal ? (CalendarSourceICal)calendarSource : null);
-				CalendarSourceICalForm.showInsertDialog(this.calendarLocation, calendarSourceICal, () -> reloadTreeGrid());
-			}).withIsPrimary(calendarSource instanceof CalendarSourceICal));
+			verticalLayout.add(new VButton("ICal Source", e -> showInsertForm(addSelectionDialog, new CalendarSourceICal(), new CalendarSourceICalForm(), calendarSource))
+					.withIsPrimary(calendarSource instanceof CalendarSourceICal));
 
-			verticalLayout.add(new VButton("XML/JSON Source", e -> {
-				addSelectionDialog.close();
-				CalendarSourceXmlScraper calendarSourceXmlScraper = (calendarSource instanceof CalendarSourceXmlScraper ? (CalendarSourceXmlScraper)calendarSource : null);
-				CalendarSourceXmlScraperForm.showInsertDialog(this.calendarLocation, calendarSourceXmlScraper, () -> reloadTreeGrid());
-			}).withIsPrimary(calendarSource instanceof CalendarSourceXmlScraper));
+			verticalLayout.add(new VButton("XML/JSON Source", e -> showInsertForm(addSelectionDialog, new CalendarSourceXmlScraper(), new CalendarSourceXmlScraperForm(), calendarSource))
+					.withIsPrimary(calendarSource instanceof CalendarSourceXmlScraper));
 
 			addSelectionDialog.open();
+		}
+		private void showInsertForm(CancelDialog addSelectionDialog, CalendarSource calendarSource, CalendarSourceForm calendarSourceForm, CalendarSource calendarSourceDefault) {
+			addSelectionDialog.close();
+			CalendarLocationAndSourceView.this.showInsertForm(calendarLocation, calendarSource, calendarSourceForm, calendarSourceDefault);
 		}
 
 		private void edit() {
@@ -589,6 +581,26 @@ implements AfterNavigationObserver
 		return treeNodes;
 	}
 
+	private void showInsertForm(CalendarLocation calendarLocation, CalendarSource calendarSource, CalendarSourceForm calendarSourceForm,  CalendarSource calendarSourceDefault) {
+		if (calendarSourceDefault != null) {
+			calendarSourceForm.populateWith(calendarSourceDefault);
+		}
+
+		new OkCancelDialog("Event", calendarSourceForm)
+				.okLabel("Save")
+				.onOk(() -> {
+					try {
+						calendarSourceForm.writeTo(calendarSource);
+						calendarLocation.addCalendarSource(calendarSource);
+						R.calendarLocation().save(calendarLocation);
+						reloadTreeGrid();
+					} catch (ValidationException e) {
+						throw new RuntimeException(e);
+					}
+				})
+				.open();
+	}
+
 	private void showEditForm(Component form, Callable<Void> runnable) {
 		new OkCancelDialog(title, form)
 				.okLabel("Save")
@@ -602,6 +614,7 @@ implements AfterNavigationObserver
 				})
 				.open();
 	}
+
 	private void confirmDelete(TreeNode treeNode, Runnable runnable) {
 		new OkCancelDialog("Remove " + treeNode.text(), new NativeLabel("Are you sure?"))
 				.okLabel("Yes")

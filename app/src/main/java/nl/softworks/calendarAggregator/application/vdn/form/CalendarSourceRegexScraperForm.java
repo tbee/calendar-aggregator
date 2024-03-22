@@ -6,8 +6,6 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
-import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
-import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceRegexScraper;
@@ -66,32 +64,18 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 	@Override
 	public CalendarSourceRegexScraperForm populateWith(CalendarSource calendarSource) {
 		super.populateWith(calendarSource);
-		binder.readBean((CalendarSourceRegexScraper)calendarSource);
+		if (calendarSource instanceof CalendarSourceRegexScraper calendarSourceRegexScraper) {
+			binder.readBean(calendarSourceRegexScraper);
+		}
 		return this;
 	}
 
 	@Override
 	public CalendarSourceRegexScraperForm writeTo(CalendarSource calendarSource) throws ValidationException {
 		super.writeTo(calendarSource);
-		binder.writeBean((CalendarSourceRegexScraper)calendarSource);
+		if (calendarSource instanceof CalendarSourceRegexScraper calendarSourceRegexScraper) {
+			binder.writeBean(calendarSourceRegexScraper);
+		}
 		return this;
-	}
-
-	public static void showInsertDialog(CalendarLocation calendarLocation, CalendarSource selectedCalendarSource, Runnable onInsert) {
-		CalendarSourceRegexScraper calendarSource = new CalendarSourceRegexScraper();
-		CalendarSourceRegexScraperForm calendarSourceForm = new CalendarSourceRegexScraperForm().populateWith(selectedCalendarSource != null ? selectedCalendarSource : calendarSource);
-		new OkCancelDialog("Source", calendarSourceForm)
-				.okLabel("Save")
-				.onOk(() -> {
-					try {
-						calendarSourceForm.writeTo(calendarSource);
-						calendarLocation.addCalendarSource(calendarSource);
-						R.calendarLocation().save(calendarLocation);
-						onInsert.run();
-					} catch (ValidationException e) {
-						throw new RuntimeException(e);
-					}
-				})
-				.open();
 	}
 }
