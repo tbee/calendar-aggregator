@@ -31,6 +31,18 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 	private static final Logger LOG = LoggerFactory.getLogger(CalendarSourceScraperBase.class);
 
 	final public static String SHORT_MONTH_NOTATION_PATTERN = "SMN";
+	final public static Map<String, DateTimeFormatter> DEFAULT_FORMATTERS = Map.of(
+			"ISO_ZONED_DATE_TIME", DateTimeFormatter.ISO_ZONED_DATE_TIME,
+			"ISO_OFFSET_DATE_TIME", DateTimeFormatter.ISO_OFFSET_DATE_TIME,
+			"ISO_OFFSET_DATE", DateTimeFormatter.ISO_OFFSET_DATE,
+			"ISO_OFFSET_TIME", DateTimeFormatter.ISO_OFFSET_TIME,
+			"ISO_LOCAL_DATE_TIME", DateTimeFormatter.ISO_LOCAL_DATE_TIME,
+			"ISO_LOCAL_DATE", DateTimeFormatter.ISO_LOCAL_DATE,
+			"ISO_LOCAL_TIME", DateTimeFormatter.ISO_LOCAL_TIME,
+			"ISO_DATE_TIME", DateTimeFormatter.ISO_DATE_TIME,
+			"ISO_DATE", DateTimeFormatter.ISO_DATE,
+			"ISO_TIME", DateTimeFormatter.ISO_TIME
+		);
 
 	protected String scrapeUrl;
 	static public final String SCRAPEURL_PROPERTYID = "scrapeUrl";
@@ -131,6 +143,9 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 
 	protected DateTimeFormatter createDateFormatter(String datePattern, String shortMonthNotation, Locale locale) {
 		logAppend("datePattern " + datePattern + "\n");
+		if (DEFAULT_FORMATTERS.containsKey(datePattern)) {
+			return DEFAULT_FORMATTERS.get(datePattern);
+		}
 
 		// Default setting
 		DateTimeFormatterBuilder dateTimeFormatterBuilder = new DateTimeFormatterBuilder().parseCaseInsensitive();
@@ -166,6 +181,9 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 
 	protected DateTimeFormatter createTimeFormatter(String timePattern, Locale locale) {
 		logAppend("timePattern " + timePattern + "\n");
+		if (DEFAULT_FORMATTERS.containsKey(timePattern)) {
+			return DEFAULT_FORMATTERS.get(timePattern);
+		}
         return new DateTimeFormatterBuilder()
 				.parseCaseInsensitive()
 				.appendPattern(timePattern)
