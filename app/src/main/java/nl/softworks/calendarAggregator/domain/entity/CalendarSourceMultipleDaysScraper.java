@@ -131,7 +131,7 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
             DateTimeFormatter dateFormatter = createDateFormatter(datePattern, shortMonthNotation, locale);
             DateTimeFormatter timeFormatter = createTimeFormatter(timePattern, locale);
             logAppend(regex + "\n");
-            Matcher matcher = Pattern.compile(regex).matcher(content);
+            Matcher matcher = Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(content);
             int lastMatchEnd = -1;
             while (matcher.find()) {
                 logMatcher(matcher, content);

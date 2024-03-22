@@ -188,7 +188,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
 
             // Apply regex
             logAppend(regex + "\n");
-            Matcher matcher = Pattern.compile(regex).matcher(content);
+            Matcher matcher = Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(content);
             while (matcher.find()) {
                 logMatcher(matcher, content);
 

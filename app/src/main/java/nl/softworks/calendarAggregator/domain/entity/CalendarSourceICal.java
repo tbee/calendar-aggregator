@@ -85,7 +85,7 @@ public class CalendarSourceICal extends CalendarSource {
 
 			// Prepare regex for summary
 			logAppend("regex = " + regex + "\n");
-			Pattern pattern = regex == null || regex.isEmpty() ? null : Pattern.compile(regex);
+			Pattern pattern = regex == null || regex.isEmpty() ? null : Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
 
 			// Loop over components and find events
 			ComponentList<CalendarComponent> components = calendar.getComponents();
