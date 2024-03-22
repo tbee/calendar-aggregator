@@ -119,9 +119,10 @@ public class CalendarSourceManualForm extends CalendarSourceForm {
 
 	public CalendarSourceManualForm populateWith(CalendarSource calendarSource) {
 		super.populateWith(calendarSource);
-		binder.readBean((CalendarSourceManual) calendarSource);
+		CalendarSourceManual calendarSourceManual = (CalendarSourceManual) calendarSource;
+		binder.readBean(calendarSourceManual);
 		calendarSourceManualExdates.clear();
-		calendarSourceManualExdates.addAll(List.of()); //calendarSource == null ? List.of() : calendarSource.calendarEventExdates());
+		calendarSourceManualExdates.addAll(calendarSource == null ? List.of() : calendarSourceManual.exdates());
 		calendarEventExdateListBox.setItems(calendarSourceManualExdates);
 		return this;
 	}
@@ -129,8 +130,9 @@ public class CalendarSourceManualForm extends CalendarSourceForm {
 	@Override
 	public CalendarSourceManualForm writeTo(CalendarSource calendarSource) throws ValidationException {
 		super.writeTo(calendarSource);
-		binder.writeBean((CalendarSourceManual)calendarSource);
-		//calendarSourceManual.calendarEventExdates(calendarEventExdates);
+		CalendarSourceManual calendarSourceManual = (CalendarSourceManual) calendarSource;
+		binder.writeBean(calendarSourceManual);
+		calendarSourceManual.exdates(calendarSourceManualExdates);
 		return this;
 	}
 
