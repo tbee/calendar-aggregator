@@ -78,7 +78,6 @@ implements AfterNavigationObserver
 		// calendarSourceAndEventTreeGrid
 		treeGrid.addHierarchyColumn(TreeNode::text).setHeader("Name").setFlexGrow(100);
 		treeGrid.addComponentColumn(TreeNode::crudButtons).setHeader("").setFlexGrow(30);
-		//treeGrid.addComponentColumn((ValueProvider<TreeNode, NativeLabel>) tn -> createTypeLabel(tn)).setHeader("Type").setFlexGrow(10);
 		treeGrid.addComponentColumn(TreeNode::enabled).setHeader("Enabled").setFlexGrow(5);
 		treeGrid.addComponentColumn(TreeNode::url).setHeader("Website").setFlexGrow(5);
 		treeGrid.addColumn(TreeNode::startDate).setHeader("Start").setFlexGrow(50);
@@ -97,14 +96,6 @@ implements AfterNavigationObserver
 		VerticalLayout verticalLayout = new VerticalLayout(crudButtonbar, treeGrid);
 		verticalLayout.setSizeFull();
 		setContent(verticalLayout);
-	}
-
-	private NativeLabel createTypeLabel(TreeNode tn) {
-		NativeLabel nativeLabel = new NativeLabel(tn.type());
-		Tooltip.forComponent(nativeLabel)
-				.withText(tn.hint())
-				.withPosition(Tooltip.TooltipPosition.TOP_START);
-		return nativeLabel;
 	}
 
 	private void generate() {
@@ -178,7 +169,6 @@ implements AfterNavigationObserver
 		List<String> path();
 		String text();
 		Icon enabled();
-		String type();
 		Anchor url();
 		String startDate();
 		String endDate();
@@ -225,11 +215,6 @@ implements AfterNavigationObserver
 		}
 
 		@Override
-		public String type() {
-			long count = calendarLocation.calendarSources().stream().map(cs -> cs.type()).distinct().count();
-			return count == 0 ? "" : (count > 1 ? "Mix" : calendarLocation.calendarSources().get(0).type());
-		}
-		@Override
 		public Anchor url() {
 			return createAnchor(calendarLocation.url());
 		}
@@ -260,7 +245,12 @@ implements AfterNavigationObserver
 
 		@Override
 		public LocalDateTime updated() {
-			return null;
+			return calendarLocation.calendarSources().stream()
+					.filter(cs -> cs.enabled())
+					.map(cs -> cs.lastRun())
+					.filter(ls -> ls != null)
+					.min(Comparator.naturalOrder())
+					.orElse(null);
 		}
 
 		@Override
@@ -376,10 +366,6 @@ implements AfterNavigationObserver
 					.withText(hint())
 					.withPosition(Tooltip.TooltipPosition.TOP_START);
 			return icon;
-		}
-		@Override
-		public String type() {
-			return calendarSource().type();
 		}
 		@Override
 		public Anchor url() {
@@ -541,10 +527,6 @@ implements AfterNavigationObserver
 			return null;
 		}
 
-		@Override
-		public String type() {
-			return null;
-		}
 
 		@Override
 		public Anchor url() {
