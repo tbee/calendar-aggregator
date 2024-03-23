@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -66,11 +67,21 @@ public class CalendarResource {
     @GetMapping(path = "/", produces = {"text/html"})
     public String html(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d) {
 
-        String events = R.calendarEvent().findAll().stream()
-                .filter(ce -> d == 0 || d > (int)calculateDistance(lat, lon, ce.calendarSource().calendarLocation().lat(), ce.calendarSource().calendarLocation().lon()))
+        // collect events
+        List<CalendarEvent> calendarEvents = R.calendarEvent().findAll().stream()
+                .filter(ce -> d == 0 || d > (int) calculateDistance(lat, lon, ce.calendarSource().calendarLocation().lat(), ce.calendarSource().calendarLocation().lon()))
                 .sorted(Comparator.comparing(CalendarEvent::startDateTime))
-                .map(this::tr)
-                .collect(Collectors.joining());
+                .toList();
+
+        // Render events
+        StringBuilder events = new StringBuilder();
+        LocalDate lastStartDateTime = null;
+        for (CalendarEvent calendarEvent : calendarEvents) {
+            LocalDate startDateTime = calendarEvent.startDateTime().toLocalDate();
+            boolean dateChange = (lastStartDateTime != null && !lastStartDateTime.equals(startDateTime));
+            events.append(tr(calendarEvent, dateChange));
+            lastStartDateTime = startDateTime;
+        }
 
         Settings settings = Settings.get();
 
@@ -84,7 +95,7 @@ public class CalendarResource {
                       <h1 class="title">%title%</h1>
                       <h2 class="subtitle">%subtitle%</h2>
                       <div class="block" style="max-width:1000px">%disclaimer%</div>
-                      <table class="table">
+                      <table class="table is-hoverable">
                         <thead>
                           <tr>
                             <td>When</td>
@@ -126,7 +137,7 @@ public class CalendarResource {
                    .replace("%subtitle%", settings.subtitle())
                    .replace("%baseurl%", settings.websiteBaseurl())
                    .replace("%disclaimer%", settings.disclaimer())
-                   .replace("%events%", stripClosingNewline(events));
+                   .replace("%events%", stripClosingNewline(events.toString()));
     }
 
     private String stripClosingNewline(String s) {
@@ -187,7 +198,7 @@ public class CalendarResource {
                 .replaceAll("(?m)^[ \t]*\r?\n", ""); // strip empty lines
     }
 
-    private String tr(CalendarEvent calendarEvent) {
+    private String tr(CalendarEvent calendarEvent, boolean dateChange) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("E yyyy-MM-dd HH:mm");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         CalendarSource calendarSource = calendarEvent.calendarSource();
@@ -199,7 +210,8 @@ public class CalendarResource {
 
         String what = calendarLocation.name() + (calendarEvent.subject().isBlank() ? "" : " - " + calendarEvent.subject());
 
-        return 	"""
+        return 	(dateChange ? "<tr><td></td><td></td><td></td></tr>" : "") +
+                """
 				<tr>
 				<td>%when%</td>
 				<td>%what%</td>
