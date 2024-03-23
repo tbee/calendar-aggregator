@@ -210,14 +210,14 @@ public class CalendarResource {
 
         String what = calendarLocation.name() + (calendarEvent.subject().isBlank() ? "" : " - " + calendarEvent.subject());
 
-        return 	(dateChange ? "<tr><td></td><td></td><td></td></tr>" : "") +
-                """
+        return 	"""
 				<tr>
-				<td>%when%</td>
-				<td>%what%</td>
-				<td><a href="%url%" target="_blank">check here</a></td>
+				<td style='%dateChange%'>%when%</td>
+				<td style='%dateChange%'>%what%</td>
+				<td style='%dateChange%'><a href="%url%" target="_blank">check here</a></td>
 				</tr>
 				"""
+                .replace("%dateChange%", dateChange ? "border-top-width:2px;" : "")
                 .replace("%when%", when)
                 .replace("%what%", what)
                 .replace("%url%", calendarLocation.url())
