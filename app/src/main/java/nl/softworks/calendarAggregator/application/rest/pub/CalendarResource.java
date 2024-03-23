@@ -13,12 +13,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -64,6 +66,37 @@ public class CalendarResource {
         );
     }
 
+
+    private String ical(CalendarEvent calendarEvent) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss");
+        Settings settings = Settings.get();
+
+        // https://www.kanzaki.com/docs/ical/location.html
+        CalendarSource calendarSource = calendarEvent.calendarSource();
+        CalendarLocation calendarLocation = calendarSource.calendarLocation();
+        return 	"""
+				BEGIN:VEVENT
+				UID:%uid%
+				DTSTAMP:%dtStart%
+				DTSTART;TZID=%tzid%:%dtStart%
+				DTEND;TZID=%tzid%:%dtEnd%
+				TRANSP:OPAQUE
+				CLASS:PUBLIC
+				SUMMARY:%summary%
+				DESCRIPTION:%description%
+				LOCATION:%location%
+				%exdate%
+				END:VEVENT
+				"""
+                .replace("%uid%", calendarEvent.id() + "@dancemoments.softworks.nl")
+                .replace("%tzid%", calendarLocation.timezone().name())
+                .replace("%dtStart%", dateTimeFormatter.format(calendarEvent.startDateTime()))
+                .replace("%dtEnd%", dateTimeFormatter.format(calendarEvent.endDateTime()))
+                .replace("%summary%", (calendarLocation.name() + " " + calendarEvent.subject()).trim())
+                .replace("%location%", calendarLocation.location().replace("\n", ", "))
+                .replace("%description%", calendarLocation.url() + "\\n\\n" + settings.disclaimer())
+                .replaceAll("(?m)^[ \t]*\r?\n", ""); // strip empty lines
+    }
 
     // example http://localhost:8080/
     @GetMapping(path = "/", produces = {"text/html"})
@@ -141,63 +174,6 @@ public class CalendarResource {
                    .replace("%events%", stripClosingNewline(events.toString()));
     }
 
-    private String stripClosingNewline(String s) {
-        while (s.endsWith("\n")) {
-            s = s.substring(0, s.length() - 1);
-        }
-        return s;
-    }
-
-    private String icalFormat(String s) {
-        return s.replace("\r", "")
-                .lines()
-                .flatMap(l -> icalWrap(75, l).stream())
-                .collect(Collectors.joining("\r\n"));
-    }
-
-    private List<String> icalWrap(int cutOff, String s) {
-        cutOff--; // compensate for the space that is prefixed
-        List<String> lines = new ArrayList<>();
-        while (s.length() > cutOff) {
-            lines.add((lines.isEmpty() ? "" : " ") + s.substring(0, cutOff));
-            s = s.substring(cutOff);
-        }
-        if (!s.isEmpty()) {
-            lines.add((lines.isEmpty() ? "" : " ") + s);
-        }
-        return lines;
-    }
-
-    private String ical(CalendarEvent calendarEvent) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss");
-        Settings settings = Settings.get();
-
-        // https://www.kanzaki.com/docs/ical/location.html
-        CalendarSource calendarSource = calendarEvent.calendarSource();
-        CalendarLocation calendarLocation = calendarSource.calendarLocation();
-        return 	"""
-				BEGIN:VEVENT
-				UID:%uid%
-				DTSTAMP:%dtStart%
-				DTSTART;TZID=%tzid%:%dtStart%
-				DTEND;TZID=%tzid%:%dtEnd%
-				TRANSP:OPAQUE
-				CLASS:PUBLIC
-				SUMMARY:%summary%
-				DESCRIPTION:%description%
-				LOCATION:%location%
-				%exdate%
-				END:VEVENT
-				"""
-                .replace("%uid%", calendarEvent.id() + "@dancemoments.softworks.nl")
-                .replace("%tzid%", calendarLocation.timezone().name())
-                .replace("%dtStart%", dateTimeFormatter.format(calendarEvent.startDateTime()))
-                .replace("%dtEnd%", dateTimeFormatter.format(calendarEvent.endDateTime()))
-                .replace("%summary%", (calendarLocation.name() + " " + calendarEvent.subject()).trim())
-                .replace("%location%", calendarLocation.location().replace("\n", ", "))
-                .replace("%description%", calendarLocation.url() + "\\n\\n" + settings.disclaimer())
-                .replaceAll("(?m)^[ \t]*\r?\n", ""); // strip empty lines
-    }
 
     private String tr(CalendarEvent calendarEvent, boolean dateChange) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("E yyyy-MM-dd HH:mm");
@@ -223,6 +199,127 @@ public class CalendarResource {
                 .replace("%what%", what)
                 .replace("%url%", calendarLocation.url())
                 ;
+    }
+
+    // example http://localhost:8080/htmlcal
+    @GetMapping(path = "/htmlmonth", produces = {"text/html"})
+    public String htmlmonth(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d
+            , @RequestParam(defaultValue = "0") int year, @RequestParam(defaultValue = "0") int month) {
+
+        // Default parameter values
+        if (year == 0 || month == 0) {
+            LocalDate now = LocalDate.now();
+            year = now.getYear();
+            month = now.getMonthValue();
+        }
+        LocalDate monthStart = LocalDate.of(year, month, 1);
+        LocalDate monthEnd = monthStart.plusMonths(1).minusDays(1);
+
+        // start at monday
+        LocalDate renderStart = monthStart.minusDays(monthStart.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
+        LocalDate renderEnd = monthEnd.plusDays(DayOfWeek.SUNDAY.getValue() - monthEnd.getDayOfWeek().getValue());
+
+        // Collect events
+        Map<LocalDate, List<CalendarEvent>> dateToCalendarEvents = R.calendarEvent().findAll().stream()
+                .filter(ce -> !ce.startDateTime().toLocalDate().isAfter(renderEnd))
+                .filter(ce -> !ce.endDateTime().toLocalDate().isBefore(renderStart))
+                .filter(ce -> d == 0 || d > (int) calculateDistance(lat, lon, ce.calendarSource().calendarLocation().lat(), ce.calendarSource().calendarLocation().lon()))
+                .sorted(Comparator.comparing(CalendarEvent::startDateTime))
+                .collect(Collectors.groupingBy(ce -> ce.startDateTime().toLocalDate()));
+
+        Settings settings = Settings.get();
+
+        // Render day table cells
+        StringBuilder tbody = new StringBuilder();
+        LocalDate render = renderStart;
+        DateTimeFormatter yyyymmdd = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        DateTimeFormatter hhmm = DateTimeFormatter.ofPattern("HH:mm");
+        tbody.append("<tr>");
+        while (!render.isAfter(renderEnd)) {
+            if (render.getDayOfWeek() == DayOfWeek.MONDAY) {
+                tbody.append("</tr><tr>");
+            }
+            List<CalendarEvent> calendarEvents = dateToCalendarEvents.get(render);
+            calendarEvents = (calendarEvents == null ? List.of() : calendarEvents);
+            String events = calendarEvents.stream()
+                    .map(ce -> hhmm.format(ce.startDateTime()) + " " + ce.subject())
+                    .collect(Collectors.joining("<br/>"));
+
+            tbody.append("""
+                    <td style="border:1px solid black; height:3em;">
+                        <span style="font-weight:bold">%date%</span>
+                        <br/>
+                        %events%
+                    </td>
+                    """
+                    .replace("%date%", yyyymmdd.format(render))
+                    .replace("%events%", events));
+            render = render.plusDays(1);
+        }
+        tbody.append("</tr>");
+
+        return  """
+                <html>
+                  <head>
+                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+                  </head>
+                  <body>
+                    <section class="section">
+                      <h1 class="title">%title%</h1>
+                      <h2 class="subtitle">%subtitle%</h2>
+                      <div class="block" style="max-width:1000px">%disclaimer%</div>
+                      <table class="">
+                        <thead>
+                          <tr>
+                            <td width="12%">Monday</td>
+                            <td width="12%">Tueday</td>
+                            <td width="12%">Wednesday</td>
+                            <td width="12%">Thursday</td>
+                            <td width="12%">Friday</td>
+                            <td width="12%">Saturday</td>
+                            <td width="12%">Sunday</td>
+                          </tr>
+                        </thead>
+                        <tbody>
+                            %tbody%
+                        </tbody>
+                      </table>
+                    </section>
+                  </body>
+                </html>
+                """
+                .replace("%title%", settings.title())
+                .replace("%subtitle%", settings.subtitle())
+                .replace("%baseurl%", settings.websiteBaseurl())
+                .replace("%disclaimer%", settings.disclaimer())
+                .replace("%tbody%", tbody.toString());
+    }
+
+    private String stripClosingNewline(String s) {
+        while (s.endsWith("\n")) {
+            s = s.substring(0, s.length() - 1);
+        }
+        return s;
+    }
+
+    private String icalFormat(String s) {
+        return s.replace("\r", "")
+                .lines()
+                .flatMap(l -> icalWrap(75, l).stream())
+                .collect(Collectors.joining("\r\n"));
+    }
+
+    private List<String> icalWrap(int cutOff, String s) {
+        cutOff--; // compensate for the space that is prefixed
+        List<String> lines = new ArrayList<>();
+        while (s.length() > cutOff) {
+            lines.add((lines.isEmpty() ? "" : " ") + s.substring(0, cutOff));
+            s = s.substring(cutOff);
+        }
+        if (!s.isEmpty()) {
+            lines.add((lines.isEmpty() ? "" : " ") + s);
+        }
+        return lines;
     }
 
     // https://www.baeldung.com/java-find-distance-between-points
