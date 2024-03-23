@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @RestController
@@ -67,21 +69,20 @@ public class CalendarResource {
     @GetMapping(path = "/", produces = {"text/html"})
     public String html(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d) {
 
-        // collect events
-        List<CalendarEvent> calendarEvents = R.calendarEvent().findAll().stream()
+        // Collect events
+        LocalDateTime threshold = LocalDateTime.now().minusHours(2);
+        AtomicReference<LocalDate> lastStartDateTimeRef = new AtomicReference<>();
+        String events = R.calendarEvent().findAll().stream()
+                .filter(ce -> ce.startDateTime().isAfter(threshold))
                 .filter(ce -> d == 0 || d > (int) calculateDistance(lat, lon, ce.calendarSource().calendarLocation().lat(), ce.calendarSource().calendarLocation().lon()))
                 .sorted(Comparator.comparing(CalendarEvent::startDateTime))
-                .toList();
-
-        // Render events
-        StringBuilder events = new StringBuilder();
-        LocalDate lastStartDateTime = null;
-        for (CalendarEvent calendarEvent : calendarEvents) {
-            LocalDate startDateTime = calendarEvent.startDateTime().toLocalDate();
-            boolean dateChange = (lastStartDateTime != null && !lastStartDateTime.equals(startDateTime));
-            events.append(tr(calendarEvent, dateChange));
-            lastStartDateTime = startDateTime;
-        }
+                .map(ce -> {
+                    LocalDate startDateTime = ce.startDateTime().toLocalDate();
+                    boolean dateChange = (lastStartDateTimeRef.get() != null && !lastStartDateTimeRef.get().equals(startDateTime));
+                    lastStartDateTimeRef.set(startDateTime); // This is a side effect, but we need some way to detect a date change and stream gathers are still a way off
+                    return tr(ce, dateChange);
+                })
+                .collect(Collectors.joining());
 
         Settings settings = Settings.get();
 
