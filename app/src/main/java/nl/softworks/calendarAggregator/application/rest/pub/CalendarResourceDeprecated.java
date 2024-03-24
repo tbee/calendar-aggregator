@@ -22,6 +22,6 @@ public class CalendarResourceDeprecated {
 
     @GetMapping(path = "/html", produces = {"text/html"})
     public String html(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d) {
-        return new CalendarResource().html(request, lat, lon, d);
+        return new CalendarResource().pagetemplate(request, lat, lon, d);
     }
 }

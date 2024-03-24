@@ -20,6 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
@@ -32,75 +33,64 @@ public class CalendarResource {
 
     private static int EARTH_RADIUS = 6371;
 
-    // example http://localhost:8080/ical
-    @GetMapping(path = "/ical", produces = {"text/calendar"})
-    public String ical(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d) {
-
-        String timezones = R.timezone().findAll().stream()
-                .map(tz -> tz.ical())
-                .collect(Collectors.joining());
-
-        String events = R.calendarEvent().findAll().stream()
-                .filter(ce -> d == 0 || d > (int)calculateDistance(lat, lon, ce.calendarSource().calendarLocation().lat(), ce.calendarSource().calendarLocation().lon()))
-                .map(this::ical)
-                .collect(Collectors.joining());
-
+    private String pagetemplate() {
         Settings settings = Settings.get();
-
-        return icalFormat(
-                """
-                BEGIN:VCALENDAR
-                VERSION:2.0
-                PRODID:-//Softworks//NONSGML %title%//EN
-                CALSCALE:GREGORIAN
-                METHOD:PUBLISH
-                REFRESH-INTERVAL;VALUE=DURATION:P1D
-                X-PUBLISHED-TTL:P1D
-                %timezones%
-                %events%
-                END:VCALENDAR
+        return """
+                <html>
+                  <head>
+                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+                    <link rel="stylesheet" href="https://bulma.io/vendor/fontawesome-free-5.15.2-web/css/all.min.css">
+                    <style>
+                      .bullet {
+                        list-style: square outside;
+                        margin-left: 20px;
+                        padding-left: 0;
+                      }
+                    </style>
+                    <!--pageheader-->
+                  </head>
+                  <body>
+                    <section class="section">
+                      <h1 class="title">%title%</h1>
+                      <h2 class="subtitle">%subtitle%</h2>
+                      <div class="block" style="max-width:1000px">%disclaimer%</div>
+                      <!--pagecontent-->
+                      <div class="notification" style="max-width:1000px; margin-top:10px;">
+                        <p>
+                          This data is available in:
+                        </p>
+                        <ul>
+                          <li class="bullet"><a href="%baseurl%/">List</a> form</li>
+                          <li class="bullet"><a href="%baseurl%/htmlmonth">Calendar</a> form</li>
+                          <li class="bullet">For including in e.g. Google calendar by adding an external URL calendar using the following URL: <a href="%baseurl%/ical" target="_blank">%baseurl%/ical</a></li>
+                        </ul>
+                      </div>
+                      <div class="notification" style="max-width:1000px">
+                        <p>
+                          You can limit the amount of entries by filtering on distance (as the crow flies).
+                          For this you need to determine the decimal latitude (lat) and longitude (lon) of where you live, for example by using Google maps.
+                          Then add these as parameters to the URL, together with a distance (d) in kilometers.
+                          For example:
+                        </p>
+                        <p style="margin-top:5px;">
+                          <a href="%baseurl%/?lat=51.9214012&lon=6.5761531&d=40" target="_blank">%baseurl%/?lat=51.9214012&lon=6.5761531&d=40</a>
+                        </p>
+                        <p style="margin-top:5px;">
+                          These parameters can be set on all the views of this data.
+                        </p>
+                      </div>
+                    </section>
+                  </body>
+                </html>
                 """
                 .replace("%title%", settings.title())
-                .replace("%timezones%", stripClosingNewline(timezones))
-                .replace("%events%", stripClosingNewline(events))
-        );
+                .replace("%subtitle%", settings.subtitle())
+                .replace("%baseurl%", settings.websiteBaseurl())
+                .replace("%disclaimer%", settings.disclaimer());
     }
-
-
-    private String ical(CalendarEvent calendarEvent) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss");
-        Settings settings = Settings.get();
-
-        // https://www.kanzaki.com/docs/ical/location.html
-        CalendarSource calendarSource = calendarEvent.calendarSource();
-        CalendarLocation calendarLocation = calendarSource.calendarLocation();
-        return 	"""
-				BEGIN:VEVENT
-				UID:%uid%
-				DTSTAMP:%dtStart%
-				DTSTART;TZID=%tzid%:%dtStart%
-				DTEND;TZID=%tzid%:%dtEnd%
-				TRANSP:OPAQUE
-				CLASS:PUBLIC
-				SUMMARY:%summary%
-				DESCRIPTION:%description%
-				LOCATION:%location%
-				%exdate%
-				END:VEVENT
-				"""
-                .replace("%uid%", calendarEvent.id() + "@dancemoments.softworks.nl")
-                .replace("%tzid%", calendarLocation.timezone().name())
-                .replace("%dtStart%", dateTimeFormatter.format(calendarEvent.startDateTime()))
-                .replace("%dtEnd%", dateTimeFormatter.format(calendarEvent.endDateTime()))
-                .replace("%summary%", (calendarLocation.name() + " " + calendarEvent.subject()).trim())
-                .replace("%location%", calendarLocation.location().replace("\n", ", "))
-                .replace("%description%", calendarLocation.url() + "\\n\\n" + settings.disclaimer())
-                .replaceAll("(?m)^[ \t]*\r?\n", ""); // strip empty lines
-    }
-
     // example http://localhost:8080/
     @GetMapping(path = "/", produces = {"text/html"})
-    public String html(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d) {
+    public String pagetemplate(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d) {
 
         // Collect events
         LocalDateTime threshold = LocalDateTime.now().minusHours(2);
@@ -117,18 +107,8 @@ public class CalendarResource {
                 })
                 .collect(Collectors.joining());
 
-        Settings settings = Settings.get();
-
-        return  """
-                <html>
-                  <head>
-                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-                  </head>
-                  <body>
-                    <section class="section">
-                      <h1 class="title">%title%</h1>
-                      <h2 class="subtitle">%subtitle%</h2>
-                      <div class="block" style="max-width:1000px">%disclaimer%</div>
+        return pagetemplate()
+                .replace("<!--pagecontent-->", """
                       <table class="table is-hoverable">
                         <thead>
                           <tr>
@@ -141,37 +121,8 @@ public class CalendarResource {
                           %events%
                         </tbody>
                       </table>
-                      <div class="notification" style="max-width:1000px">
-                        <p>
-                          This list is also available in calendar form.
-                          You can add it to, for example, Google calendar by adding an external URL calendar using the following URL:
-                        </p>
-                        <p style="margin-top:5px;">
-                          <a href="%baseurl%/ical" target="_blank">%baseurl%/ical</a>
-                        </p>
-                      </div>
-                      <div class="notification" style="max-width:1000px">
-                        <p>
-                          You can limit the amount of entries by filtering on distance (as the crow flies).
-                          For this you need to determine the decimal latitude (lat) and longitude (lon) of where you live, for example by using Google maps.
-                          Then add these as parameters to the URL, together with a distance (d) in kilometers. 
-                          For example:
-                        </p>
-                        <p style="margin-top:5px;">
-                          <a href="%baseurl%/?lat=51.9214012&lon=6.5761531&d=40" target="_blank">%baseurl%/?lat=51.9214012&lon=6.5761531&d=40</a>
-                        </p>
-                        <p style="margin-top:5px;">
-                          The same parameters can be set on the URL for the calendar.
-                        </p>
-                      </div>
-                    </section>
-                  </body>
-                </html>
-                """.replace("%title%", settings.title())
-                   .replace("%subtitle%", settings.subtitle())
-                   .replace("%baseurl%", settings.websiteBaseurl())
-                   .replace("%disclaimer%", settings.disclaimer())
-                   .replace("%events%", stripClosingNewline(events.toString()));
+                """)
+                .replace("%events%", events.toString());
     }
 
 
@@ -227,52 +178,96 @@ public class CalendarResource {
                 .sorted(Comparator.comparing(CalendarEvent::startDateTime))
                 .collect(Collectors.groupingBy(ce -> ce.startDateTime().toLocalDate()));
 
-        Settings settings = Settings.get();
-
         // Render day table cells
         StringBuilder tbody = new StringBuilder();
         LocalDate render = renderStart;
-        DateTimeFormatter yyyymmdd = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        DateTimeFormatter hhmm = DateTimeFormatter.ofPattern("HH:mm");
+        DateTimeFormatter yyyy = DateTimeFormatter.ofPattern("yyyy", Locale.ENGLISH);
+        DateTimeFormatter mmm = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH);
+        DateTimeFormatter dd = DateTimeFormatter.ofPattern("d", Locale.ENGLISH);
+        DateTimeFormatter hhmm = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH);
         tbody.append("<tr>");
         while (!render.isAfter(renderEnd)) {
             if (render.getDayOfWeek() == DayOfWeek.MONDAY) {
                 tbody.append("</tr><tr>");
             }
+
+            boolean outsideMonth = render.isBefore(monthStart) || render.isAfter(monthEnd);
+
             List<CalendarEvent> calendarEvents = dateToCalendarEvents.get(render);
             calendarEvents = (calendarEvents == null ? List.of() : calendarEvents);
-            String events = calendarEvents.stream()
-                    .map(ce -> hhmm.format(ce.startDateTime()) + " " + ce.subject())
-                    .collect(Collectors.joining("<br/>"));
+            String events = "<ul>" +
+                    calendarEvents.stream()
+                    .map(ce -> "<li>" + hhmm.format(ce.startDateTime()) + " " + ce.calendarSource().calendarLocation().name() + "</li>")
+                    .collect(Collectors.joining(""))
+                    + "</ul>";
 
             tbody.append("""
-                    <td style="border:1px solid black; height:3em;">
-                        <span style="font-weight:bold">%date%</span>
-                        <br/>
-                        %events%
+                    <td class="%inOrOutsideMonth%">
+                        <h5 class="title is-5">%date%</h5>
+                        <div class="">
+                            %events%
+                        </div>
                     </td>
                     """
-                    .replace("%date%", yyyymmdd.format(render))
+                    .replace("%inOrOutsideMonth%", outsideMonth ? "outside-month" : "inside-month")
+                    .replace("%date%", dd.format(render))
                     .replace("%events%", events));
             render = render.plusDays(1);
         }
         tbody.append("</tr>");
 
-        return  """
-                <html>
-                  <head>
-                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
-                  </head>
-                  <body>
-                    <section class="section">
-                      <h1 class="title">%title%</h1>
-                      <h2 class="subtitle">%subtitle%</h2>
-                      <div class="block" style="max-width:1000px">%disclaimer%</div>
-                      <table class="">
+        LocalDate prevMonth = monthStart.minusMonths(1);
+        LocalDate nextMonth = monthStart.plusMonths(1);
+        Settings settings = Settings.get();
+        return pagetemplate()
+                .replace("<!--pageheader-->", """
+                  <style>
+                    .centered {
+                      text-align: center;
+                    }
+                    .alignright {
+                      text-align: right;
+                    }
+                    #calendar {
+                      width:100%;
+                    }
+                    tbody td {
+                      height:5em;
+                      white-space: nowrap;
+                    }
+                    tbody h5 {
+                      margin-bottom: 0!important;
+                    }
+                    .outside-month > h5 {
+                      color: lightgray!important;
+                    }
+                    .border {
+                      border: 2px solid;
+                    }
+                  </style>
+                """)
+                .replace("<!--pagecontent-->", """
+                      <div class="columns is-gapless">
+                        <div class="column alignright">
+                          <span class="icon">
+                            <a href="%baseurl%/htmlmonth?year=%prevyear%&month=%prevmonth%"><i class="fas fa-arrow-left"></i></a>
+                          </span>
+                        </div>
+                        <div class="column is-one-fifth">
+                          <h3 class="title is-4 centered">%year%</h3>
+                          <h3 class="subtitle is-4 centered"> %month%</h3>
+                        </div>
+                        <div class="column">
+                          <span class="icon">
+                            <a href="%baseurl%/htmlmonth?year=%nextyear%&month=%nextmonth%"><i class="fas fa-arrow-right"></i></a>
+                          </span>
+                        </div>
+                      </div>
+                      <table id="calendar" class="table">
                         <thead>
                           <tr>
                             <td width="12%">Monday</td>
-                            <td width="12%">Tueday</td>
+                            <td width="12%">Tuesday</td>
                             <td width="12%">Wednesday</td>
                             <td width="12%">Thursday</td>
                             <td width="12%">Friday</td>
@@ -284,15 +279,81 @@ public class CalendarResource {
                             %tbody%
                         </tbody>
                       </table>
-                    </section>
-                  </body>
-                </html>
-                """
-                .replace("%title%", settings.title())
-                .replace("%subtitle%", settings.subtitle())
+                """)
+                .replace("%year%", yyyy.format(monthStart))
+                .replace("%month%", mmm.format(monthStart))
+                .replace("%prevyear%", "" + prevMonth.getYear())
+                .replace("%prevmonth%", "" + prevMonth.getMonthValue())
+                .replace("%nextyear%", "" + nextMonth.getYear())
+                .replace("%nextmonth%", "" + nextMonth.getMonthValue())
                 .replace("%baseurl%", settings.websiteBaseurl())
-                .replace("%disclaimer%", settings.disclaimer())
                 .replace("%tbody%", tbody.toString());
+    }
+
+    // example http://localhost:8080/ical
+    @GetMapping(path = "/ical", produces = {"text/calendar"})
+    public String ical(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d) {
+
+        String timezones = R.timezone().findAll().stream()
+                .map(tz -> tz.ical())
+                .collect(Collectors.joining());
+
+        String events = R.calendarEvent().findAll().stream()
+                .filter(ce -> d == 0 || d > (int)calculateDistance(lat, lon, ce.calendarSource().calendarLocation().lat(), ce.calendarSource().calendarLocation().lon()))
+                .map(this::ical)
+                .collect(Collectors.joining());
+
+        Settings settings = Settings.get();
+
+        return icalFormat(
+                """
+                BEGIN:VCALENDAR
+                VERSION:2.0
+                PRODID:-//Softworks//NONSGML %title%//EN
+                CALSCALE:GREGORIAN
+                METHOD:PUBLISH
+                REFRESH-INTERVAL;VALUE=DURATION:P1D
+                X-PUBLISHED-TTL:P1D
+                %timezones%
+                %events%
+                END:VCALENDAR
+                """
+                        .replace("%title%", settings.title())
+                        .replace("%timezones%", stripClosingNewline(timezones))
+                        .replace("%events%", stripClosingNewline(events))
+        );
+    }
+
+
+    private String ical(CalendarEvent calendarEvent) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss");
+        Settings settings = Settings.get();
+
+        // https://www.kanzaki.com/docs/ical/location.html
+        CalendarSource calendarSource = calendarEvent.calendarSource();
+        CalendarLocation calendarLocation = calendarSource.calendarLocation();
+        return 	"""
+				BEGIN:VEVENT
+				UID:%uid%
+				DTSTAMP:%dtStart%
+				DTSTART;TZID=%tzid%:%dtStart%
+				DTEND;TZID=%tzid%:%dtEnd%
+				TRANSP:OPAQUE
+				CLASS:PUBLIC
+				SUMMARY:%summary%
+				DESCRIPTION:%description%
+				LOCATION:%location%
+				%exdate%
+				END:VEVENT
+				"""
+                .replace("%uid%", calendarEvent.id() + "@dancemoments.softworks.nl")
+                .replace("%tzid%", calendarLocation.timezone().name())
+                .replace("%dtStart%", dateTimeFormatter.format(calendarEvent.startDateTime()))
+                .replace("%dtEnd%", dateTimeFormatter.format(calendarEvent.endDateTime()))
+                .replace("%summary%", (calendarLocation.name() + " " + calendarEvent.subject()).trim())
+                .replace("%location%", calendarLocation.location().replace("\n", ", "))
+                .replace("%description%", calendarLocation.url() + "\\n\\n" + settings.disclaimer())
+                .replaceAll("(?m)^[ \t]*\r?\n", ""); // strip empty lines
     }
 
     private String stripClosingNewline(String s) {
