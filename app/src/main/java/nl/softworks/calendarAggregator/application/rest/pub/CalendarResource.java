@@ -41,6 +41,12 @@ public class CalendarResource {
                     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
                     <script src="https://kit.fontawesome.com/501b8808a2.js" crossorigin="anonymous"></script>
                     <style>
+                      .centered {
+                        text-align: center;
+                      }
+                      .alignright {
+                        text-align: right;
+                      }
                       .bullet {
                         list-style: square outside;
                         margin-left: 20px;
@@ -53,9 +59,18 @@ public class CalendarResource {
                     <section class="section">
                       <h1 class="title">%title%</h1>
                       <h2 class="subtitle">%subtitle%</h2>
-                      <div class="block" style="max-width:1000px">%disclaimer%</div>
+                      <div class="block pagewidth">%disclaimer%</div>
+                      <div id="iconbar" class="block alignright pagewidth">
+                        <span class="icon">
+                          <a href="%baseurl%/"><i class="fas fa-list fa-xl"></i></a>
+                        </span>
+                        <span class="icon">
+                          <a href="%baseurl%/htmlmonth"><i class="fas fa-calendar-days fa-xl"></i></a>
+                        </span>
+                        </a>
+                      </div>
                       <!--pagecontent-->
-                      <div class="notification" style="max-width:1000px; margin-top:10px;">
+                      <div class="notification pagewidth" style="margin-top:10px;">
                         <p>
                           This data is available in:
                         </p>
@@ -65,7 +80,7 @@ public class CalendarResource {
                           <li class="bullet">For including in e.g. Google calendar by adding an external URL calendar using the following URL: <a href="%baseurl%/ical" target="_blank">%baseurl%/ical</a></li>
                         </ul>
                       </div>
-                      <div class="notification" style="max-width:1000px">
+                      <div class="notification pagewidth">
                         <p>
                           You can limit the amount of entries by filtering on distance (as the crow flies).
                           For this you need to determine the decimal latitude (lat) and longitude (lon) of where you live, for example by using Google maps.
@@ -108,6 +123,13 @@ public class CalendarResource {
                 .collect(Collectors.joining());
 
         return pagetemplate()
+                .replace("<!--pageheader-->", """
+                  <style>
+                    .pagewidth {
+                      max-width:1000px;
+                    }
+                  </style>
+                """)
                 .replace("<!--pagecontent-->", """
                       <table class="table is-hoverable">
                         <thead>
@@ -237,14 +259,11 @@ public class CalendarResource {
         return pagetemplate()
                 .replace("<!--pageheader-->", """
                   <style>
-                    .centered {
-                      text-align: center;
-                    }
-                    .alignright {
-                      text-align: right;
-                    }
                     .today {
                       background: #c0c0c0!important;
+                    }
+                    .pagewidth {
+                      width:100%;
                     }
                     
                     #calendarwrapper {
