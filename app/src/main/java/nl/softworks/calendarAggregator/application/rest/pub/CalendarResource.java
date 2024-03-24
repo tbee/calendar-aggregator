@@ -214,8 +214,9 @@ public class CalendarResource {
                     .collect(Collectors.joining(""))
                     + "</ul>";
 
+            LocalDate today = LocalDate.now();
             tbody.append("""
-                    <td class="%inOrOutsideMonth%">
+                    <td class="%inOrOutsideMonth% %today%">
                         <h5 class="title is-5">%date%</h5>
                         <div class="">
                             %events%
@@ -223,6 +224,7 @@ public class CalendarResource {
                     </td>
                     """
                     .replace("%inOrOutsideMonth%", outsideMonth ? "outside-month" : "inside-month")
+                    .replace("%today%", today.equals(render) ? "today" : "")
                     .replace("%date%", dd.format(render))
                     .replace("%events%", events));
             render = render.plusDays(1);
@@ -241,6 +243,9 @@ public class CalendarResource {
                     .alignright {
                       text-align: right;
                     }
+                    .today {
+                      background: #e0e0e0!important;
+                    }
                     
                     #calendarwrapper {
                       overflow-x: auto;
@@ -251,6 +256,7 @@ public class CalendarResource {
                     tbody td {
                       height:5em;
                       white-space: nowrap;
+                      font-size: 13px;
                     }
                     tbody h5 {
                       margin-bottom: 0!important;
