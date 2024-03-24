@@ -136,7 +136,7 @@ public class CalendarResource {
                           <tr>
                             <td>When</td>
                             <td>What</td>
-                            <td>Web</td>
+                            <td>Check here</td>
                           </tr>
                         </thead>
                         <tbody>
@@ -164,7 +164,11 @@ public class CalendarResource {
 				<tr>
 				<td style='%dateChange%'>%when%</td>
 				<td style='%dateChange%'>%what%</td>
-				<td style='%dateChange%'><a href="%url%" target="_blank">check here</a></td>
+				<td style='%dateChange%'>
+                 <span class="icon">
+                   <a href="%url%" target="_blank"><i class="fas fa-arrow-up-right-from-square"></i></a>
+                 </span>
+				</td>
 				</tr>
 				"""
                 .replace("%dateChange%", dateChange ? "border-top-width:2px;" : "")
