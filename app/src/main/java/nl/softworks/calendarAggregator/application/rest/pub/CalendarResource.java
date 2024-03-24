@@ -244,7 +244,7 @@ public class CalendarResource {
                       text-align: right;
                     }
                     .today {
-                      background: #e0e0e0!important;
+                      background: #c0c0c0!important;
                     }
                     
                     #calendarwrapper {
