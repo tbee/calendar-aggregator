@@ -39,7 +39,7 @@ public class CalendarResource {
                 <html>
                   <head>
                     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
-                    <link rel="stylesheet" href="https://bulma.io/vendor/fontawesome-free-5.15.2-web/css/all.min.css">
+                    <script src="https://kit.fontawesome.com/501b8808a2.js" crossorigin="anonymous"></script>
                     <style>
                       .bullet {
                         list-style: square outside;
@@ -197,7 +197,20 @@ public class CalendarResource {
             calendarEvents = (calendarEvents == null ? List.of() : calendarEvents);
             String events = "<ul>" +
                     calendarEvents.stream()
-                    .map(ce -> "<li>" + hhmm.format(ce.startDateTime()) + " " + ce.calendarSource().calendarLocation().name() + "</li>")
+                    .map(ce -> """
+                                 <li>
+                                   <div class="tooltip">
+                                     %text%
+                                     <span class="tooltiptext">%description%</span>
+                                   </div>
+                                   <span class="icon">
+                                     <a href="%url%" target="_blank"><i class="fas fa-arrow-up-right-from-square fa-xs"></i></a>
+                                   </span>
+                                 </li>
+                               """
+                               .replace("%text%", hhmm.format(ce.startDateTime()) + " " + ce.calendarSource().calendarLocation().name())
+                               .replace("%description%", (ce.subject().isBlank() ? "See the website" : ce.subject()))
+                               .replace("%url%", ce.calendarSource().calendarLocation().url()))
                     .collect(Collectors.joining(""))
                     + "</ul>";
 
@@ -228,6 +241,10 @@ public class CalendarResource {
                     .alignright {
                       text-align: right;
                     }
+                    
+                    #calendarwrapper {
+                      overflow-x: auto;
+                    }
                     #calendar {
                       width:100%;
                     }
@@ -244,13 +261,34 @@ public class CalendarResource {
                     .border {
                       border: 2px solid;
                     }
+                    
+                    .tooltip {
+                      position: relative;
+                      display: inline-block;
+                      xxxborder-bottom: 1px dotted black;
+                    }
+                    .tooltip .tooltiptext {
+                      visibility: hidden;
+                      background-color: gray;
+                      color: white;
+                      text-align: center;
+                      border-radius: 6px;
+                      padding: 5px;
+                    
+                      /* Position the tooltip */
+                      position: absolute;
+                      z-index: 1;
+                    }
+                    .tooltip:hover .tooltiptext {
+                      visibility: visible;
+                    }
                   </style>
                 """)
                 .replace("<!--pagecontent-->", """
                       <div class="columns is-gapless">
                         <div class="column alignright">
                           <span class="icon">
-                            <a href="%baseurl%/htmlmonth?year=%prevyear%&month=%prevmonth%"><i class="fas fa-arrow-left"></i></a>
+                            <a href="%baseurl%/htmlmonth?year=%prevyear%&month=%prevmonth%"><i class="fas fa-arrow-left fa-2xl"></i></a>
                           </span>
                         </div>
                         <div class="column is-one-fifth">
@@ -259,26 +297,28 @@ public class CalendarResource {
                         </div>
                         <div class="column">
                           <span class="icon">
-                            <a href="%baseurl%/htmlmonth?year=%nextyear%&month=%nextmonth%"><i class="fas fa-arrow-right"></i></a>
+                            <a href="%baseurl%/htmlmonth?year=%nextyear%&month=%nextmonth%"><i class="fas fa-arrow-right fa-2xl"></i></a>
                           </span>
                         </div>
                       </div>
-                      <table id="calendar" class="table">
-                        <thead>
-                          <tr>
-                            <td width="12%">Monday</td>
-                            <td width="12%">Tuesday</td>
-                            <td width="12%">Wednesday</td>
-                            <td width="12%">Thursday</td>
-                            <td width="12%">Friday</td>
-                            <td width="12%">Saturday</td>
-                            <td width="12%">Sunday</td>
-                          </tr>
-                        </thead>
-                        <tbody>
-                            %tbody%
-                        </tbody>
-                      </table>
+                      <div id="calendarwrapper">
+                        <table id="calendar" class="table">
+                          <thead>
+                            <tr>
+                              <td width="12%">Monday</td>
+                              <td width="12%">Tuesday</td>
+                              <td width="12%">Wednesday</td>
+                              <td width="12%">Thursday</td>
+                              <td width="12%">Friday</td>
+                              <td width="12%">Saturday</td>
+                              <td width="12%">Sunday</td>
+                            </tr>
+                          </thead>
+                          <tbody>
+                              %tbody%
+                          </tbody>
+                        </table>
+                      </div>
                 """)
                 .replace("%year%", yyyy.format(monthStart))
                 .replace("%month%", mmm.format(monthStart))
