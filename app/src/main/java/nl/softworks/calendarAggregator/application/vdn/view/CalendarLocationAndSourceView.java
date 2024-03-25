@@ -7,9 +7,11 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dependency.JavaScript;
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.NativeLabel;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -59,6 +61,7 @@ import java.util.function.Function;
 
 @Route("/")
 @StyleSheet("context://../vaadin.css")
+@JavaScript("https://kit.fontawesome.com/501b8808a2.js")
 @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
 public class CalendarLocationAndSourceView extends CalendarAggregatorAppLayout
 implements AfterNavigationObserver
@@ -170,7 +173,7 @@ implements AfterNavigationObserver
 		List<String> path();
 		String text();
 		Icon enabled();
-		Anchor url();
+		Component url();
 		String startDate();
 		String endDate();
 		CalendarSource calendarSource();
@@ -216,8 +219,8 @@ implements AfterNavigationObserver
 		}
 
 		@Override
-		public Anchor url() {
-			return createAnchor(calendarLocation.url());
+		public Component url() {
+			return createUrlAnchor(calendarLocation.url());
 		}
 
 		@Override
@@ -360,7 +363,7 @@ implements AfterNavigationObserver
 			return icon;
 		}
 		@Override
-		public Anchor url() {
+		public Component url() {
 			return null;
 		}
 
@@ -521,7 +524,7 @@ implements AfterNavigationObserver
 
 
 		@Override
-		public Anchor url() {
+		public Component url() {
 			return null;
 		}
 
@@ -625,12 +628,21 @@ implements AfterNavigationObserver
 				.open();
 	}
 
-	private Anchor createAnchor(String url) {
+	private Anchor createUrlAnchor(String url) {
 		if (url == null) {
 			return null;
 		}
-		Anchor anchor = new Anchor(url, "⇒");
+
+		Span spanIcon = new Span();
+		spanIcon.addClassName("fas");
+		spanIcon.addClassName("fa-arrow-up-right-from-square");
+
+		Span spanWrapper = new Span(spanIcon);
+		spanWrapper.addClassName("icon");
+
+		Anchor anchor = new Anchor(url, spanWrapper);
 		anchor.setTarget("_blank");
+
 		return anchor;
 	}
 }
