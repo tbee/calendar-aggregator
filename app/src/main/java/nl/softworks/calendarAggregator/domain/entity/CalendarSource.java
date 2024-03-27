@@ -97,7 +97,7 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 		return this;
 	}
 	public boolean isEnabled() {
-		return enabled && calendarLocation.enabled;
+		return enabled && calendarLocation.isEnabled();
 	}
 
 	private LocalDateTime lastRun;

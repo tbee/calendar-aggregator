@@ -121,6 +121,9 @@ public class CalendarLocation extends EntityBase<CalendarLocation> {
 		this.enabled = v;
 		return this;
 	}
+	public boolean isEnabled() {
+		return enabled();
+	}
 
 	private LocalDateTime lastRun;
 	static public final String LASTRUN_PROPERTYID = "lastRun";

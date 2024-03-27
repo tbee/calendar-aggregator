@@ -16,7 +16,6 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.shared.Tooltip;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.AfterNavigationEvent;
@@ -27,6 +26,7 @@ import nl.softworks.calendarAggregator.application.vdn.CalendarAggregatorAppLayo
 import nl.softworks.calendarAggregator.application.vdn.component.CancelDialog;
 import nl.softworks.calendarAggregator.application.vdn.component.CrudButtonbar;
 import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
+import nl.softworks.calendarAggregator.application.vdn.component.ResultDialog;
 import nl.softworks.calendarAggregator.application.vdn.component.VButton;
 import nl.softworks.calendarAggregator.application.vdn.form.CalendarLocationForm;
 import nl.softworks.calendarAggregator.application.vdn.form.CalendarSourceForm;
@@ -215,7 +215,7 @@ implements AfterNavigationObserver
 		}
 		@Override
 		public Icon enabled() {
-			return calendarLocation.enabled() ? ENABLED_ICON.create() : DISABLED_ICON.create();
+			return calendarLocation.isEnabled() ? ENABLED_ICON.create() : DISABLED_ICON.create();
 		}
 
 		@Override
@@ -250,7 +250,7 @@ implements AfterNavigationObserver
 		@Override
 		public LocalDateTime updated() {
 			return calendarLocation.calendarSources().stream()
-					.filter(cs -> cs.enabled())
+					.filter(cs -> cs.isEnabled())
 					.map(cs -> cs.lastRun())
 					.filter(ls -> ls != null)
 					.min(Comparator.naturalOrder())
@@ -356,7 +356,7 @@ implements AfterNavigationObserver
 		}
 		@Override
 		public Icon enabled() {
-			Icon icon = calendarSource.enabled() ? ENABLED_ICON.create() : DISABLED_ICON.create();
+			Icon icon = calendarSource.isEnabled() ? ENABLED_ICON.create() : DISABLED_ICON.create();
 			Tooltip.forComponent(icon)
 					.withText(hint())
 					.withPosition(Tooltip.TooltipPosition.TOP_START);
@@ -394,14 +394,7 @@ implements AfterNavigationObserver
 
 		@Override
 		public Component status() {
-			Button button = new Button(calendarSource.status(), evt -> {
-				TextArea textArea = new TextArea("Result", calendarSource.log(), "");
-				textArea.setSizeFull();
-
-				CancelDialog cancelDialog = new CancelDialog("Log", textArea);
-				cancelDialog.setSizeFull();
-				cancelDialog.open();
-			});
+			Button button = new Button(calendarSource.status(), evt -> new ResultDialog(calendarSource.log()).open());
 			button.addThemeVariants(ButtonVariant.LUMO_SMALL);
 			return button;
 		}

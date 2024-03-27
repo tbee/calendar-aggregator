@@ -1,12 +1,12 @@
 package nl.softworks.calendarAggregator.application.vdn.form;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
-import nl.softworks.calendarAggregator.application.vdn.component.CancelDialog;
+import nl.softworks.calendarAggregator.application.vdn.component.ResultDialog;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import org.slf4j.Logger;
@@ -24,12 +24,12 @@ abstract public class CalendarSourceForm extends FormLayout {
 
 	private final TextField descriptionTextfield = new TextField("Description");
 	private final TextField statusTextField = new TextField("Status");
+	private final Checkbox enabledCheckbox = new Checkbox("Enabled");
 
 	private CalendarSource calendarSource;
 	public CalendarSourceForm() {
-		setColspan(descriptionTextfield, 2);
 		setColspan(statusTextField, 2);
-		add(descriptionTextfield, statusTextField);
+		add(descriptionTextfield, enabledCheckbox, statusTextField);
 
 		Button generateButton = new Button("Generate", evt -> generate());
 		setColspan(generateButton, 2);
@@ -37,6 +37,7 @@ abstract public class CalendarSourceForm extends FormLayout {
 
 		binder.forField(descriptionTextfield).bind(CalendarSource::description, CalendarSource::description);
 		binder.forField(statusTextField).bind(CalendarSource::status, CalendarSource::status);
+		binder.forField(enabledCheckbox).bind(CalendarSource::enabled, CalendarSource::enabled);
 	}
 
 	public CalendarSourceForm populateWith(CalendarSource calendarSource) {
@@ -72,11 +73,6 @@ abstract public class CalendarSourceForm extends FormLayout {
 			calendarSource.logAppend(stringWriter.toString());
 		}
 
-		TextArea textArea = new TextArea("Result", calendarSource.log(), "");
-		textArea.setSizeFull();
-
-		CancelDialog cancelDialog = new CancelDialog("Result", textArea);
-		cancelDialog.setSizeFull();
-		cancelDialog.open();
+		new ResultDialog(calendarSource.log()).open();
 	}
 }

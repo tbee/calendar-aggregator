@@ -7,13 +7,12 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.NumberField;
-import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import nl.softworks.calendarAggregator.application.vdn.component.CancelDialog;
 import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
+import nl.softworks.calendarAggregator.application.vdn.component.ResultDialog;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
@@ -83,7 +82,7 @@ public class CalendarLocationForm extends FormLayout {
 			List<CalendarEvent> calendarEvents = calendarLocation.generateEvents();
 			populateWith(calendarLocation);
 
-			calendarEventsString = calendarEvents.stream().map(s -> s + "\n").collect(Collectors.joining());
+			calendarEventsString = calendarEvents.stream().map(s -> s.calendarSource().type() + ": " + s + "\n").collect(Collectors.joining());
 			if (calendarEventsString.isBlank()) {
 				calendarEventsString = "No events were generated";
 			}
@@ -92,12 +91,7 @@ public class CalendarLocationForm extends FormLayout {
 			Notification.show(e.toString(), 5000, Notification.Position.BOTTOM_CENTER);
 		}
 
-		TextArea textArea = new TextArea("Result", calendarEventsString, "");
-		textArea.setSizeFull();
-
-		CancelDialog cancelDialog = new CancelDialog("Result", textArea);
-		cancelDialog.setSizeFull();
-		cancelDialog.open();
+		new ResultDialog(calendarEventsString).open();
 	}
 
 	public static void showInsertDialog(CalendarLocation selectedCalendarLocation, Runnable onInsert) {
