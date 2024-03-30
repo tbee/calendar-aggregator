@@ -189,7 +189,10 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 					.build();
 			HttpRequest request = HttpRequest.newBuilder()
 					.GET()
-					.uri(new URI(urlString))
+					.uri(new URI(urlString.trim()))
+					.header("Accept", "*/*")
+					//.header("Accept-Encoding", "gzip, deflate, br, zstd")
+					.header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
 					.build();
 			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 			return response.body();
