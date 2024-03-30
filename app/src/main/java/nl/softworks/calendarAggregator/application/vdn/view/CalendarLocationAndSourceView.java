@@ -578,9 +578,7 @@ implements AfterNavigationObserver
 	}
 
 	private void showInsertForm(CalendarLocation calendarLocation, CalendarSource calendarSource, CalendarSourceForm calendarSourceForm,  CalendarSource calendarSourceDefault) {
-		if (calendarSourceDefault != null) {
-			calendarSourceForm.populateWith(calendarSourceDefault);
-		}
+		calendarSourceForm.populateWith(calendarSourceDefault != null ? calendarSourceDefault : calendarSource);
 
 		new OkCancelDialog("Event", calendarSourceForm)
 				.okLabel("Save")
