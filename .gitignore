@@ -35,3 +35,4 @@ app/src/main/dev-bundle
 app/java.cmd
 app/javaHome.cmd
 app/dependency-reduced-pom.xml
+application-default.properties
