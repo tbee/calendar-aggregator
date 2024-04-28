@@ -62,12 +62,11 @@ public class CalendarResource {
                       <div class="block pagewidth">%disclaimer%</div>
                       <div id="iconbar" class="block alignright pagewidth">
                         <span class="icon">
-                          <a href="%baseurl%/"><i class="fas fa-list fa-xl"></i></a>
+                          <a href="%baseurl%/list"><i class="fas fa-list fa-xl"></i></a>
                         </span>
                         <span class="icon">
-                          <a href="%baseurl%/htmlmonth"><i class="fas fa-calendar-days fa-xl"></i></a>
+                          <a href="%baseurl%/"><i class="fas fa-calendar-days fa-xl"></i></a>
                         </span>
-                        </a>
                       </div>
                       <!--pagecontent-->
                       <div class="notification pagewidth" style="margin-top:10px;">
@@ -75,8 +74,8 @@ public class CalendarResource {
                           This data is available in:
                         </p>
                         <ul>
-                          <li class="bullet"><a href="%baseurl%/">List</a> form</li>
-                          <li class="bullet"><a href="%baseurl%/htmlmonth">Calendar</a> form</li>
+                          <li class="bullet"><a href="%baseurl%/list">List</a> form</li>
+                          <li class="bullet"><a href="%baseurl%/">Calendar</a> form</li>
                           <li class="bullet">For including in e.g. Google calendar by adding an external URL calendar using the following URL: <a href="%baseurl%/ical" target="_blank">%baseurl%/ical</a></li>
                         </ul>
                       </div>
@@ -88,7 +87,7 @@ public class CalendarResource {
                           For example:
                         </p>
                         <p style="margin-top:5px;">
-                          <a href="%baseurl%/?lat=51.9214012&lon=6.5761531&d=40" target="_blank">%baseurl%/?lat=51.9214012&lon=6.5761531&d=40</a>
+                          <a href="%baseurl%/month?lat=51.9214012&lon=6.5761531&d=40" target="_blank">%baseurl%/?lat=51.9214012&lon=6.5761531&d=40</a>
                         </p>
                         <p style="margin-top:5px;">
                           These parameters can be set on all the views of this data.
@@ -103,9 +102,10 @@ public class CalendarResource {
                 .replace("%baseurl%", settings.websiteBaseurl())
                 .replace("%disclaimer%", settings.disclaimer());
     }
-    // example http://localhost:8080/
-    @GetMapping(path = "/", produces = {"text/html"})
-    public String pagetemplate(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d) {
+
+    // example http://localhost:8080/htmlist
+    @GetMapping(path = {"/list", "/pub/html"}, produces = {"text/html"})
+    public String htmllist(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d) {
 
         // Collect events
         LocalDateTime threshold = LocalDateTime.now().minusHours(2);
@@ -178,8 +178,8 @@ public class CalendarResource {
                 ;
     }
 
-    // example http://localhost:8080/htmlcal
-    @GetMapping(path = "/htmlmonth", produces = {"text/html"})
+    // example http://localhost:8080/htmlmonth
+    @GetMapping(path = {"/month", "/htmlmonth", "/"}, produces = {"text/html"})
     public String htmlmonth(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d
             , @RequestParam(defaultValue = "0") int year, @RequestParam(defaultValue = "0") int month) {
 
@@ -317,7 +317,7 @@ public class CalendarResource {
                       <div class="columns is-gapless">
                         <div class="column alignright">
                           <span class="icon">
-                            <a href="%baseurl%/htmlmonth?year=%prevyear%&month=%prevmonth%"><i class="fas fa-arrow-left fa-2xl"></i></a>
+                            <a href="%baseurl%/?year=%prevyear%&month=%prevmonth%"><i class="fas fa-arrow-left fa-2xl"></i></a>
                           </span>
                         </div>
                         <div class="column is-one-fifth">
@@ -326,7 +326,7 @@ public class CalendarResource {
                         </div>
                         <div class="column">
                           <span class="icon">
-                            <a href="%baseurl%/htmlmonth?year=%nextyear%&month=%nextmonth%"><i class="fas fa-arrow-right fa-2xl"></i></a>
+                            <a href="%baseurl%/?year=%nextyear%&month=%nextmonth%"><i class="fas fa-arrow-right fa-2xl"></i></a>
                           </span>
                         </div>
                       </div>
@@ -360,7 +360,7 @@ public class CalendarResource {
     }
 
     // example http://localhost:8080/ical
-    @GetMapping(path = "/ical", produces = {"text/calendar"})
+    @GetMapping(path = {"/ical", "/pub/calendar", "/pub/ical"}, produces = {"text/calendar"})
     public String ical(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d) {
 
         String timezones = R.timezone().findAll().stream()
