@@ -412,7 +412,6 @@ public class CalendarResource {
 				SUMMARY:%summary%
 				DESCRIPTION:%description%
 				LOCATION:%location%
-				%exdate%
 				END:VEVENT
 				"""
                 .replace("%uid%", calendarEvent.id() + "@dancemoments.softworks.nl")
