@@ -223,20 +223,23 @@ public class CalendarResource {
             calendarEvents = (calendarEvents == null ? List.of() : calendarEvents);
             String events = "<ul>" +
                     calendarEvents.stream()
-                    .map(ce -> """
-                                 <li>
-                                   <div class="tooltip">
-                                     %text%
-                                     <span class="tooltiptext">%description%</span>
-                                   </div>
-                                   <span class="icon">
-                                     <a href="%url%" target="_blank"><i class="fas fa-arrow-up-right-from-square fa-xs"></i></a>
-                                   </span>
-                                 </li>
-                               """
-                               .replace("%text%", hhmm.format(ce.startDateTime()) + " " + ce.calendarSource().calendarLocation().name())
-                               .replace("%description%", (ce.subject().isBlank() ? "See the website" : ce.subject()))
-                               .replace("%url%", ce.calendarSource().calendarLocation().url()))
+                    .map(ce -> {
+                        String description = ce.determineSubject();
+                        return """
+                                     <li>
+                                       <div class="tooltip">
+                                         %text%
+                                         <span class="tooltiptext">%description%</span>
+                                       </div>
+                                       <span class="icon">
+                                         <a href="%url%" target="_blank"><i class="fas fa-arrow-up-right-from-square fa-xs"></i></a>
+                                       </span>
+                                     </li>
+                                   """
+                                   .replace("%text%", hhmm.format(ce.startDateTime()) + " " + ce.calendarSource().calendarLocation().name())
+                                   .replace("%description%", (description.isBlank() ? "See the website" : description))
+                                   .replace("%url%", ce.calendarSource().determineUrl());
+                    })
                     .collect(Collectors.joining(""))
                     + "</ul>";
 
@@ -420,7 +423,7 @@ public class CalendarResource {
                 .replace("%dtEnd%", dateTimeFormatter.format(calendarEvent.endDateTime()))
                 .replace("%summary%", (calendarLocation.name() + " " + calendarEvent.subject()).trim())
                 .replace("%location%", calendarLocation.location().replace("\n", ", "))
-                .replace("%description%", calendarLocation.url() + "\\n\\n" + settings.disclaimer())
+                .replace("%description%", calendarSource.determineUrl() + "\\n\\n" + settings.disclaimer())
                 .replaceAll("(?m)^[ \t]*\r?\n", ""); // strip empty lines
     }
 

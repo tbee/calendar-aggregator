@@ -53,6 +53,12 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 	public String subject() {
 		return subject;
 	}
+	public String determineSubject() {
+		if (subject != null && !subject.isBlank()) {
+			return subject;
+		}
+		return calendarSource.description();
+	}
 
 	public CalendarEvent subject(String v) {
 		this.subject = v;

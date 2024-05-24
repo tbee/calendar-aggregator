@@ -72,6 +72,23 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 		return this;
 	}
 
+	protected String url = "";
+	static public final String URL_PROPERTYID = "url";
+	public String url() {
+		return url;
+	}
+	public CalendarSource url(String v) {
+		this.url = v;
+		return this;
+	}
+	public String determineUrl() {
+		if (url != null && !url.isBlank()) {
+			return url;
+		}
+		return calendarLocation.url;
+	}
+
+
 	@NotNull
 	protected String status = "";
 	static public final String STATUS_PROPERTYID = "status";

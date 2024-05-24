@@ -25,11 +25,14 @@ abstract public class CalendarSourceForm extends FormLayout {
 	private final TextField descriptionTextfield = new TextField("Description");
 	private final TextField statusTextField = new TextField("Status");
 	private final Checkbox enabledCheckbox = new Checkbox("Enabled");
+	private final TextField urlTextField = new TextField("URL");
 
 	private CalendarSource calendarSource;
 	public CalendarSourceForm() {
 		setColspan(statusTextField, 2);
-		add(descriptionTextfield, enabledCheckbox, statusTextField);
+		setColspan(urlTextField, 2);
+		urlTextField.setTooltipText("If more-info URL differs from the one in location");
+		add(descriptionTextfield, enabledCheckbox, urlTextField, statusTextField);
 
 		Button generateButton = new Button("Generate", evt -> generate());
 		setColspan(generateButton, 2);
@@ -38,6 +41,7 @@ abstract public class CalendarSourceForm extends FormLayout {
 		binder.forField(descriptionTextfield).bind(CalendarSource::description, CalendarSource::description);
 		binder.forField(statusTextField).bind(CalendarSource::status, CalendarSource::status);
 		binder.forField(enabledCheckbox).bind(CalendarSource::enabled, CalendarSource::enabled);
+		binder.forField(urlTextField).bind(CalendarSource::url, CalendarSource::url);
 	}
 
 	public CalendarSourceForm populateWith(CalendarSource calendarSource) {
