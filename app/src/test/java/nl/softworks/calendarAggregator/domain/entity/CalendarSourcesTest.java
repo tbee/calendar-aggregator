@@ -80,6 +80,33 @@ public class CalendarSourcesTest {
     }
 
     @Test
+    public void stijl_20240531a_multipleDates() {
+        CalendarSourceScraperBase calendarSource = new CalendarSourceRegexScraper() {}
+                .regex("(Kerstgala|Vrijdansen[ a-zA-Z0-9]*)?(Colenbergh 1( + 2)?|Gymzaal Duurstedelaan A)? ([0-9][0-9]? +(januari|februari|maart|april|mei|juni|juli|augustus|september|oktober|november|december) [0-9]{4}) ([0-9]+:[0-9]+)")
+                .subjectGroupIdx(1)
+                .datePattern("d MMMM yyyy")
+                .startDateGroupIdx(4)
+                .endDateGroupIdx(4)
+                .timePattern("HH:mm")
+                .startTimeGroupIdx(6)
+                .endTimeDefault("23:00")
+                .dateTimeLocale("NL")
+                .removeChars("'()-")
+                .scrapeUrl(this.getClass().getResource("/webSnapshots/stijl_20240531a_multipleDates.html").toExternalForm());
+        calendarSource.localDateTimeNowSupplier = () -> LocalDateTime.of(2024, 5, 31, 12, 34, 56);
+        new CalendarLocation().addCalendarSource(calendarSource);
+        List<CalendarEvent> calendarEvents = calendarSource.generateEvents();
+        System.out.println(calendarSource.log());
+        calendarEvents.forEach(e -> System.out.println(e));
+
+        Assertions.assertEquals(14, calendarEvents.size());
+        Assertions.assertEquals("Vrijdansen en Workshop West Coast Swing 31 mei 2024 HF Witte Colenbergh 1", calendarEvents.get(0).subject().trim());
+        Assertions.assertEquals(LocalDateTime.of(2024, 5, 31, 19, 0, 0), calendarEvents.get(0).startDateTime());
+        Assertions.assertEquals("Vrijdansen Maandagavond Zomer 2024 Gymzaal Duurstedelaan A", calendarEvents.get(13).subject().trim());
+        Assertions.assertEquals(LocalDateTime.of(2024, 8, 26, 19, 30, 0), calendarEvents.get(13).startDateTime());
+    }
+
+    @Test
     public void wijgers_20231201a_shortDateNotation() {
         CalendarSourceScraperBase calendarSource = new CalendarSourceRegexScraper()
                 .regex("([0-9][0-9]? (jan|feb|mrt|apr|mei|jun|jul|aug|sep|okt|nov|dec)) (Vrije Dansavond)")

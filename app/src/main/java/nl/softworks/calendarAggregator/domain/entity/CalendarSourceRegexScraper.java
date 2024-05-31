@@ -189,11 +189,17 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
             // Apply regex
             logAppend(regex + "\n");
             Matcher matcher = Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(content);
+            String previousSubject = "";
             while (matcher.find()) {
                 logMatcher(matcher, content);
 
                 // extract strings
                 String subject = subjectGroupIdx < 1 ? "" : matcher.group(subjectGroupIdx);
+                if (subject == null) {
+                    subject = previousSubject;
+                    logAppend("Subject is null, using previous subject: " + subject + "\n");
+                }
+                previousSubject = subject;
                 String startDateString = matcher.group(startDateGroupIdx);
                 String endDateString = matcher.group(endDateGroupIdx);
                 String startTimeString = startTimeGroupIdx < 1 ? startTimeDefault : matcher.group(startTimeGroupIdx);
