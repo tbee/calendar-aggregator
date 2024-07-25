@@ -7,7 +7,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.Lob;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
@@ -37,6 +40,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 
@@ -155,11 +159,14 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 		calendarEvent.calendarSource = null;
 	}
 
+	@ManyToMany
+	@JoinTable(name = "calendar_source2label", joinColumns = @JoinColumn(name = "label_id"), inverseJoinColumns = @JoinColumn(name = "calendar_source_id"))
+	private Set<Label> labels;
+
 	/**
 	 * Using MVEL2 http://mvel.documentnode.com/
 	 *
 	 * @param url
-	 * @param stringBuilder
 	 * @return
 	 */
 	protected String resolveUrl(String url) {

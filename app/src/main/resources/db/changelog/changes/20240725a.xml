@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- https://xenovation.com/blog/development/java/java-professional-developer/liquibase-related-sql-java-types -->
+
+    <changeSet id="20240725a" author="tom">
+        <createTable tableName="label">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lazylock" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="html" type="nvarchar(1000)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint constraintName="label_uk01"
+                             tableName="label"
+                             columnNames="name"/>
+
+        <createTable tableName="calendar_source2label">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lazylock" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="calendar_source_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="label_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint constraintName="calendar_source2label_uk01"
+                             tableName="calendar_source2label"
+                             columnNames="calendar_source_id, label_id"/>
+        <addForeignKeyConstraint  constraintName="calendar_source2label__calendar_source"
+                                  baseTableName="calendar_source2label"
+                                  baseColumnNames="calendar_source_id"
+                                  referencedTableName="calendar_source"
+                                  referencedColumnNames="id"/>
+        <addForeignKeyConstraint  constraintName="calendar_source2label__label"
+                                  baseTableName="calendar_source2label"
+                                  baseColumnNames="label_id"
+                                  referencedTableName="label"
+                                  referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>
