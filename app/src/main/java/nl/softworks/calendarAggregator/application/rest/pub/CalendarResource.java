@@ -60,7 +60,6 @@ public class CalendarResource {
                           text-decoration: none;
                           display: block;
                           margin: 0 auto;
-                          background: #6da795;
                           height: 14px;
                           width: 14px;
                           border-radius: 2px;
@@ -68,10 +67,17 @@ public class CalendarResource {
                           border: solid 1px transparent;
                         }
                         .css-icon span {
+                          margin-top:-2px;
                           font-size: 80%;
                           text-align: center;
                           display: block;
                           color: #ffffff;
+                        }
+                        .css-icon-eventtype {
+                          background: #6da795;
+                        }
+                        .css-icon-dancestyle {
+                          background: red;
                         }
                     </style>
                     <!--pageheader-->
@@ -248,10 +254,14 @@ public class CalendarResource {
                         String description = ce.determineSubject();
                         return """
                                      <li>
-                                       <div class="tooltipped">
+                                       <divd" class="tooltippe>
                                          <span>%text%</span>
                                          <span class="tooltiptext">%description%</span>
                                        </div>
+                                       <span class="icon">
+                                         <i class="css-icon css-icon-dancestyle"><span>B</span></i>
+                                         <i class="css-icon css-icon-eventtype"><span>T</span></i>
+                                       </span>
                                        <span class="icon">
                                          <a href="%url%" target="_blank"><i class="fas fa-arrow-up-right-from-square fa-xs"></i></a>
                                        </span>
