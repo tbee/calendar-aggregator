@@ -77,7 +77,7 @@ public class CalendarResource {
                           background: #6da795;
                         }
                         .css-icon-dancestyle {
-                          background: red;
+                          background: #ad7765;
                         }
                     </style>
                     <!--pageheader-->
@@ -254,14 +254,15 @@ public class CalendarResource {
                         String description = ce.determineSubject();
                         return """
                                      <li>
-                                       <divd" class="tooltippe>
+                                       <div class="tooltipped">
                                          <span>%text%</span>
+                                           <span class="icon" style="width:40px;">
+                                             <i class="css-icon css-icon-dancestyle"><span>B</span></i>
+                                             <i class="css-icon css-icon-dancestyle"><span>L</span></i>
+                                             <i class="css-icon css-icon-eventtype"><span>T</span></i>
+                                           </span>
                                          <span class="tooltiptext">%description%</span>
                                        </div>
-                                       <span class="icon">
-                                         <i class="css-icon css-icon-dancestyle"><span>B</span></i>
-                                         <i class="css-icon css-icon-eventtype"><span>T</span></i>
-                                       </span>
                                        <span class="icon">
                                          <a href="%url%" target="_blank"><i class="fas fa-arrow-up-right-from-square fa-xs"></i></a>
                                        </span>
