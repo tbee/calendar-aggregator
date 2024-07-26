@@ -20,6 +20,7 @@ import com.vaadin.flow.server.VaadinSession;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import nl.softworks.calendarAggregator.application.vdn.view.CalendarLocationAndSourceView;
+import nl.softworks.calendarAggregator.application.vdn.view.LabelView;
 import nl.softworks.calendarAggregator.application.vdn.view.PersonView;
 import nl.softworks.calendarAggregator.application.vdn.view.SettingsView;
 import nl.softworks.calendarAggregator.application.vdn.view.TimezoneView;
@@ -47,9 +48,10 @@ implements HasDynamicTitle {
 	final protected String title;
 	final protected Tab overviewTab = new Tab(VaadinIcon.TABLE.create(), new Span("Sources") );
 	final protected Tab timezoneTab = new Tab(VaadinIcon.CLOCK.create(), new Span("Timezones") );
+	final protected Tab labelTab = new Tab(VaadinIcon.TEXT_LABEL.create(), new Span("Labels") );
 	final protected Tab personTab = new Tab(VaadinIcon.USER.create(), new Span("Persons") );
 	final protected Tab settingsTab = new Tab(VaadinIcon.LIST.create(), new Span("Settings") );
-	final protected Tabs tabs = new Tabs(overviewTab, timezoneTab, personTab, settingsTab);
+	final protected Tabs tabs = new Tabs(overviewTab, timezoneTab, labelTab, personTab, settingsTab);
 
 	@Override
 	public String getPageTitle() {
@@ -110,6 +112,9 @@ implements HasDynamicTitle {
 			}
 			if (event.getSelectedTab().equals(timezoneTab)) {
 				UI.getCurrent().navigate(TimezoneView.class);
+			}
+			if (event.getSelectedTab().equals(labelTab)) {
+				UI.getCurrent().navigate(LabelView.class);
 			}
 			if (event.getSelectedTab().equals(personTab)) {
 				UI.getCurrent().navigate(PersonView.class);

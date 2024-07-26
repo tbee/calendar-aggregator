@@ -36,8 +36,10 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -160,8 +162,16 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 
 	@ManyToMany
-	@JoinTable(name = "calendar_source2label", joinColumns = @JoinColumn(name = "label_id"), inverseJoinColumns = @JoinColumn(name = "calendar_source_id"))
+	@JoinTable(name = "calendar_source2label", joinColumns = @JoinColumn(name = "calendar_source_id"), inverseJoinColumns = @JoinColumn(name = "label_id"))
 	private Set<Label> labels;
+	public Set<Label> labels() {
+		return Collections.unmodifiableSet(labels);
+	}
+	public void labels(Collection<Label> v) {
+		labels = (labels == null ? new HashSet<>() : labels);
+		labels.clear();
+		labels.addAll(v == null ? Collections.emptySet() : v);
+	}
 
 	/**
 	 * Using MVEL2 http://mvel.documentnode.com/

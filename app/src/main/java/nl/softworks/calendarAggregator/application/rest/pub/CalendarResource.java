@@ -52,6 +52,27 @@ public class CalendarResource {
                         margin-left: 20px;
                         padding-left: 0;
                       }
+                        .css-icon {
+                          font-family: "Work Sans", sans-serif;
+                          font-weight: 800;
+                          font-style: normal;
+                          font-size: 14px;
+                          text-decoration: none;
+                          display: block;
+                          margin: 0 auto;
+                          background: #6da795;
+                          height: 14px;
+                          width: 14px;
+                          border-radius: 2px;
+                          overflow: hidden;
+                          border: solid 1px transparent;
+                        }
+                        .css-icon span {
+                          font-size: 80%;
+                          text-align: center;
+                          display: block;
+                          color: #ffffff;
+                        }
                     </style>
                     <!--pageheader-->
                   </head>
@@ -103,7 +124,7 @@ public class CalendarResource {
                 .replace("%disclaimer%", settings.disclaimer());
     }
 
-    // example http://localhost:8080/htmlist
+    // example http://localhost:8080/list
     @GetMapping(path = {"/list", "/pub/html"}, produces = {"text/html"})
     public String htmllist(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d) {
 
@@ -178,7 +199,7 @@ public class CalendarResource {
                 ;
     }
 
-    // example http://localhost:8080/htmlmonth
+    // example http://localhost:8080/month
     @GetMapping(path = {"/month", "/htmlmonth", "/"}, produces = {"text/html"})
     public String htmlmonth(HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d
             , @RequestParam(defaultValue = "0") int year, @RequestParam(defaultValue = "0") int month) {
@@ -227,8 +248,8 @@ public class CalendarResource {
                         String description = ce.determineSubject();
                         return """
                                      <li>
-                                       <div class="tooltip">
-                                         %text%
+                                       <div class="tooltipped">
+                                         <span>%text%</span>
                                          <span class="tooltiptext">%description%</span>
                                        </div>
                                        <span class="icon">
@@ -294,12 +315,12 @@ public class CalendarResource {
                       border: 2px solid;
                     }
                     
-                    .tooltip {
+                    .tooltipped {
                       position: relative;
                       display: inline-block;
                       xxxborder-bottom: 1px dotted black;
                     }
-                    .tooltip .tooltiptext {
+                    .tooltipped .tooltiptext {
                       visibility: hidden;
                       background-color: gray;
                       color: white;
@@ -311,7 +332,7 @@ public class CalendarResource {
                       position: absolute;
                       z-index: 1;
                     }
-                    .tooltip:hover .tooltiptext {
+                    .tooltipped:hover .tooltiptext {
                       visibility: visible;
                     }
                   </style>

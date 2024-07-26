@@ -54,4 +54,10 @@ public class R {
     static public SettingsRepo settings() {
         return R.singleton.settingsRepo;
     }
+
+    @Autowired
+    LabelRepo labelRepo;
+    static public LabelRepo label() {
+        return R.singleton.labelRepo;
+    }
 }

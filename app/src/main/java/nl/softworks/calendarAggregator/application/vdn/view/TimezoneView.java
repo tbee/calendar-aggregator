@@ -25,5 +25,6 @@ public class TimezoneView extends AbstractCrudView<Timezone> {
 				, grid -> {
 					grid.addColumn(Timezone::name).setHeader("Name");
 				});
+		tabs.setSelectedTab(timezoneTab);
 	}
 }

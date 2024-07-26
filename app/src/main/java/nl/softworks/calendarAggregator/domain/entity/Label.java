@@ -2,9 +2,13 @@ package nl.softworks.calendarAggregator.domain.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToMany;
 import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Set;
 
 @Entity
 public class Label extends EntityBase<Label> {
@@ -32,6 +36,9 @@ public class Label extends EntityBase<Label> {
 		this.html = v;
 		return this;
 	}
+
+	@ManyToMany(mappedBy = "labels", fetch = FetchType.LAZY)
+	Set<CalendarSource> calendarSources;
 
 	public String toString() {
 		return super.toString() //
