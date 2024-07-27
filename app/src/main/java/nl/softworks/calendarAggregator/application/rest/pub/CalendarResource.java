@@ -5,6 +5,7 @@ import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
+import nl.softworks.calendarAggregator.domain.entity.Label;
 import nl.softworks.calendarAggregator.domain.entity.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -252,23 +253,36 @@ public class CalendarResource {
                     calendarEvents.stream()
                     .map(ce -> {
                         String description = ce.determineSubject();
+                        int numberOfLabels = ce.calendarSource().labels().size();
+                        String labels = ce.calendarSource().labels().stream()
+                                .sorted(Comparator.comparing(Label::seqnr))
+                                .map(l -> """
+                                        <div class="tooltipped">
+                                        <i class="css-icon css-icon-%labelgroup%"><span>%icon%</span></i>
+                                        <span class="tooltiptext">%tooltip%</span>
+                                        </div>
+                                        """
+                                        .replace("%icon%", l.icon())
+                                        .replace("%labelgroup%", l.labelGroup().name().replace(" ", "").toLowerCase())
+                                        .replace("%tooltip%", l.description()))
+                                .collect(Collectors.joining("\n"));
                         return """
                                      <li>
                                        <div class="tooltipped">
                                          <span>%text%</span>
-                                           <span class="icon" style="width:40px;">
-                                             <i class="css-icon css-icon-dancestyle"><span>B</span></i>
-                                             <i class="css-icon css-icon-dancestyle"><span>L</span></i>
-                                             <i class="css-icon css-icon-eventtype"><span>T</span></i>
-                                           </span>
                                          <span class="tooltiptext">%description%</span>
                                        </div>
-                                       <span class="icon">
+                                       <span class="icon" style="width:%labelswidth%px; height:10px;">
+                                         %labels%
+                                       </span>
+                                       <span class="icon" style="width:12px; height:10px;">
                                          <a href="%url%" target="_blank"><i class="fas fa-arrow-up-right-from-square fa-xs"></i></a>
                                        </span>
                                      </li>
                                    """
                                    .replace("%text%", hhmm.format(ce.startDateTime()) + " " + ce.calendarSource().calendarLocation().name())
+                                   .replace("%labelswidth%", "" + (numberOfLabels * 12))
+                                   .replace("%labels%", labels)
                                    .replace("%description%", (description.isBlank() ? "See the website" : description))
                                    .replace("%url%", ce.calendarSource().determineUrl());
                     })
