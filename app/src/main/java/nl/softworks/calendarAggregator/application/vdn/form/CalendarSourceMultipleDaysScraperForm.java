@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CalendarSourceMultipleDaysScraperForm extends CalendarSourceScraperBaseForm {
-	private static final Logger LOG = LoggerFactory.getLogger(CalendarSourceMultipleDaysScraperForm.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourceMultipleDaysScraperForm.class);
 
 	private final Binder<CalendarSourceMultipleDaysScraper> binder = new Binder<>();
 

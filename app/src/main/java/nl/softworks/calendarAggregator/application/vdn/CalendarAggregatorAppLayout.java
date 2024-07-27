@@ -41,7 +41,7 @@ import java.util.concurrent.Callable;
 
 public abstract class CalendarAggregatorAppLayout extends AppLayout // https://vaadin.com/docs/latest/components/app-layout
 implements HasDynamicTitle {
-	private static final Logger LOG = LoggerFactory.getLogger(CalendarAggregatorAppLayout.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarAggregatorAppLayout.class);
 
 	@Autowired
 	private PlatformTransactionManager transactionManager;
@@ -81,7 +81,7 @@ implements HasDynamicTitle {
 				t = t.getCause();
 			}
 			showErrorNotification(last.getMessage());
-			if (LOG.isInfoEnabled()) LOG.info(last.getMessage(), event.getThrowable());
+			 if (LOGGER.isInfoEnabled())  LOGGER.info(last.getMessage(), event.getThrowable());
 		});
 
 		// The drawer toggle icon
@@ -177,7 +177,7 @@ implements HasDynamicTitle {
 		}
 
 		// default handling
-		LOG.error(e.getMessage(), e);
+		LOGGER.error(e.getMessage(), e);
 		showErrorNotification(e.getMessage());
 	}
 

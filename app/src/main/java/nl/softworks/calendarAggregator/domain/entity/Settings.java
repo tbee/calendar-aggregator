@@ -10,7 +10,7 @@ import org.tbee.jakarta.validator.UrlValidator;
 
 @Entity
 public class Settings extends EntityBase<Settings> {
-	private static final Logger LOG = LoggerFactory.getLogger(Settings.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Settings.class);
 
 	static public Settings get() {
 		Settings settings = R.settings().findById(1l).orElse(null);
@@ -24,7 +24,7 @@ public class Settings extends EntityBase<Settings> {
 	@NotNull
 	@UrlValidator
 	protected String websiteBaseurl;
-	static public final String WEBSITEBASEURL_PROPERTYID = "websiteBaseurl";
+	static public final String WEBSITEBASEURL = "websiteBaseurl";
 	public String websiteBaseurl() {
 		return websiteBaseurl;
 	}
@@ -35,7 +35,7 @@ public class Settings extends EntityBase<Settings> {
 
 	@NotNull
 	protected String title;
-	static public final String TITLE_PROPERTYID = "title";
+	static public final String TITLE = "title";
 	public String title() {
 		return title;
 	}
@@ -46,7 +46,7 @@ public class Settings extends EntityBase<Settings> {
 
 	@NotNull
 	protected String subtitle;
-	static public final String SUBTITLE_PROPERTYID = "subtitle";
+	static public final String SUBTITLE = "subtitle";
 	public String subtitle() {
 		return subtitle;
 	}
@@ -57,7 +57,7 @@ public class Settings extends EntityBase<Settings> {
 
 	@NotNull
 	protected String disclaimer = "";
-	static public final String DISCLAIMER_PROPERTYID = "disclaimer";
+	static public final String DISCLAIMER = "disclaimer";
 	public String disclaimer() {
 		return disclaimer;
 	}

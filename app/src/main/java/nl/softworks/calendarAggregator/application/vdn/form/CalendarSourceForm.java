@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 abstract public class CalendarSourceForm extends FormLayout {
-	private static final Logger LOG = LoggerFactory.getLogger(CalendarSourceForm.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourceForm.class);
 
 	private final Binder<CalendarSource> binder = new Binder<>();
 

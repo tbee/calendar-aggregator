@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CalendarLocationForm extends FormLayout {
-	private static final Logger LOG = LoggerFactory.getLogger(CalendarLocationForm.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarLocationForm.class);
 
 	private final Binder<CalendarLocation> binder = new Binder<>();
 

@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 @RolesAllowed("ROLE_ADMIN")
 public class SettingsView extends CalendarAggregatorAppLayout
 implements AfterNavigationObserver {
-	private static final Logger LOG = LoggerFactory.getLogger(SettingsView.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SettingsView.class);
 
 	private final SettingsForm settingsForm = new SettingsForm();
 	private final Button saveButton = new Button("Save", e -> save());

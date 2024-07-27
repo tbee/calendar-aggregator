@@ -9,12 +9,12 @@ import org.slf4j.LoggerFactory;
 
 @Entity
 public class Label extends EntityBase<Label> {
-	private static final Logger LOG = LoggerFactory.getLogger(Label.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(Label.class);
 
 	@Column(unique=true) // prevent the same name to occur
 	@NotNull
 	protected String name;
-	static public final String NAME_PROPERTYID = "name";
+	static public final String NAME = "name";
 	public String name() {
 		return name;
 	}
@@ -25,7 +25,7 @@ public class Label extends EntityBase<Label> {
 
 	@NotNull
 	protected String description;
-	static public final String DESCRIPTION_PROPERTYID = "description";
+	static public final String DESCRIPTION = "description";
 	public String description() {
 		return description;
 	}
@@ -36,7 +36,7 @@ public class Label extends EntityBase<Label> {
 
 	@NotNull
 	protected String icon;
-	static public final String ICON_PROPERTYID = "icon";
+	static public final String ICON = "icon";
 	public String icon() {
 		return icon;
 	}
@@ -47,7 +47,7 @@ public class Label extends EntityBase<Label> {
 
 	@NotNull
 	protected int seqnr = 0;
-	static public final String SEQNR_PROPERTYID = "seqnr";
+	static public final String SEQNR = "seqnr";
 	public int seqnr() {
 		return seqnr;
 	}

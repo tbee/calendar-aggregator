@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 @StyleSheet("context://../vaadin.css")
 @RolesAllowed("ROLE_ADMIN")
 public class LabelView extends AbstractCrudView<Label> {
-	private static final Logger LOG = LoggerFactory.getLogger(LabelView.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LabelView.class);
 
 	public LabelView() {
 		super("Label"

@@ -10,16 +10,16 @@ import org.springframework.context.annotation.Bean;
 
 @org.springframework.context.annotation.Configuration
 public class Configuration {
-    private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Configuration.class);
 
     @Bean
     public WebServerFactoryCustomizer<TomcatServletWebServerFactory> cookieProcessorCustomizer() {
         return (TomcatServletWebServerFactory factory) -> {
 
             // also listen on http?
-            if (LOG.isInfoEnabled()) LOG.info("server.http.port = " + httpPort);
+             if (LOGGER.isInfoEnabled())  LOGGER.info("server.http.port = " + httpPort);
             if (httpPort != 0) {
-                if (LOG.isInfoEnabled()) LOG.info("Also listen on http " + httpPort);
+                 if (LOGGER.isInfoEnabled())  LOGGER.info("Also listen on http " + httpPort);
                 final Connector connector = new Connector();
                 connector.setPort(httpPort);
                 factory.addAdditionalTomcatConnectors(connector);

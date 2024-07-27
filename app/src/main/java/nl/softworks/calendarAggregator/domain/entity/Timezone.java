@@ -1,7 +1,6 @@
 package nl.softworks.calendarAggregator.domain.entity;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
@@ -9,7 +8,7 @@ public class Timezone extends EntityBase<Timezone> {
 
 	@NotNull
 	private String name;
-	static public final String NAME_PROPERTYID = "subject";
+	static public final String NAME = "subject";
 	public String name() {
 		return name;
 	}
@@ -20,7 +19,7 @@ public class Timezone extends EntityBase<Timezone> {
 
 	@NotNull
 	private String content;
-	static public final String CONTENT_PROPERTYID = "content";
+	static public final String CONTENT = "content";
 	public String content() {
 		return content;
 	}

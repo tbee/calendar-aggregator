@@ -66,7 +66,7 @@ import java.util.function.Function;
 public class CalendarLocationAndSourceView extends CalendarAggregatorAppLayout
 implements AfterNavigationObserver
 {
-	private static final Logger LOG = LoggerFactory.getLogger(CalendarLocationAndSourceView.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarLocationAndSourceView.class);
 	public static final VaadinIcon ENABLED_ICON = VaadinIcon.CHECK;
 	public static final VaadinIcon DISABLED_ICON = VaadinIcon.MINUS;
 

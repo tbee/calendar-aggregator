@@ -4,7 +4,7 @@ import nl.softworks.calendarAggregator.testing.TestContext;
 import org.apache.log4j.Logger;
 
 public abstract class API {
-    private static final Logger LOG = Logger.getLogger(API.class);
+    private static final Logger LOGGER = Logger.getLogger(API.class);
 
     protected String baseUrl() {
         return TestContext.get().configuration().webBaseUrl();
@@ -28,7 +28,7 @@ public abstract class API {
 //            int statusCode = httpResponse.getStatusLine().getStatusCode();
 //            if (statusCode != 200) {
 //                String bodyContent = EntityUtils.toString(httpResponse.getEntity(), StandardCharsets.UTF_8);
-//                LOG.error(bodyContent);
+//                LOGGER.error(bodyContent);
 //            }
 //            return statusCode;
 //        } catch (Exception e) {

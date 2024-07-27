@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @SpringBootApplication
 @EnableJpaRepositories(repositoryBaseClass = RepoBaseImpl.class)
 public class CalendarAggregateApplication {
-	private static final Logger LOG = LoggerFactory.getLogger(CalendarAggregateApplication.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarAggregateApplication.class);
 	private static final AtomicBoolean hsqldbStarted = new AtomicBoolean(false);
 
 	public static void main(String[] args) {
@@ -47,7 +47,7 @@ public class CalendarAggregateApplication {
 		try {
 			// Load the JDK's cacerts keystore file
 			String filename = System.getProperty("java.home") + "/lib/security/cacerts".replace('/', File.separatorChar);
-			if (LOG.isInfoEnabled()) LOG.info(filename);
+			 if (LOGGER.isInfoEnabled())  LOGGER.info(filename);
 			FileInputStream fileInputStream = new FileInputStream(filename);
 			KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
 			String password = "changeit";
@@ -59,7 +59,7 @@ public class CalendarAggregateApplication {
 			// Get the set of trust anchors, which contain the most-trusted CA certificates
             for (TrustAnchor trustAnchor : params.getTrustAnchors()) {
                 X509Certificate x509Certificate = trustAnchor.getTrustedCert();
-                if (LOG.isInfoEnabled()) LOG.info(x509Certificate.getSubjectX500Principal().toString());
+                 if (LOGGER.isInfoEnabled())  LOGGER.info(x509Certificate.getSubjectX500Principal().toString());
             }
 
 			//new URL("https://wallznijkerk.trainin.app/api/v2/AWBW2/client/schedule?filter[view]=grid&filter[listing]=7092&filter[from]=2023-10-01&filter[until]=2025-01-01").openConnection().getContent();

@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 
 abstract public class AbstractCrudView<E> extends CalendarAggregatorAppLayout
 implements AfterNavigationObserver {
-	private static final Logger LOG = LoggerFactory.getLogger(AbstractCrudView.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractCrudView.class);
 
 	private final Grid<E> treeGrid = new Grid<>();
 	private final Supplier<E> entitySupplier;

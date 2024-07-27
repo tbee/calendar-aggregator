@@ -50,7 +50,7 @@ import java.util.regex.Matcher;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING, name = "type")
 abstract public class CalendarSource extends EntityBase<CalendarSource> {
-	private static final Logger LOG = LoggerFactory.getLogger(CalendarSource.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSource.class);
 	public static final String OK = "ok";
 
 	transient protected Supplier<LocalDateTime> localDateTimeNowSupplier = () -> LocalDateTime.now();
@@ -68,7 +68,7 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 
 	protected String description = "";
-	static public final String DESCRIPTION_PROPERTYID = "description";
+	static public final String DESCRIPTION = "description";
 	public String description() {
 		return description == null ? "" : description;
 	}
@@ -78,7 +78,7 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 
 	protected String url = "";
-	static public final String URL_PROPERTYID = "url";
+	static public final String URL = "url";
 	public String url() {
 		return url;
 	}
@@ -96,7 +96,7 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 
 	@NotNull
 	protected String status = "";
-	static public final String STATUS_PROPERTYID = "status";
+	static public final String STATUS = "status";
 	public String status() {
 		return status;
 	}
@@ -110,7 +110,7 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 
 	@NotNull
 	protected boolean enabled = true;
-	static public final String ENABLED_PROPERTYID = "enabled";
+	static public final String ENABLED = "enabled";
 	public boolean enabled() {
 		return enabled;
 	}
@@ -123,7 +123,7 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 
 	private LocalDateTime lastRun;
-	static public final String LASTRUN_PROPERTYID = "lastRun";
+	static public final String LASTRUN = "lastRun";
 	public LocalDateTime lastRun() {
 		return lastRun;
 	}
@@ -134,7 +134,7 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 
 	@Lob
 	private String log;
-	static public final String LOG_PROPERTYID = "log";
+	static public final String LOG = "log";
 	public String log() {
 		return log;
 	}

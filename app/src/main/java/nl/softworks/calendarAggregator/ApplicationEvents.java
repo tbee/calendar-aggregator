@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 @Component
 public class ApplicationEvents {
-    private static final Logger LOG = LoggerFactory.getLogger(ApplicationEvents.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationEvents.class);
 
     private final ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(1);
 
@@ -34,7 +34,7 @@ public class ApplicationEvents {
         // Make sure there is an admin user
         List<Person> persons = R.person().findByRoleAndEnabled(Person.Role.ROLE_ADMIN, true);
         if (!persons.isEmpty()) {
-            LOG.info("At least one administrator is present and active");
+             LOGGER.info("At least one administrator is present and active");
         }
         else {
 
@@ -46,7 +46,7 @@ public class ApplicationEvents {
 
             // Create user
             String password = RandomStringUtils.random(32, true, true);
-            LOG.warn("Creating an administrator user because none exist, note down this: " + username + " / " + password);
+            LOGGER.warn("Creating an administrator user because none exist, note down this: " + username + " / " + password);
             R.person().save(new Person()
                     .username(username)
                     .password(password)
@@ -58,17 +58,17 @@ public class ApplicationEvents {
         // Create scheduler
         LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
         LocalDateTime firstRun = now.toLocalDate().atStartOfDay().plusDays(1); // 00:00 (this will make sure unexpected restarts do not skip running the task)
-        if (LOG.isInfoEnabled()) LOG.info("Creating scheduled task for generating events, first run at " + firstRun);
+         if (LOGGER.isInfoEnabled())  LOGGER.info("Creating scheduled task for generating events, first run at " + firstRun);
         long delayUntilFirstRunInSeconds = Duration.between(now, firstRun).getSeconds();
         scheduledExecutorService.scheduleAtFixedRate(this::generateEvents, delayUntilFirstRunInSeconds, TimeUnit.DAYS.toSeconds(1), TimeUnit.SECONDS); // both values are in TimeUnit
     }
 
     private void generateEvents() {
         try {
-            if (LOG.isInfoEnabled()) LOG.info("Scheduled task runs generate events");
+             if (LOGGER.isInfoEnabled())  LOGGER.info("Scheduled task runs generate events");
             generateEventsService.generateEvents();
         } catch (RuntimeException e) {
-            LOG.error("Problem generating events in scheduled task", e);
+            LOGGER.error("Problem generating events in scheduled task", e);
         }
     }
 }

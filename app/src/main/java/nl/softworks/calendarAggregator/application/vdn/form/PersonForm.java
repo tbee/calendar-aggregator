@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PersonForm extends AbstractCrudForm<Person> {
-	private static final Logger LOG = LoggerFactory.getLogger(PersonForm.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PersonForm.class);
 
 	private final Binder<Person> binder = new Binder<>();
 	private final TextField usernameTextField = new TextField("Username");

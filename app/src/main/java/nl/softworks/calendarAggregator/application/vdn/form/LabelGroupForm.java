@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class LabelGroupForm extends AbstractCrudForm<LabelGroup> {
-	private static final Logger LOG = LoggerFactory.getLogger(LabelGroupForm.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LabelGroupForm.class);
 
 	private final Binder<LabelGroup> binder = new Binder<>();
 

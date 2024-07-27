@@ -38,7 +38,7 @@ public class CalendarSourceManual extends CalendarSource {
 
 	@NotNull
 	private LocalDateTime startDateTime;
-	static public final String STARTDATETIME_PROPERTYID = "startDateTime";
+	static public final String STARTDATETIME = "startDateTime";
 	public LocalDateTime startDateTime() {
 		return startDateTime;
 	}
@@ -49,7 +49,7 @@ public class CalendarSourceManual extends CalendarSource {
 
 	@NotNull
 	private LocalDateTime endDateTime;
-	static public final String ENDDATETIME_PROPERTYID = "endDateTime";
+	static public final String ENDDATETIME = "endDateTime";
 	public LocalDateTime endDateTime() {
 		return endDateTime;
 	}
@@ -60,7 +60,7 @@ public class CalendarSourceManual extends CalendarSource {
 
 	@NotNull
 	private String subject = "";
-	static public final String SUBJECT_PROPERTYID = "subject";
+	static public final String SUBJECT = "subject";
 	public String subject() {
 		return subject;
 	}
@@ -72,7 +72,7 @@ public class CalendarSourceManual extends CalendarSource {
 
 	@NotNull
 	private String rrule = "";
-	static public final String RRULE_PROPERTYID = "rrule";
+	static public final String RRULE = "rrule";
 	public String rrule() {
 		return rrule;
 	}

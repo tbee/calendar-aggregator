@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 @StyleSheet("context://../vaadin.css")
 @RolesAllowed("ROLE_ADMIN")
 public class TimezoneView extends AbstractCrudView<Timezone> {
-	private static final Logger LOG = LoggerFactory.getLogger(TimezoneView.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TimezoneView.class);
 
 	public TimezoneView() {
 		super("Timezone"

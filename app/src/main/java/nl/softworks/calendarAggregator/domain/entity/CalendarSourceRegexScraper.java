@@ -27,7 +27,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
 
     @NotNull
     private String regex;
-    static public final String REGEX_PROPERTYID = "regex";
+    static public final String REGEX = "regex";
     public String regex() {
         return regex;
     }
@@ -38,7 +38,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
 
     @NotNull
     private int subjectGroupIdx;
-    static public final String SUBJECTGROUPIDX_PROPERTYID = "subjectGroupIdx";
+    static public final String SUBJECTGROUPIDX = "subjectGroupIdx";
     public int subjectGroupIdx() {
         return subjectGroupIdx;
     }
@@ -49,7 +49,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
 
     @NotNull
     private int startDateGroupIdx;
-    static public final String STARTDATEGROUPIDX_PROPERTYID = "startDateGroupIdx";
+    static public final String STARTDATEGROUPIDX = "startDateGroupIdx";
     public int startDateGroupIdx() {
         return startDateGroupIdx;
     }
@@ -60,7 +60,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
 
     @NotNull
     private int endDateGroupIdx;
-    static public final String ENDDATEGROUPIDX_PROPERTYID = "endDateGroupIdx";
+    static public final String ENDDATEGROUPIDX = "endDateGroupIdx";
     public int endDateGroupIdx() {
         return startDateGroupIdx;
     }
@@ -71,7 +71,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
 
     @NotNull
     private String datePattern;
-    static public final String DATEPATTERN_PROPERTYID = "datePattern";
+    static public final String DATEPATTERN = "datePattern";
     public String datePattern() {
         return datePattern;
     }
@@ -82,7 +82,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
 
     @NotNull
     private String shortMonthNotation;
-    static public final String SHORTMONTHNOTATION_PROPERTYID = "shortMonthNotation";
+    static public final String SHORTMONTHNOTATION = "shortMonthNotation";
     public String shortMonthNotation() {
         return shortMonthNotation;
     }
@@ -93,7 +93,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
 
     @NotNull
     protected boolean nearestYear = false;
-    static public final String NEARESTYEAR_PROPERTYID = "nearestYear";
+    static public final String NEARESTYEAR = "nearestYear";
     public boolean nearestYear() {
         return nearestYear;
     }
@@ -103,7 +103,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
     }
 
     private int startTimeGroupIdx;
-    static public final String STARTTIMEGROUPIDX_PROPERTYID = "startTimeGroupIdx";
+    static public final String STARTTIMEGROUPIDX = "startTimeGroupIdx";
     public int startTimeGroupIdx() {
         return startTimeGroupIdx;
     }
@@ -113,7 +113,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
     }
 
     private String startTimeDefault;
-    static public final String STARTTIMEDEFAULT_PROPERTYID = "startTimeDefault";
+    static public final String STARTTIMEDEFAULT = "startTimeDefault";
     public String startTimeDefault() {
         return startTimeDefault;
     }
@@ -123,7 +123,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
     }
 
     private int endTimeGroupIdx;
-    static public final String ENDTIMEGROUPIDX_PROPERTYID = "endTimeGroupIdx";
+    static public final String ENDTIMEGROUPIDX = "endTimeGroupIdx";
     public int endTimeGroupIdx() {
         return endTimeGroupIdx;
     }
@@ -133,7 +133,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
     }
 
     private String endTimeDefault;
-    static public final String ENDTIMEDEFAULT_PROPERTYID = "endTimeDefault";
+    static public final String ENDTIMEDEFAULT = "endTimeDefault";
     public String endTimeDefault() {
         return endTimeDefault;
     }
@@ -144,7 +144,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
 
     @NotNull
     private String timePattern;
-    static public final String TIMEPATTERN_PROPERTYID = "timePattern";
+    static public final String TIMEPATTERN = "timePattern";
     public String timePattern() {
         return timePattern;
     }
@@ -155,7 +155,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
 
     @NotNull
     private String dateTimeLocale;
-    static public final String DATETIMELOCALE_PROPERTYID = "dateTimeLocale";
+    static public final String DATETIMELOCALE = "dateTimeLocale";
     public String dateTimeLocale() {
         return dateTimeLocale;
     }

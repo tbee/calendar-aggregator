@@ -13,11 +13,11 @@ import java.util.Objects;
 @MappedSuperclass
 abstract public class EntityBase<T> {
 	transient
-	protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
+	protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
 	@Id @GeneratedValue(strategy=GenerationType.IDENTITY)
 	protected long id;
-	static public final String ID_PROPERTYID = "id";
+	static public final String ID = "id";
 	public long id() {
 		return id;
 	}

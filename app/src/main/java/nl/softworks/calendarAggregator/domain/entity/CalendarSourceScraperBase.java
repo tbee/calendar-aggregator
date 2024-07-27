@@ -28,7 +28,7 @@ import java.util.Map;
 @MappedSuperclass
 abstract public class CalendarSourceScraperBase extends CalendarSource {
 
-	private static final Logger LOG = LoggerFactory.getLogger(CalendarSourceScraperBase.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourceScraperBase.class);
 
 	final public static String SHORT_MONTH_NOTATION_PATTERN = "SMN";
 	final public static Map<String, DateTimeFormatter> DEFAULT_FORMATTERS = Map.of(
@@ -45,7 +45,7 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 		);
 
 	protected String scrapeUrl;
-	static public final String SCRAPEURL_PROPERTYID = "scrapeUrl";
+	static public final String SCRAPEURL = "scrapeUrl";
 	public String scrapeUrl() {
 		return scrapeUrl;
 	}
@@ -59,7 +59,7 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 	}
 
 	protected String scrapeBlockStart;
-	static public final String SCRAPEBLOCKSTART_PROPERTYID = "scrapeBlockStart";
+	static public final String SCRAPEBLOCKSTART = "scrapeBlockStart";
 	public String scrapeBlockStart() {
 		return scrapeBlockStart;
 	}
@@ -69,7 +69,7 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 	}
 
 	protected String scrapeBlockEnd;
-	static public final String SCRAPEBLOCKEND_PROPERTYID = "scrapeBlockEnd";
+	static public final String SCRAPEBLOCKEND = "scrapeBlockEnd";
 	public String scrapeBlockEnd() {
 		return scrapeBlockEnd;
 	}
@@ -80,7 +80,7 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 
 	@NotNull
 	private String removeChars = "";
-	static public final String CONTENT_PROPERTYID = "removeChars";
+	static public final String CONTENT = "removeChars";
 	public String removeChars() {
 		return removeChars;
 	}
@@ -233,7 +233,7 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 		}
 		catch (DateTimeException e) {
 			logAppend("For " + year + "-" + month.getValue() + "-" + dayOfMonth + ": " + e.getMessage());
-//			else LOG.warn("Problems creating a LocalDate " + year + "-" + month.getValue() + "-" + dayOfMonth, e);
+//			else LOGGER.warn("Problems creating a LocalDate " + year + "-" + month.getValue() + "-" + dayOfMonth, e);
 			return null;
 		}
 	}

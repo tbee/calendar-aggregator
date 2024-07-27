@@ -8,12 +8,12 @@ import org.slf4j.LoggerFactory;
 
 @Entity
 public class LabelGroup extends EntityBase<LabelGroup> {
-	private static final Logger LOG = LoggerFactory.getLogger(LabelGroup.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LabelGroup.class);
 
 	@Column(unique=true) // prevent the same name to occur
 	@NotNull
 	protected String name;
-	static public final String NAME_PROPERTYID = "name";
+	static public final String NAME = "name";
 	public String name() {
 		return name;
 	}

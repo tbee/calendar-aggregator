@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CalendarSourceICalForm extends CalendarSourceForm {
-	private static final Logger LOG = LoggerFactory.getLogger(CalendarSourceICalForm.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourceICalForm.class);
 
 	private final Binder<CalendarSourceICal> binder = new Binder<>();
 

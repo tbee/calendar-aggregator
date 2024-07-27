@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CucumberHooks {
-    private static final Logger LOG = Logger.getLogger(CucumberHooks.class);
+    private static final Logger LOGGER = Logger.getLogger(CucumberHooks.class);
 
     private static Configuration configuration;
     private static Playwright playwright;
@@ -165,7 +165,7 @@ public class CucumberHooks {
         Tracing.StopOptions stopOptions = new Tracing.StopOptions();
         if (saveInFile != null) {
             stopOptions.setPath(Paths.get(saveInFile.getAbsolutePath()));
-            LOG.info("Saving Playwright trace to " + saveInFile.getAbsolutePath() + ", open with showTrace.sh or on trace.playwright.dev");
+             LOGGER.info("Saving Playwright trace to " + saveInFile.getAbsolutePath() + ", open with showTrace.sh or on trace.playwright.dev");
         }
         browserContext.tracing().stop(stopOptions);
     }

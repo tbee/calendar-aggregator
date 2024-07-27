@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CalendarSourceXmlScraperForm extends CalendarSourceScraperBaseForm {
-	private static final Logger LOG = LoggerFactory.getLogger(CalendarSourceXmlScraperForm.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourceXmlScraperForm.class);
 
 	private final Binder<CalendarSourceXmlScraper> binder = new Binder<>();
 

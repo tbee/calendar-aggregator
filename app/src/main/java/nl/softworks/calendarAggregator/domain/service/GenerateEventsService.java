@@ -14,7 +14,7 @@ import java.util.concurrent.Future;
 
 @Service
 public class GenerateEventsService {
-    private static final Logger LOG = LoggerFactory.getLogger(GenerateEventsService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEventsService.class);
 
     private static final ExecutorService executorService = Executors.newCachedThreadPool();
 
@@ -24,7 +24,7 @@ public class GenerateEventsService {
 
     public void generateEvents(Runnable onStarted) {
         try {
-            if (LOG.isInfoEnabled()) LOG.info("Scheduling event generation");
+             if (LOGGER.isInfoEnabled())  LOGGER.info("Scheduling event generation");
             R.calendarLocation().findAll().stream()
                     .flatMap(cl -> cl.calendarSources().stream())
                     .forEach(cs -> {
@@ -32,13 +32,13 @@ public class GenerateEventsService {
                         R.calendarSource().saveAndFlush(cs);
                         Future<?> future = executorService.submit(() -> generateEvents(cs.id()));
                     });
-            if (LOG.isInfoEnabled()) LOG.info("Event generation scheduled");
+             if (LOGGER.isInfoEnabled())  LOGGER.info("Event generation scheduled");
             if (onStarted != null) {
                 onStarted.run();
             }
         }
         catch (RuntimeException e) {
-            LOG.error("Problem scheduling events", e);
+            LOGGER.error("Problem scheduling events", e);
             throw e;
         }
     }
@@ -48,11 +48,11 @@ public class GenerateEventsService {
         try {
             CalendarSource calendarSource = R.calendarSource().findById(calendarSourceId).orElseThrow();
             try {
-                if (LOG.isInfoEnabled()) LOG.info("Generating events for " + calendarSource.calendarLocation().name() + " in " + Thread.currentThread().getName());
+                 if (LOGGER.isInfoEnabled())  LOGGER.info("Generating events for " + calendarSource.calendarLocation().name() + " in " + Thread.currentThread().getName());
                 calendarSource.generateEvents();
-                if (LOG.isInfoEnabled()) LOG.info("Generating events for " + calendarSource.calendarLocation().name() + " in " + Thread.currentThread().getName() + " finished");
+                 if (LOGGER.isInfoEnabled())  LOGGER.info("Generating events for " + calendarSource.calendarLocation().name() + " in " + Thread.currentThread().getName() + " finished");
             } catch (RuntimeException e) {
-                LOG.error("Problem generating events for " + calendarSource.calendarLocation().name(), e);
+                LOGGER.error("Problem generating events for " + calendarSource.calendarLocation().name(), e);
                 calendarSource = R.calendarSource().findById(calendarSource.id()).orElseThrow(); // fresh does not work
                 calendarSource.log(e.toString());
                 calendarSource.status("Exception: " + e.getMessage());
@@ -60,7 +60,7 @@ public class GenerateEventsService {
             calendarSource.lastRun(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
             R.calendarSource().save(calendarSource);
         } catch (RuntimeException e) {
-            LOG.error("Problem generating events for CalendarSource " + calendarSourceId, e);
+            LOGGER.error("Problem generating events for CalendarSource " + calendarSourceId, e);
         }
     }
 }

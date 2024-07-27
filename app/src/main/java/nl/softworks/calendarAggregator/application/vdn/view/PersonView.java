@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 @StyleSheet("context://../vaadin.css")
 @RolesAllowed("ROLE_ADMIN")
 public class PersonView extends AbstractCrudView<Person> {
-	private static final Logger LOG = LoggerFactory.getLogger(PersonView.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PersonView.class);
 
 	public PersonView() {
 		super("Person"

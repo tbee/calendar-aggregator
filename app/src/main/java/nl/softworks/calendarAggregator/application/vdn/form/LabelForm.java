@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class LabelForm extends AbstractCrudForm<Label> {
-	private static final Logger LOG = LoggerFactory.getLogger(LabelForm.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LabelForm.class);
 
 	private final Binder<Label> binder = new Binder<>();
 

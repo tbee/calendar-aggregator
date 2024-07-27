@@ -36,7 +36,7 @@ public class CalendarSourceICal extends CalendarSource {
 	@NotNull
 	@Column(name = "scrapeUrl")
 	protected String icalUrl;
-	static public final String ICALURL_PROPERTYID = "icalUrl";
+	static public final String ICALURL = "icalUrl";
 	public String icalUrl() {
 		return icalUrl;
 	}
@@ -47,7 +47,7 @@ public class CalendarSourceICal extends CalendarSource {
 
 	@NotNull
 	private String regex;
-	static public final String REGEX_PROPERTYID = "regex";
+	static public final String REGEX = "regex";
 	public String regex() {
 		return regex;
 	}

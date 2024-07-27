@@ -19,12 +19,12 @@ import java.util.List;
 
 @Entity
 public class CalendarLocation extends EntityBase<CalendarLocation> {
-	private static final Logger LOG = LoggerFactory.getLogger(CalendarLocation.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarLocation.class);
 
 	@Column(unique=true) // prevent the same name to occur
 	@NotNull
 	protected String name;
-	static public final String NAME_PROPERTYID = "name";
+	static public final String NAME = "name";
 	public String name() {
 		return name;
 	}
@@ -35,7 +35,7 @@ public class CalendarLocation extends EntityBase<CalendarLocation> {
 
 	@NotNull
 	protected String location;
-	static public final String LOCATION_PROPERTYID = "location";
+	static public final String LOCATION = "location";
 	public String location() {
 		return location;
 	}
@@ -47,7 +47,7 @@ public class CalendarLocation extends EntityBase<CalendarLocation> {
 	@NotNull
 	@UrlValidator
 	protected String url;
-	static public final String URL_PROPERTYID = "url";
+	static public final String URL = "url";
 	public String url() {
 		return url;
 	}
@@ -72,7 +72,7 @@ public class CalendarLocation extends EntityBase<CalendarLocation> {
 
 	@NotNull
 	protected double lat;
-	static public final String LAT_PROPERTYID = "lat";
+	static public final String LAT = "lat";
 	public double lat() {
 		return lat;
 	}
@@ -86,7 +86,7 @@ public class CalendarLocation extends EntityBase<CalendarLocation> {
 
 	@NotNull
 	protected double lon;
-	static public final String LON_PROPERTYID = "lon";
+	static public final String LON = "lon";
 	public double lon() {
 		return lon;
 	}
@@ -102,7 +102,7 @@ public class CalendarLocation extends EntityBase<CalendarLocation> {
 	@JoinColumn(name = "timezone_id", nullable = false)
 	@ManyToOne(targetEntity=Timezone.class, fetch=FetchType.LAZY)
 	protected Timezone timezone;
-	static public final String TIMEZONE_PROPERTYID = "timezone";
+	static public final String TIMEZONE = "timezone";
 	public Timezone timezone() {
 		return timezone;
 	}
@@ -113,7 +113,7 @@ public class CalendarLocation extends EntityBase<CalendarLocation> {
 
 	@NotNull
 	protected boolean enabled = true;
-	static public final String ENABLED_PROPERTYID = "enabled";
+	static public final String ENABLED = "enabled";
 	public boolean enabled() {
 		return enabled;
 	}
@@ -126,7 +126,7 @@ public class CalendarLocation extends EntityBase<CalendarLocation> {
 	}
 
 	private LocalDateTime lastRun;
-	static public final String LASTRUN_PROPERTYID = "lastRun";
+	static public final String LASTRUN = "lastRun";
 	public LocalDateTime lastRun() {
 		return lastRun;
 	}

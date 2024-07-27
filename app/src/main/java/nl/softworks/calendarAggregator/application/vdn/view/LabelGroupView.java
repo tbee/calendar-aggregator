@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 @StyleSheet("context://../vaadin.css")
 @RolesAllowed("ROLE_ADMIN")
 public class LabelGroupView extends AbstractCrudView<LabelGroup> {
-	private static final Logger LOG = LoggerFactory.getLogger(LabelGroupView.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LabelGroupView.class);
 
 	public LabelGroupView() {
 		super("Label group"

@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TimezoneForm extends AbstractCrudForm<Timezone> {
-	private static final Logger LOG = LoggerFactory.getLogger(TimezoneForm.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(TimezoneForm.class);
 
 	private final Binder<Timezone> binder = new Binder<>();
 

@@ -17,7 +17,7 @@ import java.net.URL;
  * org.springframework.context.ApplicationListener=nl.softworks.calendarAggregator.ApplicationPrepared
  */
 public class ApplicationPrepared implements ApplicationListener<ApplicationPreparedEvent> {
-    private static final Logger LOG = LoggerFactory.getLogger(ApplicationPrepared.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationPrepared.class);
 
     @Override
     public void onApplicationEvent(ApplicationPreparedEvent event) {
@@ -33,7 +33,7 @@ public class ApplicationPrepared implements ApplicationListener<ApplicationPrepa
 
         // Determine HSQLDB port
         if (!url.startsWith("jdbc:hsqldb:hsql://")) {
-            LOG.warn("Not starting HSQLDB because URL seems to be of a different RDBMS: " + url);
+            LOGGER.warn("Not starting HSQLDB because URL seems to be of a different RDBMS: " + url);
             return;
         }
         String datasourceUrlSuffix = url.substring(url.lastIndexOf(":") + 1);
@@ -53,14 +53,14 @@ public class ApplicationPrepared implements ApplicationListener<ApplicationPrepa
             return;
         }
         dbServer.start();
-        if (LOG.isInfoEnabled()) LOG.info("HSQLDB started");
+         if (LOGGER.isInfoEnabled())  LOGGER.info("HSQLDB started");
 
         // Handle clean shutdown
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (!dbServer.isNotRunning()) {
-                if (LOG.isInfoEnabled()) LOG.info("HSQLDB shutting down");
+                 if (LOGGER.isInfoEnabled())  LOGGER.info("HSQLDB shutting down");
                 dbServer.shutdown();
-                if (LOG.isInfoEnabled()) LOG.info("HSQLDB shutdown");
+                 if (LOGGER.isInfoEnabled())  LOGGER.info("HSQLDB shutdown");
             }
         }));
     }
@@ -71,7 +71,7 @@ public class ApplicationPrepared implements ApplicationListener<ApplicationPrepa
             aclFile.deleteOnExit();
             URL serverACLResourceURL = ApplicationPrepared.class.getResource("/hsqldb.acl");
             IOUtils.copy(serverACLResourceURL, aclFile);
-            if (LOG.isInfoEnabled()) LOG.info("HSQLDB using " + aclFile.getAbsolutePath());
+             if (LOGGER.isInfoEnabled())  LOGGER.info("HSQLDB using " + aclFile.getAbsolutePath());
             return aclFile.getAbsolutePath();
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 public class CalendarSourceManualForm extends CalendarSourceForm {
-	private static final Logger LOG = LoggerFactory.getLogger(CalendarSourceManualForm.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourceManualForm.class);
 
 	private final Binder<CalendarSourceManual> binder = new Binder<>();
 

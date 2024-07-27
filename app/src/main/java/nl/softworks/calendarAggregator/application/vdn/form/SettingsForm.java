@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.tbee.jakarta.validator.UrlValidatorImpl;
 
 public class SettingsForm extends FormLayout {
-	private static final Logger LOG = LoggerFactory.getLogger(SettingsForm.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SettingsForm.class);
 
 	private final Binder<Settings> binder = new Binder<>();
 

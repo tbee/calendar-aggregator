@@ -27,7 +27,7 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 
 	@NotNull
 	LocalDateTime startDateTime;
-	static public final String STARTDATETIME_PROPERTYID = "startDateTime";
+	static public final String STARTDATETIME = "startDateTime";
 	public LocalDateTime startDateTime() {
 		return startDateTime;
 	}
@@ -38,7 +38,7 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 
 	@NotNull
 	private LocalDateTime endDateTime;
-	static public final String ENDDATETIME_PROPERTYID = "endDateTime";
+	static public final String ENDDATETIME = "endDateTime";
 	public LocalDateTime endDateTime() {
 		return endDateTime;
 	}
@@ -49,7 +49,7 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 
 	@NotNull
 	private String subject = "";
-	static public final String SUBJECT_PROPERTYID = "subject";
+	static public final String SUBJECT = "subject";
 	public String subject() {
 		return subject;
 	}

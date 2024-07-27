@@ -15,7 +15,7 @@ public class Person extends EntityBase<Person> {
 	@NotNull
 	@Column(unique=true)
 	private String username;
-	static public final String USERNAME_PROPERTYID = "username";
+	static public final String USERNAME = "username";
 	public String username() {
 		return username;
 	}
@@ -26,7 +26,7 @@ public class Person extends EntityBase<Person> {
 
 	@NotNull
 	private String password;
-	static public final String PASSWORD_PROPERTYID = "password";
+	static public final String PASSWORD = "password";
 	public String password() {
 		return this.password;
 	}
@@ -44,7 +44,7 @@ public class Person extends EntityBase<Person> {
 
 	@NotNull
 	private String email;
-	static public final String EMAIL_PROPERTYID = "email";
+	static public final String EMAIL = "email";
 	public String email() {
 		return email;
 	}
@@ -56,7 +56,7 @@ public class Person extends EntityBase<Person> {
 	@NotNull
 	@Convert(converter = PersonRoleConverter.class)
 	private Role role = Role.ROLE_USER;
-	static public final String ROLE_PROPERTYID = "role";
+	static public final String ROLE = "role";
 	public Role role() {
 		return role;
 	}
@@ -69,7 +69,7 @@ public class Person extends EntityBase<Person> {
 
 	@NotNull
 	private boolean enabled = true;
-	static public final String ENABLED_PROPERTYID = "enabled";
+	static public final String ENABLED = "enabled";
 	public boolean enabled() {
 		return enabled;
 	}

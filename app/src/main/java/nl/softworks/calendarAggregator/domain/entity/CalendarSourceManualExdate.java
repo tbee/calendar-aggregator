@@ -21,7 +21,7 @@ public class CalendarSourceManualExdate extends EntityBase<CalendarSourceManualE
 
 	@NotNull
 	private LocalDate excludedDate;
-	static public final String EXCLUDEDDATE_PROPERTYID = "excludedDate";
+	static public final String EXCLUDEDDATE = "excludedDate";
 	public LocalDate excludedDate() {
 		return excludedDate;
 	}
