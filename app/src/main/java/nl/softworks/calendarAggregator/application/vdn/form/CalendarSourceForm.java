@@ -46,7 +46,7 @@ abstract public class CalendarSourceForm extends FormLayout {
 		setColspan(generateButton, 2);
 		add(generateButton);
 
-		labelCheckboxGroup.setItems(new ListDataProvider<>(R.label().findAllByOrderByNameAsc()));
+		labelCheckboxGroup.setItems(new ListDataProvider<>(R.label().findAllByOrderBySeqnrAsc()));
 		labelCheckboxGroup.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
 		labelCheckboxGroup.setRenderer(new ComponentRenderer<>(label -> {
 			NativeLabel nativeLabel = new NativeLabel();

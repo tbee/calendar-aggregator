@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface LabelRepo extends RepoBase<Label, Long> {
     List<Label> findAllByOrderByNameAsc();
+    List<Label> findAllByOrderBySeqnrAsc();
     Optional<Label> findByName(String name);
 }
