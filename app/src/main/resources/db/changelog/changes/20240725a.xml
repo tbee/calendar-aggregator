@@ -8,6 +8,21 @@
     <!-- https://xenovation.com/blog/development/java/java-professional-developer/liquibase-related-sql-java-types -->
 
     <changeSet id="20240725a" author="tom">
+        <createTable tableName="label_group">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lazylock" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint constraintName="label_group_uk01"
+                             tableName="label_group"
+                             columnNames="name"/>
+
         <createTable tableName="label">
             <column name="id" type="bigint" autoIncrement="true" startWith="1">
                 <constraints primaryKey="true" nullable="false"/>
@@ -18,13 +33,27 @@
             <column name="name" type="varchar(50)">
                 <constraints nullable="false"/>
             </column>
-            <column name="html" type="nvarchar(1000)">
+            <column name="description" type="nvarchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="icon" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="seqnr" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="label_group_id" type="bigint">
                 <constraints nullable="false"/>
             </column>
         </createTable>
         <addUniqueConstraint constraintName="label_uk01"
                              tableName="label"
                              columnNames="name"/>
+        <addForeignKeyConstraint  constraintName="label__label_group"
+                                  baseTableName="label"
+                                  baseColumnNames="label_group_id"
+                                  referencedTableName="label_group"
+                                  referencedColumnNames="id"/>
 
         <createTable tableName="calendar_source2label">
             <column name="id" type="bigint" autoIncrement="true" startWith="1">

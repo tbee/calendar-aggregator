@@ -2,13 +2,10 @@ package nl.softworks.calendarAggregator.domain.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Set;
 
 @Entity
 public class Label extends EntityBase<Label> {
@@ -27,18 +24,51 @@ public class Label extends EntityBase<Label> {
 	}
 
 	@NotNull
-	protected String html;
-	static public final String HTML_PROPERTYID = "html";
-	public String html() {
-		return html;
+	protected String description;
+	static public final String DESCRIPTION_PROPERTYID = "description";
+	public String description() {
+		return description;
 	}
-	public Label html(String v) {
-		this.html = v;
+	public Label description(String v) {
+		this.description = v;
 		return this;
 	}
 
-	@ManyToMany(mappedBy = "labels", fetch = FetchType.LAZY)
-	Set<CalendarSource> calendarSources;
+	@NotNull
+	protected String icon;
+	static public final String ICON_PROPERTYID = "icon";
+	public String icon() {
+		return icon;
+	}
+	public Label icon(String v) {
+		this.icon = v;
+		return this;
+	}
+
+	@NotNull
+	protected int seqnr = 0;
+	static public final String SEQNR_PROPERTYID = "seqnr";
+	public int seqnr() {
+		return seqnr;
+	}
+	public Label seqnr(int v) {
+		this.seqnr = v;
+		return this;
+	}
+
+	@ManyToOne
+	@NotNull
+	private LabelGroup labelGroup;
+	public LabelGroup labelGroup() {
+		return labelGroup;
+	}
+	public Label labelGroup(LabelGroup v) {
+		this.labelGroup = v;
+		return this;
+	}
+
+//	@ManyToMany(mappedBy = "labels", fetch = FetchType.LAZY)
+//	Set<CalendarSource> calendarSources;
 
 	public String toString() {
 		return super.toString() //

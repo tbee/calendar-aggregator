@@ -9,6 +9,7 @@ import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import nl.softworks.calendarAggregator.application.vdn.component.ResultDialog;
 import nl.softworks.calendarAggregator.domain.boundary.R;
@@ -45,7 +46,7 @@ abstract public class CalendarSourceForm extends FormLayout {
 		setColspan(generateButton, 2);
 		add(generateButton);
 
-		labelCheckboxGroup.setItems(R.label().findAllByOrderByNameAsc().toArray(new Label[]{}));
+		labelCheckboxGroup.setItems(new ListDataProvider<>(R.label().findAllByOrderByNameAsc()));
 		labelCheckboxGroup.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
 		labelCheckboxGroup.setRenderer(new ComponentRenderer<>(label -> {
 			NativeLabel nativeLabel = new NativeLabel();

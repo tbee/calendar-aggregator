@@ -1,6 +1,8 @@
 package nl.softworks.calendarAggregator.application.vdn.view;
 
 import com.vaadin.flow.component.dependency.StyleSheet;
+import com.vaadin.flow.component.html.NativeLabel;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
 import nl.softworks.calendarAggregator.application.vdn.form.LabelForm;
@@ -23,7 +25,13 @@ public class LabelView extends AbstractCrudView<Label> {
 				, () -> R.label().findAllByOrderByNameAsc()
 				, LabelForm::new
 				, grid -> {
-					grid.addColumn(Label::name).setHeader("Name");
+					grid.addColumn(Label::name).setHeader("Name").setSortable(true);
+					grid.addColumn(new ComponentRenderer<>(label -> {
+						NativeLabel nativeLabel = new NativeLabel();
+						nativeLabel.setText(label == null || label.labelGroup() == null ? "-" : label.labelGroup().name());
+						return nativeLabel;
+					})).setHeader("Group");
+					grid.addColumn(Label::seqnr).setHeader("Seqnr").setSortable(true);
 				});
 		tabs.setSelectedTab(labelTab);
 	}

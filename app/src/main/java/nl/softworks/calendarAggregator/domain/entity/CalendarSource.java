@@ -67,7 +67,6 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 		return calendarLocation;
 	}
 
-
 	protected String description = "";
 	static public final String DESCRIPTION_PROPERTYID = "description";
 	public String description() {

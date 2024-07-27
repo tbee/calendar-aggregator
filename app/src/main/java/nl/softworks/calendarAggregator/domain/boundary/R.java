@@ -56,6 +56,12 @@ public class R {
     }
 
     @Autowired
+    LabelGroupRepo labelGroupRepo;
+    static public LabelGroupRepo labelGroup() {
+        return R.singleton.labelGroupRepo;
+    }
+
+    @Autowired
     LabelRepo labelRepo;
     static public LabelRepo label() {
         return R.singleton.labelRepo;
