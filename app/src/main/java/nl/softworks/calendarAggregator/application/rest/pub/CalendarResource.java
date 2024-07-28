@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/")
 public class CalendarResource {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(CalendarResource.class);
 
     private static int EARTH_RADIUS = 6371;
