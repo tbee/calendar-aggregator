@@ -26,6 +26,7 @@ import jakarta.annotation.security.RolesAllowed;
 import nl.softworks.calendarAggregator.application.vdn.CalendarAggregatorAppLayout;
 import nl.softworks.calendarAggregator.application.vdn.component.CancelDialog;
 import nl.softworks.calendarAggregator.application.vdn.component.CrudButtonbar;
+import nl.softworks.calendarAggregator.application.vdn.component.CrudIconButtonbar;
 import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.application.vdn.component.ResultDialog;
 import nl.softworks.calendarAggregator.application.vdn.component.VButton;
@@ -277,7 +278,7 @@ implements AfterNavigationObserver
 
 		@Override
 		public Component crudButtons() {
-			return new CrudButtonbar()
+			return new CrudIconButtonbar()
 					.onInsert(this::insert)
 					.onEdit(this::edit)
 					.onDelete(() -> delete());
@@ -436,7 +437,7 @@ implements AfterNavigationObserver
 
 		@Override
 		public Component crudButtons() {
-			return new CrudButtonbar()
+			return new CrudIconButtonbar()
 					.onEdit(this::edit)
 					.onDelete(this::delete);
 		}
