@@ -110,18 +110,62 @@ public class CalendarResource {
                         </ul>
                       </div>
                       <div class="notification pagewidth">
-                        <p>
-                          You can limit the amount of entries by filtering on distance (as the crow flies).
-                          For this you need to determine the decimal latitude (lat) and longitude (lon) of where you live, for example by using Google maps.
-                          Then add these as parameters to the URL, together with a distance (d) in kilometers.
-                          For example:
-                        </p>
-                        <p style="margin-top:5px;">
-                          <a href="%baseurl%/month?lat=51.9214012&lon=6.5761531&d=40" target="_blank">%baseurl%/?lat=51.9214012&lon=6.5761531&d=40</a>
-                        </p>
-                        <p style="margin-top:5px;">
-                          These parameters can be set on all the views of this data.
-                        </p>
+                        <form method="get">
+                            <div class="field">
+                                <p>
+                                  You can limit the amount of entries by filtering on distance (as the crow flies).
+                                  For this you need to determine the decimal latitude and longitude of where you live, for example by using Google maps.
+                                  These parameters can also be applied to the ical url.
+                                </p>
+                            </div>
+                            <div class="field is-horizontal">
+                              <div class="field-label is-normal">
+                                <label class="label">Latitude</label>
+                              </div>
+                              <div class="field-body">
+                                <div class="field">
+                                  <p class="control">
+                                    <input name="lat" class="input" type="number" step="0.0000001" min="-90.0" max="90.0" placeholder="e.g. 51.9214012"/>
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="field is-horizontal">
+                              <div class="field-label is-normal">
+                                <label class="label">Longitude</label>
+                              </div>
+                              <div class="field-body">
+                                <div class="field">
+                                  <p class="control">
+                                    <input name="lon" class="input" type="number" step="0.0000001" min="-180.0" max="180.0" placeholder="e.g 6.5761531"/>
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="field is-horizontal">
+                              <div class="field-label is-normal">
+                                <label class="label">Distance</label>
+                              </div>
+                              <div class="field-body">
+                                <div class="field">
+                                  <p class="control">
+                                    <input name="d" class="input" type="number" step="1" min="0" max="500" placeholder="e.g. 50"/>
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="field is-horizontal">
+                              <div class="field-label is-normal">
+                              </div>
+                              <div class="field-body">
+                                <div class="field">
+                                  <p class="control">
+                                    <input class="button" type="submit" value="Go!" />
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                        </form>
                       </div>
                     </section>
                   </body>
@@ -256,7 +300,6 @@ public class CalendarResource {
                     .map(ce -> {
                         String description = ce.determineSubject();
                         List<Label> labels = ce.calendarSource().labelAssignments().stream()
-                                .peek(la -> System.out.println(description + " " + la.subjectRegexp() + " " + description.matches(la.subjectRegexp())))
                                 .filter(la -> la.subjectRegexp().isBlank() || description.matches(la.subjectRegexp()))
                                 .map(CalendarSourceLabelAssignment::label)
                                 .toList();
