@@ -258,12 +258,13 @@ public class CalendarResource {
                                 .sorted(Comparator.comparing(Label::seqnr))
                                 .map(l -> """
                                         <div class="tooltipped">
-                                        <i class="css-icon css-icon-%labelgroup%"><span>%icon%</span></i>
+                                        <i class="css-icon css-icon-%labelgroup%" style="%color%"><span>%icon%</span></i>
                                         <span class="tooltiptext">%tooltip%</span>
                                         </div>
                                         """
                                         .replace("%icon%", l.icon())
                                         .replace("%labelgroup%", l.labelGroup().name().replace(" ", "").toLowerCase())
+                                        .replace("%color%", l.labelGroup().color() == null || l.labelGroup().color().isBlank() ? "" : "background:" + l.labelGroup().color() + ";")
                                         .replace("%tooltip%", l.description()))
                                 .collect(Collectors.joining("\n"));
                         return """

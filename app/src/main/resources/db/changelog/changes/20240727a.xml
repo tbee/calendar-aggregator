@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- https://xenovation.com/blog/development/java/java-professional-developer/liquibase-related-sql-java-types -->
+
+    <changeSet id="20240727a" author="tom">
+        <addColumn tableName="label_group" >
+            <column name="color" type="varchar(20)" defaultValue="black">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="calendar_source2label" >
+            <column name="subject_regexp" type="nvarchar(1000)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

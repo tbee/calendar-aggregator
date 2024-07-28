@@ -13,11 +13,13 @@ public class LabelGroupForm extends AbstractCrudForm<LabelGroup> {
 	private final Binder<LabelGroup> binder = new Binder<>();
 
 	private final TextField nameTextField = new TextField("Name");
+	private final TextField colorTextField = new TextField("Color");
 
 	public LabelGroupForm() {
-		add(nameTextField);
+		add(nameTextField, colorTextField);
 
 		binder.forField(nameTextField).bind(LabelGroup::name, LabelGroup::name);
+		binder.forField(colorTextField).bind(LabelGroup::color, LabelGroup::color);
 	}
 
 	@Override

@@ -321,7 +321,7 @@ implements AfterNavigationObserver
 		private void edit() {
 			treeGrid.select(this); // for reselect after reload
 			CalendarLocationForm calendarLocationForm = new CalendarLocationForm().populateWith(calendarLocation);
-			showEditForm(calendarLocationForm, () -> {
+			showEditForm("Location", calendarLocationForm, () -> {
 				calendarLocationForm.writeTo(calendarLocation);
 				R.calendarLocation().save(calendarLocation);
 				return null;
@@ -476,7 +476,7 @@ implements AfterNavigationObserver
 			else {
 				throw new IllegalStateException("Unknown CalendarSource " + calendarSource.getClass().getSimpleName());
 			}
-			showEditForm(calendarSourceForm, () -> {
+			showEditForm(calendarSource.calendarLocation().name() + " " + title, calendarSourceForm, () -> {
 				calendarSourceForm.writeTo(calendarSource);
 				R.calendarSource().save(calendarSource);
 				return null;
@@ -595,7 +595,7 @@ implements AfterNavigationObserver
 				.open();
 	}
 
-	private void showEditForm(Component form, Callable<Void> runnable) {
+	private void showEditForm(String title, Component form, Callable<Void> runnable) {
 		new OkCancelDialog(title, form)
 				.okLabel("Save")
 				.onOk(() -> {

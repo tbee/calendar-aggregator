@@ -66,4 +66,10 @@ public class R {
     static public LabelRepo label() {
         return R.singleton.labelRepo;
     }
+
+    @Autowired
+    CalendarSourceLabelAssignmentRepo calendarSourceLabelAssignmentRepo;
+    static public CalendarSourceLabelAssignmentRepo calendarSourceLabelAssignment() {
+        return R.singleton.calendarSourceLabelAssignmentRepo;
+    }
 }

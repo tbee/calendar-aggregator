@@ -22,6 +22,17 @@ public class LabelGroup extends EntityBase<LabelGroup> {
 		return this;
 	}
 
+	@NotNull
+	protected String color;
+	static public final String COLOR = "color";
+	public String color() {
+		return color;
+	}
+	public LabelGroup color(String v) {
+		this.color = v;
+		return this;
+	}
+
 	public String toString() {
 		return super.toString() //
 		     + ",name=" + name

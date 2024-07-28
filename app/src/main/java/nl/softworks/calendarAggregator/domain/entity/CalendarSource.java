@@ -7,10 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.Lob;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
@@ -39,12 +36,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
+import java.util.stream.Collectors;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -160,16 +157,28 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 		calendarEvent.calendarSource = null;
 	}
 
-	@ManyToMany
-	@JoinTable(name = "calendar_source2label", joinColumns = @JoinColumn(name = "calendar_source_id"), inverseJoinColumns = @JoinColumn(name = "label_id"))
-	private Set<Label> labels;
-	public Set<Label> labels() {
-		return Collections.unmodifiableSet(labels);
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.EAGER)
+	protected final List<CalendarSourceLabelAssignment> labelAssignments = new ArrayList<>();
+	public List<CalendarSourceLabelAssignment> labelAssignments() {
+		return Collections.unmodifiableList(labelAssignments);
 	}
-	public void labels(Collection<Label> v) {
-		labels = (labels == null ? new HashSet<>() : labels);
-		labels.clear();
-		labels.addAll(v == null ? Collections.emptySet() : v);
+	public void labelAssignments(Collection<CalendarSourceLabelAssignment> v) {
+		// TODO this can be done more efficient
+		labelAssignments.forEach(la -> la.calendarSource = null); // delete
+		labelAssignments.clear();
+		v.forEach(la -> la.calendarSource = this);
+		labelAssignments.addAll(v);
+	}
+	public void addLabelAssignment(CalendarSourceLabelAssignment v) {
+		labelAssignments.add(v);
+	}
+	public void removeLabelAssignment(CalendarSourceLabelAssignment v) {
+		labelAssignments.remove(v);
+	}
+	public Set<Label> labels() {
+		return labelAssignments.stream()
+				.map(CalendarSourceLabelAssignment::label)
+				.collect(Collectors.toSet());
 	}
 
 	/**
