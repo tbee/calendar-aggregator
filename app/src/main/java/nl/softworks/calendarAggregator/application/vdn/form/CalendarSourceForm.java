@@ -1,20 +1,18 @@
 package nl.softworks.calendarAggregator.application.vdn.form;
 
-import com.vaadin.flow.component.BlurNotifier;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Focusable;
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.KeyDownEvent;
+import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.theme.lumo.LumoIcon;
+import nl.softworks.calendarAggregator.application.vdn.component.IconButton;
+import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.application.vdn.component.ResultDialog;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
@@ -41,6 +39,7 @@ abstract public class CalendarSourceForm extends FormLayout {
 	private final TextField urlTextField = new TextField("URL");
 	private final Grid<LabelAssignmentGridRow> labelAssignGrid = new Grid<>(LabelAssignmentGridRow.class, false);
 	private final List<LabelAssignmentGridRow> labelAssignGridItems;
+	private final ListDataProvider<LabelAssignmentGridRow> labelAssignListDataProvider;
 
 	private CalendarSource calendarSource;
 
@@ -55,40 +54,19 @@ abstract public class CalendarSourceForm extends FormLayout {
 		setColspan(generateButton, 2);
 		add(generateButton);
 
+		// Setup labelAssignGrid
+		labelAssignGrid.addComponentColumn(LabelAssignmentGridRow::selected).setHeader("").setWidth("60px").setFlexGrow(0);
+		labelAssignGrid.addColumn(LabelAssignmentGridRow::name).setHeader("Label");
+		labelAssignGrid.addComponentColumn(LabelAssignmentGridRow::editButton).setHeader("").setWidth("60px").setFlexGrow(0);
+		labelAssignGrid.addColumn(LabelAssignmentGridRow::subjectRegexp).setHeader("Subject regexp");
+
 		binder.forField(descriptionTextfield).bind(CalendarSource::description, CalendarSource::description);
 		binder.forField(statusTextField).bind(CalendarSource::status, CalendarSource::status);
 		binder.forField(enabledCheckbox).bind(CalendarSource::enabled, CalendarSource::enabled);
 		binder.forField(urlTextField).bind(CalendarSource::url, CalendarSource::url);
-
-		// Setup labelAssignGrid
-		labelAssignGrid.addComponentColumn(LabelAssignmentGridRow::selected).setHeader("").setWidth("60px").setFlexGrow(0);
-		labelAssignGrid.addColumn(LabelAssignmentGridRow::name).setHeader("Label");
-		Grid.Column<LabelAssignmentGridRow> subjectRegexpColumn = labelAssignGrid.addColumn(LabelAssignmentGridRow::subjectRegexp).setHeader("Subject regexp");
 		labelAssignGridItems = R.label().findAllByOrderByNameAsc().stream().map(LabelAssignmentGridRow::new).toList();
-		labelAssignGrid.setItems(new ListDataProvider<>(labelAssignGridItems));
-
-		// Setup inline editing labelAssignGrid
-		Editor<LabelAssignmentGridRow> editor = labelAssignGrid.getEditor();
-		TextField subjectRegexpTextField = new TextField();
-		subjectRegexpTextField.addBlurListener((ComponentEventListener<BlurNotifier.BlurEvent<TextField>>) event -> {
-			editor.getItem().subjectRegexp(subjectRegexpTextField.getValue());
-			editor.closeEditor();
-		});
-		subjectRegexpTextField.addKeyDownListener(Key.ESCAPE, (ComponentEventListener<KeyDownEvent>) event -> {
-			editor.cancel();
-		});
-		subjectRegexpTextField.setWidthFull();
-		subjectRegexpColumn.setEditorComponent(subjectRegexpTextField);
-
-		// On double click open inline editing
-		labelAssignGrid.addItemDoubleClickListener(e -> {
-			editor.editItem(e.getItem());
-			subjectRegexpTextField.setValue(e.getItem().subjectRegexp());
-			Component editorComponent = e.getColumn().getEditorComponent();
-			if (editorComponent instanceof Focusable focusable) {
-				focusable.focus();
-			}
-		});
+		labelAssignListDataProvider = new ListDataProvider<>(labelAssignGridItems);
+		labelAssignGrid.setItems(labelAssignListDataProvider);
 	}
 
 	public CalendarSourceForm populateWith(CalendarSource calendarSource) {
@@ -145,6 +123,7 @@ abstract public class CalendarSourceForm extends FormLayout {
 		final private Label label;
 		private CalendarSourceLabelAssignment assign;
 		private Checkbox selectedCheckbox = new Checkbox(false);
+		private IconButton editIcon = new IconButton(LumoIcon.EDIT.create(), e -> edit());
 
 		public LabelAssignmentGridRow(Label v) {
 			this.label = v;
@@ -172,16 +151,33 @@ abstract public class CalendarSourceForm extends FormLayout {
 		public String subjectRegexp() {
 			return assign == null ? "" : assign.subjectRegexp();
 		}
-		public void subjectRegexp(String v) {
-			assign = (assign != null ? assign : new CalendarSourceLabelAssignment(calendarSource, label));
-			assign.subjectRegexp(v);
-		}
 
 		public Component selected() {
 			return selectedCheckbox;
 		}
 
+		public IconButton editButton() {
+			return editIcon;
+		}
+
 		public void edit() {
+			assign = (assign != null ? assign : new CalendarSourceLabelAssignment(calendarSource, label));
+			TextField textField = new TextField();
+			textField.setWidthFull();
+			textField.setValue(assign.subjectRegexp() == null ? "" : assign.subjectRegexp());
+			new OkCancelDialog("Subject regexp", textField)
+					.width(50, Unit.PERCENTAGE)
+					.okLabel("Accept")
+					.onOk(() -> {
+						try {
+							assign.subjectRegexp(textField.getValue());
+							LabelAssignmentGridRow.this.selectedCheckbox.setValue(true);
+							labelAssignListDataProvider.refreshItem(LabelAssignmentGridRow.this);
+						} catch (Exception e) {
+							throw new RuntimeException(e);
+						}
+					})
+					.open();
 		}
 	}
 }

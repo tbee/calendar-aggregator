@@ -1,6 +1,7 @@
 package nl.softworks.calendarAggregator.application.vdn.component;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -48,6 +49,11 @@ public class OkCancelDialog extends Dialog {
 
     public OkCancelDialog okLabel(String v) {
         this.okButton.setText(v);
+        return this;
+    }
+
+    public OkCancelDialog width(float width, Unit unit) {
+        this.setWidth(width, unit);
         return this;
     }
 }

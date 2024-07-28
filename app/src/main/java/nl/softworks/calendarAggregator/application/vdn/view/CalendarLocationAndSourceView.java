@@ -13,7 +13,6 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.component.treegrid.TreeGrid;
@@ -21,6 +20,7 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.theme.lumo.LumoIcon;
 import jakarta.annotation.security.RolesAllowed;
 import nl.softworks.calendarAggregator.application.vdn.CalendarAggregatorAppLayout;
 import nl.softworks.calendarAggregator.application.vdn.component.CancelDialog;
@@ -67,8 +67,8 @@ public class CalendarLocationAndSourceView extends CalendarAggregatorAppLayout
 implements AfterNavigationObserver
 {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarLocationAndSourceView.class);
-	public static final VaadinIcon ENABLED_ICON = VaadinIcon.CHECK;
-	public static final VaadinIcon DISABLED_ICON = VaadinIcon.MINUS;
+	public static final LumoIcon ENABLED_ICON = LumoIcon.PLUS;
+	public static final LumoIcon DISABLED_ICON = LumoIcon.CROSS;
 
 	private final TreeGrid<TreeNode> treeGrid = new TreeGrid<>();
 
@@ -215,7 +215,7 @@ implements AfterNavigationObserver
 		}
 		@Override
 		public Icon enabled() {
-			return calendarLocation.isEnabled() ? ENABLED_ICON.create() : DISABLED_ICON.create();
+			return calendarLocation.isEnabled() ? null : DISABLED_ICON.create();
 		}
 
 		@Override

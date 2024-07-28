@@ -1,6 +1,5 @@
 package nl.softworks.calendarAggregator.application.vdn.component;
 
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 
@@ -10,10 +9,10 @@ public class CrudButtonbar extends HorizontalLayout {
     private Runnable onInsert = null;
     private Runnable onEdit = null;
     private Runnable onDelete = null;
-    private final Button reloadButton = new Button(LumoIcon.RELOAD.create(), e -> onReload.run());
-    private final Button insertButton = new Button(LumoIcon.PLUS.create(), e -> onInsert.run());
-    private final Button editButton = new Button(LumoIcon.EDIT.create(), e -> onEdit.run());
-    private final Button deleteButton = new Button(LumoIcon.MINUS.create(), e -> onDelete.run());
+    private final IconButton reloadButton = new IconButton(LumoIcon.RELOAD.create(), e -> onReload.run());
+    private final IconButton insertButton = new IconButton(LumoIcon.PLUS.create(), e -> onInsert.run());
+    private final IconButton editButton = new IconButton(LumoIcon.EDIT.create(), e -> onEdit.run());
+    private final IconButton deleteButton = new IconButton(LumoIcon.MINUS.create(), e -> onDelete.run());
 
     public CrudButtonbar() {
         this(false);
