@@ -15,13 +15,14 @@ public class CalendarSourceLabelAssignment extends EntityBase<CalendarSourceLabe
 	public CalendarSourceLabelAssignment() {}
 
 	public CalendarSourceLabelAssignment(CalendarSource calendarSource, Label label) {
-		this.calendarSource =calendarSource;
+		this.calendarSource = calendarSource;
 		this.label = label;
 	}
 
 	@ManyToOne
 	@NotNull
 	CalendarSource calendarSource;
+	static public final String CALENDARSOURCE = "calendarSource";
 	public CalendarSource calendarSource() {
 		return calendarSource;
 	}
@@ -33,6 +34,7 @@ public class CalendarSourceLabelAssignment extends EntityBase<CalendarSourceLabe
 	@ManyToOne
 	@NotNull
 	private Label label;
+	static public final String LABEL = "label";
 	public Label label() {
 		return label;
 	}
@@ -41,21 +43,22 @@ public class CalendarSourceLabelAssignment extends EntityBase<CalendarSourceLabe
 		return this;
 	}
 
-	public String toString() {
-		return super.toString() //
-		     + ",calendarSource=" + (calendarSource == null ? "null" : calendarSource.type())
-			 + ",label=" + (label == null ? "null" : label.name())
-		     ;
-	}
-
-	protected String subjectRegexp;
-	static public final String NAME = "subjectRegexp";
+	@NotNull
+	private String subjectRegexp;
+	static public final String SUBJECTREGEXP = "subjectRegexp";
 	public String subjectRegexp() {
 		return subjectRegexp;
 	}
 	public CalendarSourceLabelAssignment subjectRegexp(String v) {
 		this.subjectRegexp = v;
 		return this;
+	}
+
+	public String toString() {
+		return super.toString() //
+		     + ",calendarSource=" + (calendarSource == null ? "null" : calendarSource.type())
+			 + ",label=" + (label == null ? "null" : label.name())
+		     ;
 	}
 }
 

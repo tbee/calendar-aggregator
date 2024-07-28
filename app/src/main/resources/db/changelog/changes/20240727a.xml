@@ -17,8 +17,8 @@
             </column>
         </addColumn>
         <addColumn tableName="calendar_source2label" >
-            <column name="subject_regexp" type="nvarchar(1000)">
-                <constraints nullable="true"/>
+            <column name="subject_regexp" type="nvarchar(1000)" defaultValue="">
+                <constraints nullable="false"/>
             </column>
         </addColumn>
     </changeSet>

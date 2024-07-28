@@ -5,6 +5,7 @@ import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
+import nl.softworks.calendarAggregator.domain.entity.CalendarSourceLabelAssignment;
 import nl.softworks.calendarAggregator.domain.entity.Label;
 import nl.softworks.calendarAggregator.domain.entity.Settings;
 import org.slf4j.Logger;
@@ -254,8 +255,12 @@ public class CalendarResource {
                     calendarEvents.stream()
                     .map(ce -> {
                         String description = ce.determineSubject();
-                        int numberOfLabels = ce.calendarSource().labels().size();
-                        String labels = ce.calendarSource().labels().stream()
+                        List<Label> labels = ce.calendarSource().labelAssignments().stream()
+                                .peek(la -> System.out.println(description + " " + la.subjectRegexp() + " " + description.matches(la.subjectRegexp())))
+                                .filter(la -> la.subjectRegexp().isBlank() || description.matches(la.subjectRegexp()))
+                                .map(CalendarSourceLabelAssignment::label)
+                                .toList();
+                        String labelHTML = labels.stream()
                                 .sorted(Comparator.comparing(Label::seqnr))
                                 .map(l -> """
                                         <div class="tooltipped">
@@ -283,8 +288,8 @@ public class CalendarResource {
                                      </li>
                                    """
                                    .replace("%text%", hhmm.format(ce.startDateTime()) + " " + ce.calendarSource().calendarLocation().name())
-                                   .replace("%labelswidth%", "" + (numberOfLabels * 12))
-                                   .replace("%labels%", labels)
+                                   .replace("%labelswidth%", "" + (labels.size() * 12))
+                                   .replace("%labels%", labelHTML)
                                    .replace("%description%", (description.isBlank() ? "See the website" : description))
                                    .replace("%url%", ce.calendarSource().determineUrl());
                     })
