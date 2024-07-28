@@ -72,13 +72,14 @@ public class CalendarResource {
                           font-size: 80%;
                           text-align: center;
                           display: block;
-                          color: #ffffff;
                         }
                         .css-icon-eventtype {
                           background: #6da795;
+                          color: #ffffff;
                         }
                         .css-icon-dancestyle {
                           background: #ad7765;
+                          color: #ffffff;
                         }
                     </style>
                     <!--pageheader-->
@@ -264,7 +265,7 @@ public class CalendarResource {
                                         """
                                         .replace("%icon%", l.icon())
                                         .replace("%labelgroup%", l.labelGroup().name().replace(" ", "").toLowerCase())
-                                        .replace("%color%", l.labelGroup().color() == null || l.labelGroup().color().isBlank() ? "" : "background:" + l.labelGroup().color() + ";")
+                                        .replace("%color%", "color:" + l.labelGroup().color() + "; background:" + l.labelGroup().background() + ";")
                                         .replace("%tooltip%", l.description()))
                                 .collect(Collectors.joining("\n"));
                         return """

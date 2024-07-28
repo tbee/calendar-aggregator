@@ -9,7 +9,10 @@
 
     <changeSet id="20240727a" author="tom">
         <addColumn tableName="label_group" >
-            <column name="color" type="varchar(20)" defaultValue="black">
+            <column name="color" type="varchar(20)" defaultValue="white">
+                <constraints nullable="false"/>
+            </column>
+            <column name="background" type="varchar(20)" defaultValue="grey">
                 <constraints nullable="false"/>
             </column>
         </addColumn>

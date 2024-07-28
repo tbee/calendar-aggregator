@@ -33,6 +33,17 @@ public class LabelGroup extends EntityBase<LabelGroup> {
 		return this;
 	}
 
+	@NotNull
+	protected String background;
+	static public final String BACKGROUND = "background";
+	public String background() {
+		return background;
+	}
+	public LabelGroup background(String v) {
+		this.background = v;
+		return this;
+	}
+
 	public String toString() {
 		return super.toString() //
 		     + ",name=" + name
