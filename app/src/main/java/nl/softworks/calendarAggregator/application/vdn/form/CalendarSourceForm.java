@@ -51,7 +51,7 @@ abstract public class CalendarSourceForm extends FormLayout {
 
 		labelAssignGrid.addComponentColumn(LabelAssignmentGridRow::selected).setHeader("").setWidth("60px").setFlexGrow(0);
 		labelAssignGrid.addColumn(LabelAssignmentGridRow::name).setHeader("Label");
-		labelAssignGrid.addColumn(LabelAssignmentGridRow::subjectRegexp).setHeader("Subject regexp");
+		labelAssignGrid.addComponentColumn(LabelAssignmentGridRow::subjectRegexp).setHeader("Subject regexp");
 		labelAssignGridItems = R.label().findAllByOrderByNameAsc().stream().map(LabelAssignmentGridRow::new).toList();
 		labelAssignGrid.setItems(new ListDataProvider<>(labelAssignGridItems));
 
@@ -69,8 +69,7 @@ abstract public class CalendarSourceForm extends FormLayout {
 		labelAssignGridItems.forEach(la -> {
 			la.clear();
 			if (assignedLabels.containsKey(la.label)) {
-				la.selectedCheckbox.setValue(true);
-				la.assign = assignedLabels.get(la.label);
+				la.populateWith(assignedLabels.get(la.label));
 			}
 		});
 		return this;
@@ -116,27 +115,42 @@ abstract public class CalendarSourceForm extends FormLayout {
 		final private Label label;
 		private CalendarSourceLabelAssignment assign;
 		private Checkbox selectedCheckbox = new Checkbox(false);
+		private TextField subjectRegexpTextField = new TextField();
 
 		public LabelAssignmentGridRow(Label v) {
 			this.label = v;
 			selectedCheckbox.addValueChangeListener(event -> {
                 if (selectedCheckbox.getValue() && assign == null) {
                     assign = new CalendarSourceLabelAssignment(calendarSource, label);
+					subjectRegexpTextField.setValue(assign.subjectRegexp());
                 }
             });
+			subjectRegexpTextField.setWidthFull();
+			subjectRegexpTextField.addValueChangeListener(event -> {
+				if (assign != null) {
+					assign.subjectRegexp(subjectRegexpTextField.getValue());
+				}
+			});
 		}
 
 		public void clear() {
 			selectedCheckbox.setValue(false);
 			assign = null;
+			subjectRegexpTextField.setValue("");
+		}
+
+		public void populateWith(CalendarSourceLabelAssignment calendarSourceLabelAssignment) {
+			assign = calendarSourceLabelAssignment;
+			selectedCheckbox.setValue(true);
+			subjectRegexpTextField.setValue(calendarSourceLabelAssignment == null || calendarSourceLabelAssignment.subjectRegexp() == null ? "" : calendarSourceLabelAssignment.subjectRegexp());
 		}
 
 		public String name() {
 			return label.name();
 		}
 
-		public String subjectRegexp() {
-			return assign == null ? "" : assign.subjectRegexp();
+		public Component subjectRegexp() {
+			return subjectRegexpTextField;
 		}
 
 		public Component selected() {
