@@ -3,6 +3,8 @@ package nl.softworks.calendarAggregator.application.rest.pub;
 import com.google.common.collect.Lists;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
+import nl.softworks.calendarAggregator.domain.entity.CalendarSourceLabelAssignment;
+import nl.softworks.calendarAggregator.domain.entity.Label;
 import nl.softworks.calendarAggregator.domain.entity.Settings;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -28,19 +30,19 @@ public class CalendarController {
 
     private static int EARTH_RADIUS = 6371;
 
-    private void prepareTemplate(Model model, Double lat, Double lon, Integer d) {
+    private void prepareTemplate(Model model, Double lat, Double lon, Integer distance) {
         model.addAttribute("settings", Settings.get());
         model.addAttribute("lat", lat);
         model.addAttribute("lon", lon);
-        model.addAttribute("d", d);
+        model.addAttribute("distance", distance);
     }
 
     @RequestMapping(value = "/index")
-    public String index(Model model, @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer d) {
-        prepareTemplate(model, lat, lon, d);
+    public String index(Model model, @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance) {
+        prepareTemplate(model, lat, lon, distance);
 
         // Collect events
-        List<CalendarEvent> events = filterEventsOnDistance(model, lat, lon, d);
+        List<CalendarEvent> events = filterEventsOnDistance(model, lat, lon, distance);
 
         // List
         Map<LocalDate, List<CalendarEvent>> dateToEventsMap = events.stream()
@@ -69,9 +71,13 @@ public class CalendarController {
     }
 
     @RequestMapping(value = "/month2")
-    public String month(Model model, @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer d
+    public String month(Model model, @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance
             , @RequestParam(defaultValue = "") Integer year, @RequestParam(defaultValue = "") Integer month) {
-        prepareTemplate(model, lat, lon, d);
+        prepareTemplate(model, lat, lon, distance);
+        DateTimeFormatter yyyy = DateTimeFormatter.ofPattern("yyyy", Locale.ENGLISH);
+        DateTimeFormatter mmm = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH);
+        DateTimeFormatter dd = DateTimeFormatter.ofPattern("d", Locale.ENGLISH);
+        DateTimeFormatter hhmm = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH);
 
         // Default parameter values
         if (year == null || month == null) {
@@ -81,13 +87,22 @@ public class CalendarController {
         }
         LocalDate monthStart = LocalDate.of(year, month, 1);
         LocalDate monthEnd = monthStart.plusMonths(1).minusDays(1);
+        LocalDate prevMonth = monthStart.minusMonths(1);
+        LocalDate nextMonth = monthStart.plusMonths(1);
+        model.addAttribute("today", LocalDate.now());
+        model.addAttribute("year", yyyy.format(monthStart));
+        model.addAttribute("month", mmm.format(monthStart));
+        model.addAttribute("prevyear", "" + prevMonth.getYear());
+        model.addAttribute("prevmonth", "" + prevMonth.getMonthValue());
+        model.addAttribute("nextyear", "" + nextMonth.getYear());
+        model.addAttribute("nextmonth", "" + nextMonth.getMonthValue());
 
         // start at monday
         LocalDate renderStart = monthStart.minusDays(monthStart.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
         LocalDate renderEnd = monthEnd.plusDays(DayOfWeek.SUNDAY.getValue() - monthEnd.getDayOfWeek().getValue());
 
         // Collect events
-        List<CalendarEvent> events = filterEventsOnDistance(model, lat, lon, d);
+        List<CalendarEvent> events = filterEventsOnDistance(model, lat, lon, distance);
         Map<LocalDate, List<CalendarEvent>> dateToEvents = events.stream()
                 .filter(ce -> !ce.startDateTime().toLocalDate().isAfter(renderEnd))
                 .filter(ce -> !ce.endDateTime().toLocalDate().isBefore(renderStart))
@@ -99,11 +114,36 @@ public class CalendarController {
         List<List<LocalDate>> weeksOfDates = Lists.partition(toBeRenderedDates, 7);
         model.addAttribute("weekOfDates", weeksOfDates);
 
-        // Render day table cells
-        DateTimeFormatter yyyy = DateTimeFormatter.ofPattern("yyyy", Locale.ENGLISH);
-        DateTimeFormatter mmm = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH);
-        DateTimeFormatter dd = DateTimeFormatter.ofPattern("d", Locale.ENGLISH);
-        DateTimeFormatter hhmm = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH);
+        // Is a date inside or outside the month
+        Map<LocalDate, Boolean> dateIsOutsideMonth = toBeRenderedDates.stream()
+                .map(date -> Pair.of(date, date.isBefore(monthStart) || date.isAfter(monthEnd)))
+                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+        model.addAttribute("dateIsOutsideMonth", dateIsOutsideMonth);
+
+        // The text of an event
+        Map<CalendarEvent, String> eventToText = events.stream()
+                .map(ce -> Pair.of(ce, hhmm.format(ce.startDateTime()) + " " + ce.calendarSource().calendarLocation().name()))
+                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+        model.addAttribute("eventToText", eventToText);
+
+        // The description of an event
+        Map<CalendarEvent, String> eventToTooltip = events.stream()
+                .map(ce -> Pair.of(ce, (ce.determineSubject().isBlank() ? "See the website" : ce.determineSubject())))
+                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+        model.addAttribute("eventToTooltip", eventToTooltip);
+
+        // labels
+        Map<CalendarEvent, List<Label>> eventToLabels = events.stream()
+                .map(ce -> {
+                    String description = ce.determineSubject();
+                    List<Label> labels = ce.calendarSource().labelAssignments().stream()
+                            .filter(la -> la.subjectRegexp().isBlank() || description.matches(la.subjectRegexp()))
+                            .map(CalendarSourceLabelAssignment::label)
+                            .toList();
+                    return Pair.of(ce, labels);
+                })
+                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+        model.addAttribute("eventToLabels", eventToLabels);
 
         return "month";
     }

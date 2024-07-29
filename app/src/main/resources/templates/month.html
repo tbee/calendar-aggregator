@@ -2,24 +2,114 @@
 <html lang="en" th:replace="template :: template(~{::head},~{::body})">
 <head>
     <style>
+        .today {
+            background: #c0c0c0!important;
+        }
         .pagewidth {
-            max-width:1000px;
+            width:100%;
         }
 
-        .datechange {
-            border-top-width:2px !important;
+        #calendarwrapper {
+            overflow-x: scroll;
+            overflow-y: clip;
+        }
+        #calendar {
+            width:100%;
+        }
+        tbody td {
+            height:5em;
+            white-space: nowrap;
+            font-size: 13px;
+        }
+        tbody h5 {
+            margin-bottom: 0!important;
+        }
+        .outside-month > h5 {
+            color: lightgray!important;
+        }
+        .border {
+            border: 2px solid;
+        }
+
+        .tooltipped {
+            position: relative;
+            display: inline-block;
+            xxxborder-bottom: 1px dotted black;
+        }
+        .tooltipped .tooltiptext {
+            visibility: hidden;
+            background-color: gray;
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+
+            /* Position the tooltip */
+            position: absolute;
+            z-index: 1;
+        }
+        .tooltipped:hover .tooltiptext {
+            visibility: visible;
         }
     </style>
 </head>
 <body>
-    <table class="table is-hoverable">
-        <tbody>
-            <tr th:each="dates : ${weekOfDates}">
-                <td th:each="date : ${dates}">
-                    <div th:text="${date}">...</div>
-                </td>
+    <div class="columns is-gapless">
+        <div class="column alignright">
+            <span class="icon">
+                <a th:href="${settings.websiteBaseurl() + '/?year=' + prevyear + '&month=' + prevmonth}"><i class="fas fa-arrow-left fa-2xl"></i></a>
+            </span>
+        </div>
+        <div class="column is-one-fifth">
+            <h3 class="title is-4 centered" th:text="${year}"></h3>
+            <h3 class="subtitle is-4 centered" th:text="${month}"></h3>
+        </div>
+        <div class="column">
+            <span class="icon">
+                <a th:href="${settings.websiteBaseurl() + '/?year=' + nextyear + '&month=' + nextmonth}"><i class="fas fa-arrow-right fa-2xl"></i></a>
+            </span>
+        </div>
+    </div>
+    <div id="calendarwrapper">
+        <table id="calendar" class="table">
+            <thead>
+            <tr>
+                <td width="12%">Monday</td>
+                <td width="12%">Tuesday</td>
+                <td width="12%">Wednesday</td>
+                <td width="12%">Thursday</td>
+                <td width="12%">Friday</td>
+                <td width="12%">Saturday</td>
+                <td width="12%">Sunday</td>
             </tr>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <tr th:each="dates : ${weekOfDates}">
+                    <td th:each="date : ${dates}" th:classappend="${(dateIsOutsideMonth.get(date) ? 'outside-month' : 'inside-month') + ' ' + (today.equals(date) ? 'today': '')}">
+                        <h5 class="title is-5" th:text="${#temporals.format(date,'d')}">...</h5>
+                        <div class="">
+                            <ul>
+                                <li th:each="event : ${dateToEvents.get(date)}">
+                                    <div class="tooltipped">
+                                        <span th:text="${eventToText.get(event)}">...</span>
+                                        <span class="tooltiptext" th:text="${eventToTooltip.get(event)}">...</span>
+                                    </div>
+                                    <span class="icon" th:style="${'width:' + (eventToLabels.get(event).size() * 12) + 'px; height:10px; margin-left:2px;'}">
+                                        <div class="tooltipped" th:each="label : ${eventToLabels.get(event)}">
+                                            <i class="css-icon" th:style="${'color:' + label.labelGroup().color() + '; background:' + label.labelGroup().background() + ';'}"><span th:text="${label.icon()}">...</span></i>
+                                            <span class="tooltiptext" th:text="${label.description()}">...</span>
+                                        </div>
+                                    </span>
+                                    <span class="icon" style="width:12px; height:10px;">
+                                        <a th:href="${event.calendarSource().determineUrl()}" target="_blank"><i class="fas fa-arrow-up-right-from-square fa-xs"></i></a>
+                                   </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>
