@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en" th:replace="template :: template(~{::head},~{::body})">
+<head>
+    <style>
+        .pagewidth {
+            max-width:1000px;
+        }
+
+        .datechange {
+            border-top-width:2px !important;
+        }
+    </style>
+</head>
+<body>
+    <table class="table is-hoverable">
+        <tbody>
+            <tr th:each="dates : ${weekOfDates}">
+                <td th:each="date : ${dates}">
+                    <div th:text="${date}">...</div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

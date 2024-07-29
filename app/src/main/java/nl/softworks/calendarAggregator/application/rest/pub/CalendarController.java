@@ -1,5 +1,6 @@
 package nl.softworks.calendarAggregator.application.rest.pub;
 
+import com.google.common.collect.Lists;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.Settings;
@@ -11,9 +12,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -38,26 +43,69 @@ public class CalendarController {
         List<CalendarEvent> events = filterEventsOnDistance(model, lat, lon, d);
 
         // List
-        Map<LocalDateTime, List<CalendarEvent>> dateTimeToEventsMap = events.stream()
-                .collect(Collectors.groupingBy(CalendarEvent::startDateTime));
-        model.addAttribute("dateTimeToEventsMap", dateTimeToEventsMap);
+        Map<LocalDate, List<CalendarEvent>> dateToEventsMap = events.stream()
+                .collect(Collectors.groupingBy(ce -> ce.startDateTime().toLocalDate()));
+        model.addAttribute("dateToEventsMap", dateToEventsMap);
+        model.addAttribute("eventStartDateTimeComparator", (Comparator<CalendarEvent>) (e1, e2) -> e1.startDateTime().compareTo(e2.startDateTime()));
 
         // When
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("E yyyy-MM-dd HH:mm");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-        model.addAttribute("whenMap", events.stream()
+        Map<CalendarEvent, String> whenMap = events.stream()
                 .map(event -> Pair.of(event,
                         dateTimeFormatter.format(event.startDateTime())
-                        + " - "
-                        + (event.startDateTime().toLocalDate().equals(event.endDateTime().toLocalDate()) ? timeFormatter : dateTimeFormatter).format(event.endDateTime())))
-                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight)));
+                                + " - "
+                                + (event.startDateTime().toLocalDate().equals(event.endDateTime().toLocalDate()) ? timeFormatter : dateTimeFormatter).format(event.endDateTime())))
+                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+        model.addAttribute("whenMap", whenMap);
 
         // What
-        model.addAttribute("whatMap", events.stream()
+        Map<CalendarEvent, String> whatMap = events.stream()
                 .map(event -> Pair.of(event, event.calendarSource().calendarLocation().name() + (event.subject().isBlank() ? "" : " - " + event.subject())))
-                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight)));
+                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+        model.addAttribute("whatMap", whatMap);
 
         return "list";
+    }
+
+    @RequestMapping(value = "/month2")
+    public String month(Model model, @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer d
+            , @RequestParam(defaultValue = "") Integer year, @RequestParam(defaultValue = "") Integer month) {
+        prepareTemplate(model, lat, lon, d);
+
+        // Default parameter values
+        if (year == null || month == null) {
+            LocalDate now = LocalDate.now();
+            year = now.getYear();
+            month = now.getMonthValue();
+        }
+        LocalDate monthStart = LocalDate.of(year, month, 1);
+        LocalDate monthEnd = monthStart.plusMonths(1).minusDays(1);
+
+        // start at monday
+        LocalDate renderStart = monthStart.minusDays(monthStart.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
+        LocalDate renderEnd = monthEnd.plusDays(DayOfWeek.SUNDAY.getValue() - monthEnd.getDayOfWeek().getValue());
+
+        // Collect events
+        List<CalendarEvent> events = filterEventsOnDistance(model, lat, lon, d);
+        Map<LocalDate, List<CalendarEvent>> dateToEvents = events.stream()
+                .filter(ce -> !ce.startDateTime().toLocalDate().isAfter(renderEnd))
+                .filter(ce -> !ce.endDateTime().toLocalDate().isBefore(renderStart))
+                .collect(Collectors.groupingBy(ce -> ce.startDateTime().toLocalDate()));
+        model.addAttribute("dateToEvents", dateToEvents);
+
+        // Split into weeks
+        List<LocalDate> toBeRenderedDates = renderStart.datesUntil(renderEnd.plusDays(1)).toList();
+        List<List<LocalDate>> weeksOfDates = Lists.partition(toBeRenderedDates, 7);
+        model.addAttribute("weekOfDates", weeksOfDates);
+
+        // Render day table cells
+        DateTimeFormatter yyyy = DateTimeFormatter.ofPattern("yyyy", Locale.ENGLISH);
+        DateTimeFormatter mmm = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH);
+        DateTimeFormatter dd = DateTimeFormatter.ofPattern("d", Locale.ENGLISH);
+        DateTimeFormatter hhmm = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH);
+
+        return "month";
     }
 
     static List<CalendarEvent> filterEventsOnDistance(Model model, Double lat, Double lon, Integer d) {
@@ -82,7 +130,7 @@ public class CalendarController {
 
         return EARTH_RADIUS * c;
     }
-    
+
     private static double haversine(double val) {
         return Math.pow(Math.sin(val / 2), 2);
     }
