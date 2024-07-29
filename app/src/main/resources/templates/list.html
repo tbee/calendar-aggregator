@@ -87,8 +87,8 @@
             <tbody>
                 <th:block th:each="startDateTime : ${#lists.sort(startDateTimeToEventsMap.keySet())}">
                     <tr th:each="event,eventIterStat : ${startDateTimeToEventsMap.get(startDateTime)}">
-                        <td th:classappend="${eventIterStat.index == 0} ? datechange" th:text="${#temporals.format(event.startDateTime(), 'yyyy-MM-dd HH:mm') + ' - ' + (event.startDateTime().toLocalDate().equals(event.endDateTime().toLocalDate()) ? #temporals.format(event.endDateTime(), 'HH:mm') :  #temporals.format(event.endDateTime(), 'yyyy-MM-dd HH:mm'))}">...</td>
-                        <td th:classappend="${eventIterStat.index == 0} ? datechange" th:text="${event.calendarSource().calendarLocation().name() + ' - ' + event.subject()}">...</td>
+                        <td th:classappend="${eventIterStat.index == 0} ? datechange" th:text="${whenMap.get(event)}">...</td>
+                        <td th:classappend="${eventIterStat.index == 0} ? datechange" th:text="${whatMap.get(event)}">...</td>
                         <td th:classappend="${eventIterStat.index == 0} ? datechange">
                              <span class="icon">
                                <a th:href="${event.calendarSource().calendarLocation().url()}" target="_blank"><i class="fas fa-arrow-up-right-from-square"></i></a>
