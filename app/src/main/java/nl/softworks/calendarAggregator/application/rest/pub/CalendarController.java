@@ -23,20 +23,23 @@ public class CalendarController {
 
     private static int EARTH_RADIUS = 6371;
 
-    private void prepareTemplate(Model model) {
+    private void prepareTemplate(Model model, Double lat, Double lon, Integer d) {
         model.addAttribute("settings", Settings.get());
+        model.addAttribute("lat", lat);
+        model.addAttribute("lon", lon);
+        model.addAttribute("d", d);
     }
 
     @RequestMapping(value = "/index")
     public String index(Model model, @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer d) {
-        prepareTemplate(model);
+        prepareTemplate(model, lat, lon, d);
 
         // Collect events
         List<CalendarEvent> events = filterEventsOnDistance(model, lat, lon, d);
 
         // List
         Map<LocalDateTime, List<CalendarEvent>> dateTimeToEventsMap = events.stream()
-                .collect(Collectors.groupingBy(ce -> ce.startDateTime()));
+                .collect(Collectors.groupingBy(CalendarEvent::startDateTime));
         model.addAttribute("dateTimeToEventsMap", dateTimeToEventsMap);
 
         // When
@@ -58,11 +61,6 @@ public class CalendarController {
     }
 
     static List<CalendarEvent> filterEventsOnDistance(Model model, Double lat, Double lon, Integer d) {
-        model.addAttribute("lat", lat);
-        model.addAttribute("lon", lon);
-        model.addAttribute("d", d);
-
-        // Collect events
         LocalDateTime threshold = LocalDateTime.now().minusHours(2);
         return R.calendarEvent().findAll().stream()
                 .filter(ce -> ce.startDateTime().isAfter(threshold))
@@ -84,6 +82,7 @@ public class CalendarController {
 
         return EARTH_RADIUS * c;
     }
+    
     private static double haversine(double val) {
         return Math.pow(Math.sin(val / 2), 2);
     }
