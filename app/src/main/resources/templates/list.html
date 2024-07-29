@@ -1,56 +1,6 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" th:replace="template :: template(~{::head},~{::body})">
 <head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
-    <script src="https://kit.fontawesome.com/501b8808a2.js" crossorigin="anonymous"></script>
-    <style>
-        .centered {
-            text-align: center;
-        }
-
-        .alignright {
-            text-align: right;
-        }
-
-        .bullet {
-            list-style: square outside;
-            margin-left: 20px;
-            padding-left: 0;
-        }
-
-        .css-icon {
-            font-family: "Work Sans", sans-serif;
-            font-weight: 800;
-            font-style: normal;
-            font-size: 14px;
-            text-decoration: none;
-            display: block;
-            margin: 0 auto;
-            height: 14px;
-            width: 14px;
-            border-radius: 2px;
-            overflow: hidden;
-            border: solid 1px transparent;
-        }
-
-        .css-icon span {
-            margin-top: -2px;
-            font-size: 80%;
-            text-align: center;
-            display: block;
-        }
-
-        .css-icon-eventtype {
-            background: #6da795;
-            color: #ffffff;
-        }
-
-        .css-icon-dancestyle {
-            background: #ad7765;
-            color: #ffffff;
-        }
-    </style>
-    <!--pageheader-->
     <style>
         .pagewidth {
             max-width:1000px;
@@ -60,113 +10,29 @@
             border-top-width:2px !important;
         }
     </style>
-
 </head>
 <body>
-    <section class="section">
-        <h1 class="title" th:text="${settings.title()}">...</h1>
-        <h2 class="subtitle" th:text="${settings.subtitle()}">...</h2>
-        <div class="block pagewidth" th:text="${settings.disclaimer()}">...</div>
-        <div id="iconbar" class="block alignright pagewidth">
-            <span class="icon">
-                <a th:href="${settings.websiteBaseurl() + '/list'}"><i class="fas fa-list fa-xl"></i></a>
-            </span>
-            <span class="icon">
-                <a th:href="${settings.websiteBaseurl() + '/'}"><i class="fas fa-calendar-days fa-xl"></i></a>
-            </span>
-        </div>
-        <!--pagecontent-->
-        <table class="table is-hoverable">
-            <thead>
-            <tr>
-                <td>When</td>
-                <td>What</td>
-                <td>Check here</td>
-            </tr>
-            </thead>
-            <tbody>
-                <th:block th:each="startDateTime : ${#lists.sort(dateTimeToEventsMap.keySet())}">
-                    <tr th:each="event,dateIterStat : ${dateTimeToEventsMap.get(startDateTime)}">
-                        <td th:classappend="${dateIterStat.index == 0} ? datechange" th:text="${whenMap.get(event)}">...</td>
-                        <td th:classappend="${dateIterStat.index == 0} ? datechange" th:text="${whatMap.get(event)}">...</td>
-                        <td th:classappend="${dateIterStat.index == 0} ? datechange">
-                             <span class="icon">
-                               <a th:href="${event.calendarSource().calendarLocation().url()}" target="_blank"><i class="fas fa-arrow-up-right-from-square"></i></a>
-                             </span>
-                        </td>
-                    </tr>
-                </th:block>
-            </tbody>
-        </table>
-        <!--/pagecontent-->
-        <div class="notification pagewidth" style="margin-top:10px;">
-            <p>
-                This data is available in:
-            </p>
-            <ul>
-                <li class="bullet"><a th:href="${settings.websiteBaseurl() + '/list'}">List</a> form</li>
-                <li class="bullet"><a th:href="${settings.websiteBaseurl() + '/'}">Calendar</a> form</li>
-                <li class="bullet">For including in e.g. Google calendar by adding an external URL calendar using the following URL: <a th:href="${settings.websiteBaseurl() + '/ical'}" target="_blank" th:text="${settings.websiteBaseurl() + '/ical'}">...</a></li>
-            </ul>
-        </div>
-        <div class="notification pagewidth">
-            <form method="get">
-                <div class="field">
-                    <p>
-                        You can limit the amount of entries by filtering on distance (as the crow flies).
-                        For this you need to determine the decimal latitude and longitude of where you live, for example by using Google maps.
-                        These parameters can also be applied to the ical url.
-                    </p>
-                </div>
-                <div class="field is-horizontal">
-                    <div class="field-label is-normal">
-                        <label class="label">Latitude</label>
-                    </div>
-                    <div class="field-body">
-                        <div class="field">
-                            <p class="control">
-                                <input name="lat" class="input" type="number" step="0.0000001" min="-90.0" max="90.0" placeholder="e.g. 51.9214012" th:value="${lat}"/>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="field is-horizontal">
-                    <div class="field-label is-normal">
-                        <label class="label">Longitude</label>
-                    </div>
-                    <div class="field-body">
-                        <div class="field">
-                            <p class="control">
-                                <input name="lon" class="input" type="number" step="0.0000001" min="-180.0" max="180.0" placeholder="e.g 6.5761531" th:value="${lon}"/>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="field is-horizontal">
-                    <div class="field-label is-normal">
-                        <label class="label">Distance</label>
-                    </div>
-                    <div class="field-body">
-                        <div class="field">
-                            <p class="control">
-                                <input name="d" class="input" type="number" step="1" min="0" max="500" placeholder="e.g. 50" th:value="${d}"/>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div class="field is-horizontal">
-                    <div class="field-label is-normal">
-                    </div>
-                    <div class="field-body">
-                        <div class="field">
-                            <p class="control">
-                                <input class="button" type="submit" value="Go!"/>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </section>
+<table class="table is-hoverable">
+    <thead>
+    <tr>
+        <td>When</td>
+        <td>What</td>
+        <td>Check here</td>
+    </tr>
+    </thead>
+    <tbody>
+    <th:block th:each="startDateTime : ${#lists.sort(dateTimeToEventsMap.keySet())}">
+        <tr th:each="event,dateIterStat : ${dateTimeToEventsMap.get(startDateTime)}">
+            <td th:classappend="${dateIterStat.index == 0} ? datechange" th:text="${whenMap.get(event)}">...</td>
+            <td th:classappend="${dateIterStat.index == 0} ? datechange" th:text="${whatMap.get(event)}">...</td>
+            <td th:classappend="${dateIterStat.index == 0} ? datechange">
+                         <span class="icon">
+                           <a th:href="${event.calendarSource().calendarLocation().url()}" target="_blank"><i class="fas fa-arrow-up-right-from-square"></i></a>
+                         </span>
+            </td>
+        </tr>
+    </th:block>
+    </tbody>
+</table>
 </body>
 </html>

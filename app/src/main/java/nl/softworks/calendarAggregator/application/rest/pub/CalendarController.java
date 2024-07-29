@@ -1,6 +1,5 @@
 package nl.softworks.calendarAggregator.application.rest.pub;
 
-import jakarta.servlet.http.HttpServletRequest;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.Settings;
@@ -24,15 +23,16 @@ public class CalendarController {
 
     private static int EARTH_RADIUS = 6371;
 
-    @RequestMapping(value = "/index")
-    public String index(Model model, HttpServletRequest request, @RequestParam(defaultValue = "0.0") double lat, @RequestParam(defaultValue = "0.0") double lon, @RequestParam(defaultValue = "0") int d) {
+    private void prepareTemplate(Model model) {
         model.addAttribute("settings", Settings.get());
-        model.addAttribute("lat", lat);
-        model.addAttribute("lon", lon);
-        model.addAttribute("d", d);
+    }
+
+    @RequestMapping(value = "/index")
+    public String index(Model model, @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer d) {
+        prepareTemplate(model);
 
         // Collect events
-        List<CalendarEvent> events = filterOnDistance(model, lat, lon, d);
+        List<CalendarEvent> events = filterEventsOnDistance(model, lat, lon, d);
 
         // List
         Map<LocalDateTime, List<CalendarEvent>> dateTimeToEventsMap = events.stream()
@@ -57,7 +57,7 @@ public class CalendarController {
         return "list";
     }
 
-    static List<CalendarEvent> filterOnDistance(Model model, double lat, double lon, int d) {
+    static List<CalendarEvent> filterEventsOnDistance(Model model, Double lat, Double lon, Integer d) {
         model.addAttribute("lat", lat);
         model.addAttribute("lon", lon);
         model.addAttribute("d", d);
@@ -66,7 +66,7 @@ public class CalendarController {
         LocalDateTime threshold = LocalDateTime.now().minusHours(2);
         return R.calendarEvent().findAll().stream()
                 .filter(ce -> ce.startDateTime().isAfter(threshold))
-                .filter(ce -> d == 0 || d > (int) calculateDistance(lat, lon, ce.calendarSource().calendarLocation().lat(), ce.calendarSource().calendarLocation().lon()))
+                .filter(ce -> lat == null || lon == null || d == null || d == 0 || d > (int) calculateDistance(lat, lon, ce.calendarSource().calendarLocation().lat(), ce.calendarSource().calendarLocation().lon()))
                 .toList();
     }
 
