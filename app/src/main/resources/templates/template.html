@@ -40,14 +40,9 @@
             display: block;
         }
 
-        .css-icon-eventtype {
-            background: #6da795;
-            color: #ffffff;
-        }
-
-        .css-icon-dancestyle {
-            background: #ad7765;
-            color: #ffffff;
+        /* for easy testing */
+        .border {
+            border: 2px solid;
         }
     </style>
     <th:block th:replace="${header}" />
@@ -83,7 +78,7 @@
             <div class="field">
                 <p>
                     You can limit the amount of entries by filtering on distance (as the crow flies).
-                    For this you need to determine the decimal latitude and longitude of where you live, for example by using Google maps.
+                    For this you need to determine the decimal latitude and longitude of where you live, for example by using <a href="https://www.google.com/maps/" target="_blank">Google maps</a>.
                     These parameters can also be applied to the ical url.
                 </p>
             </div>

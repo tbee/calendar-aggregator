@@ -38,12 +38,13 @@ public class CalendarController {
         model.addAttribute("distance", distance);
     }
 
-    @RequestMapping(value = "/index")
+    // example http://localhost:8080/list
+    @RequestMapping(value = {"/list", "/pub/html"}, produces = {"text/html"})
     public String index(Model model, @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance) {
         prepareTemplate(model, lat, lon, distance);
 
         // Collect events
-        List<CalendarEvent> events = filterEventsOnDistance(model, lat, lon, distance);
+        List<CalendarEvent> events = filterEventsOnDistance(lat, lon, distance);
 
         // List
         Map<LocalDate, List<CalendarEvent>> dateToEvents = events.stream()
@@ -71,7 +72,8 @@ public class CalendarController {
         return "list";
     }
 
-    @RequestMapping(value = "/month2")
+    // example http://localhost:8080/month
+    @RequestMapping(value = {"/", "/month", "/htmlmonth"}, produces = {"text/html"})
     public String month(Model model, @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance
             , @RequestParam(defaultValue = "") Integer year, @RequestParam(defaultValue = "") Integer month) {
         prepareTemplate(model, lat, lon, distance);
@@ -108,7 +110,7 @@ public class CalendarController {
         model.addAttribute("weekOfDates", weeksOfDates);
 
         // Collect events
-        List<CalendarEvent> events = filterEventsOnDistance(model, lat, lon, distance);
+        List<CalendarEvent> events = filterEventsOnDistance(lat, lon, distance);
         Map<LocalDate, List<CalendarEvent>> dateToEventsWithPossibleEmptyDates = events.stream()
                 .filter(ce -> !ce.startDateTime().toLocalDate().isAfter(renderEnd))
                 .filter(ce -> !ce.endDateTime().toLocalDate().isBefore(renderStart))
@@ -154,7 +156,7 @@ public class CalendarController {
         return "month";
     }
 
-    static List<CalendarEvent> filterEventsOnDistance(Model model, Double lat, Double lon, Integer d) {
+    static List<CalendarEvent> filterEventsOnDistance(Double lat, Double lon, Integer d) {
         LocalDateTime threshold = LocalDateTime.now().minusHours(2);
         return R.calendarEvent().findAll().stream()
                 .filter(ce -> ce.startDateTime().isAfter(threshold))

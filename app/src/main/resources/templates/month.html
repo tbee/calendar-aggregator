@@ -27,14 +27,10 @@
         .outside-month > h5 {
             color: lightgray!important;
         }
-        .border {
-            border: 2px solid;
-        }
 
         .tooltipped {
             position: relative;
             display: inline-block;
-            xxxborder-bottom: 1px dotted black;
         }
         .tooltipped .tooltiptext {
             visibility: hidden;
@@ -43,6 +39,10 @@
             text-align: center;
             border-radius: 6px;
             padding: 5px;
+
+            /* the width creates the scrollbar under the month for the overflow on the right, so we limit it */
+            width: 150px;
+            text-wrap: pretty;
 
             /* Position the tooltip */
             position: absolute;
