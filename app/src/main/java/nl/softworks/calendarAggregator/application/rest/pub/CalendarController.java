@@ -18,6 +18,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -45,27 +46,27 @@ public class CalendarController {
         List<CalendarEvent> events = filterEventsOnDistance(model, lat, lon, distance);
 
         // List
-        Map<LocalDate, List<CalendarEvent>> dateToEventsMap = events.stream()
+        Map<LocalDate, List<CalendarEvent>> dateToEvents = events.stream()
                 .collect(Collectors.groupingBy(ce -> ce.startDateTime().toLocalDate()));
-        model.addAttribute("dateToEventsMap", dateToEventsMap);
-        model.addAttribute("eventStartDateTimeComparator", (Comparator<CalendarEvent>) (e1, e2) -> e1.startDateTime().compareTo(e2.startDateTime()));
+        model.addAttribute("dateToEvents", dateToEvents);
+        model.addAttribute("eventStartDateTimeComparator", Comparator.comparing((CalendarEvent e) -> e.startDateTime()));
 
         // When
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("E yyyy-MM-dd HH:mm");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-        Map<CalendarEvent, String> whenMap = events.stream()
+        Map<CalendarEvent, String> eventToWhen = events.stream()
                 .map(event -> Pair.of(event,
                         dateTimeFormatter.format(event.startDateTime())
                                 + " - "
                                 + (event.startDateTime().toLocalDate().equals(event.endDateTime().toLocalDate()) ? timeFormatter : dateTimeFormatter).format(event.endDateTime())))
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
-        model.addAttribute("whenMap", whenMap);
+        model.addAttribute("eventToWhen", eventToWhen);
 
         // What
-        Map<CalendarEvent, String> whatMap = events.stream()
+        Map<CalendarEvent, String> eventToWhat = events.stream()
                 .map(event -> Pair.of(event, event.calendarSource().calendarLocation().name() + (event.subject().isBlank() ? "" : " - " + event.subject())))
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
-        model.addAttribute("whatMap", whatMap);
+        model.addAttribute("eventToWhat", eventToWhat);
 
         return "list";
     }
@@ -101,18 +102,21 @@ public class CalendarController {
         LocalDate renderStart = monthStart.minusDays(monthStart.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
         LocalDate renderEnd = monthEnd.plusDays(DayOfWeek.SUNDAY.getValue() - monthEnd.getDayOfWeek().getValue());
 
-        // Collect events
-        List<CalendarEvent> events = filterEventsOnDistance(model, lat, lon, distance);
-        Map<LocalDate, List<CalendarEvent>> dateToEvents = events.stream()
-                .filter(ce -> !ce.startDateTime().toLocalDate().isAfter(renderEnd))
-                .filter(ce -> !ce.endDateTime().toLocalDate().isBefore(renderStart))
-                .collect(Collectors.groupingBy(ce -> ce.startDateTime().toLocalDate()));
-        model.addAttribute("dateToEvents", dateToEvents);
-
         // Split into weeks
         List<LocalDate> toBeRenderedDates = renderStart.datesUntil(renderEnd.plusDays(1)).toList();
         List<List<LocalDate>> weeksOfDates = Lists.partition(toBeRenderedDates, 7);
         model.addAttribute("weekOfDates", weeksOfDates);
+
+        // Collect events
+        List<CalendarEvent> events = filterEventsOnDistance(model, lat, lon, distance);
+        Map<LocalDate, List<CalendarEvent>> dateToEventsWithPossibleEmptyDates = events.stream()
+                .filter(ce -> !ce.startDateTime().toLocalDate().isAfter(renderEnd))
+                .filter(ce -> !ce.endDateTime().toLocalDate().isBefore(renderStart))
+                .collect(Collectors.groupingBy(ce -> ce.startDateTime().toLocalDate()));
+        Map<LocalDate, List<CalendarEvent>> dateToEvents = toBeRenderedDates.stream()
+                .map(date -> Pair.of(date, dateToEventsWithPossibleEmptyDates.get(date) == null ? new ArrayList<CalendarEvent>() : dateToEventsWithPossibleEmptyDates.get(date)))
+                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+        model.addAttribute("dateToEvents", dateToEvents);
 
         // Is a date inside or outside the month
         Map<LocalDate, Boolean> dateIsOutsideMonth = toBeRenderedDates.stream()
@@ -145,6 +149,8 @@ public class CalendarController {
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
         model.addAttribute("eventToLabels", eventToLabels);
 
+        // done
+        model.addAttribute("eventStartDateTimeComparator", Comparator.comparing((CalendarEvent e) -> e.startDateTime()));
         return "month";
     }
 

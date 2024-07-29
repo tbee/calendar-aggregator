@@ -89,7 +89,7 @@
                         <h5 class="title is-5" th:text="${#temporals.format(date,'d')}">...</h5>
                         <div class="">
                             <ul>
-                                <li th:each="event : ${dateToEvents.get(date)}">
+                                <li th:each="event : ${#lists.sort(dateToEvents.get(date), eventStartDateTimeComparator)}">
                                     <div class="tooltipped">
                                         <span th:text="${eventToText.get(event)}">...</span>
                                         <span class="tooltiptext" th:text="${eventToTooltip.get(event)}">...</span>
