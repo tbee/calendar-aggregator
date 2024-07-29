@@ -35,15 +35,16 @@ public class CalendarController {
         List<CalendarEvent> events = filterOnDistance(model, lat, lon, d);
 
         // List
-        Map<LocalDateTime, List<CalendarEvent>> startDateTimeToEventsMap = events.stream()
+        Map<LocalDateTime, List<CalendarEvent>> dateTimeToEventsMap = events.stream()
                 .collect(Collectors.groupingBy(ce -> ce.startDateTime()));
-        model.addAttribute("startDateTimeToEventsMap", startDateTimeToEventsMap);
+        model.addAttribute("dateTimeToEventsMap", dateTimeToEventsMap);
 
         // When
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("E yyyy-MM-dd HH:mm");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         model.addAttribute("whenMap", events.stream()
-                .map(event -> Pair.of(event, dateTimeFormatter.format(event.startDateTime())
+                .map(event -> Pair.of(event,
+                        dateTimeFormatter.format(event.startDateTime())
                         + " - "
                         + (event.startDateTime().toLocalDate().equals(event.endDateTime().toLocalDate()) ? timeFormatter : dateTimeFormatter).format(event.endDateTime())))
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getRight)));
