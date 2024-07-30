@@ -4,6 +4,7 @@ import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
+import nl.softworks.calendarAggregator.domain.entity.Label;
 import nl.softworks.calendarAggregator.domain.entity.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,8 +23,11 @@ public class CalendarResource {
 
     // example http://localhost:8080/ical
     @GetMapping(path = {"/ical", "/pub/calendar", "/pub/ical"}, produces = {"text/calendar"})
-    public String ical(@RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance) {
+    public String ical(@RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance
+            , @RequestParam(defaultValue = "", name = "labelInclude") List<String> labelNamesInclude, @RequestParam(defaultValue = "", name = "labelExclude") List<String> labelNamesExclude) {
 
+        List<Label> labelsInclude = CalendarController.labelsNameToEntities(labelNamesInclude);
+        List<Label> labelsExclude = CalendarController.labelsNameToEntities(labelNamesExclude);
         String timezones = R.timezone().findAll().stream()
                 .map(tz -> tz.ical())
                 .collect(Collectors.joining());
@@ -31,6 +35,7 @@ public class CalendarResource {
         // Collect events
         List<CalendarEvent> events = R.calendarEvent().findAll().stream()
                 .filter(ce -> CalendarController.filterEventOnDistance(ce, lat, lon, distance))
+                .filter(ce -> CalendarController.filterEventOnLabels(ce, labelsInclude, labelsExclude))
                 .toList();
         String eventsICAL = events.stream()
                 .map(this::ical)

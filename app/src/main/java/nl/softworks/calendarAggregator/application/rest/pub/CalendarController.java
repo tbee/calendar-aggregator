@@ -42,7 +42,7 @@ public class CalendarController {
         model.addAttribute("labelsExclude", labelExclude);
     }
 
-    private List<Label> labelsNameToEntities(List<String> names) {
+    static List<Label> labelsNameToEntities(List<String> names) {
         return names.stream()
                 .map(l -> R.label().findByName(l).orElse(null))
                 .filter(Objects::nonNull)
