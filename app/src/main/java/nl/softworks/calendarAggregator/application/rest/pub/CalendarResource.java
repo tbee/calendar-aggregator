@@ -29,7 +29,9 @@ public class CalendarResource {
                 .collect(Collectors.joining());
 
         // Collect events
-        List<CalendarEvent> events = CalendarController.filterEventsOnDistance(lat, lon, distance);
+        List<CalendarEvent> events = R.calendarEvent().findAll().stream()
+                .filter(ce -> CalendarController.filterEventOnDistance(ce, lat, lon, distance))
+                .toList();
         String eventsICAL = events.stream()
                 .map(this::ical)
                 .collect(Collectors.joining());

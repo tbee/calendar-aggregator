@@ -7,6 +7,8 @@ import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 public class CalendarEvent extends EntityBase<CalendarEvent> {
@@ -81,5 +83,18 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 			throw new ValidationException("Start (" + startDateTime + ") must be before end (" + endDateTime + ")");
 		}
 		return true;
+	}
+
+	/**
+	 * Get the labels (taking subjectRegex into account)
+	 *
+	 * @return
+	 */
+	public Set<Label> labels() {
+		String description = determineSubject();
+		return calendarSource().labelAssignments().stream()
+				.filter(la -> la.subjectRegexp().isBlank() || description.matches(la.subjectRegexp()))
+				.map(CalendarSourceLabelAssignment::label)
+				.collect(Collectors.toSet());
 	}
 }

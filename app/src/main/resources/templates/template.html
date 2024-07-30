@@ -3,6 +3,8 @@
 <head>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
     <script src="https://kit.fontawesome.com/501b8808a2.js" crossorigin="anonymous"></script>
+    <!-- https://github.com/justboil/bulma-checkbox?tab=readme-ov-file -->
+    <link rel="stylesheet" href="/bulma-checkbox-1.2.1.css">
     <style>
         .centered {
             text-align: center;
@@ -115,6 +117,34 @@
                         <p class="control">
                             <input name="distance" class="input" type="number" step="1" min="0" max="500" placeholder="e.g. 50" th:value="${distance}"/>
                         </p>
+                    </div>
+                </div>
+            </div>
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label">Must include</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <label class="b-checkbox checkbox" th:each="label : ${labels}" style="padding-top: 7px;">
+                            <input type="checkbox" name="labelInclude" th:value="${label.name}" th:checked="${labelsInclude.contains(label)}">
+                            <span class="check"></span>
+                            <span class="control-label" th:text="${label.name}">...</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label">May not have</label>
+                </div>
+                <div class="field-body">
+                    <div class="field">
+                        <label class="b-checkbox checkbox" th:each="label : ${labels}" style="padding-top: 7px;">
+                            <input type="checkbox" name="labelExclude" th:value="${label.name}" th:checked="${labelsExclude.contains(label)}">
+                            <span class="check is-danger"></span>
+                            <span class="control-label" th:text="${label.name}">...</span>
+                        </label>
                     </div>
                 </div>
             </div>

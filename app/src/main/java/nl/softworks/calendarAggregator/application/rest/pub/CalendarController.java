@@ -3,7 +3,6 @@ package nl.softworks.calendarAggregator.application.rest.pub;
 import com.google.common.collect.Lists;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
-import nl.softworks.calendarAggregator.domain.entity.CalendarSourceLabelAssignment;
 import nl.softworks.calendarAggregator.domain.entity.Label;
 import nl.softworks.calendarAggregator.domain.entity.Settings;
 import org.apache.commons.lang3.tuple.Pair;
@@ -23,6 +22,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
@@ -31,20 +32,37 @@ public class CalendarController {
 
     private static int EARTH_RADIUS = 6371;
 
-    private void prepareTemplate(Model model, Double lat, Double lon, Integer distance) {
+    private void prepareTemplate(Model model, Double lat, Double lon, Integer distance, List<Label> labelInclude, List<Label> labelExclude) {
         model.addAttribute("settings", Settings.get());
         model.addAttribute("lat", lat);
         model.addAttribute("lon", lon);
         model.addAttribute("distance", distance);
+        model.addAttribute("labels", R.label().findAllByOrderBySeqnrAsc());
+        model.addAttribute("labelsInclude", labelInclude);
+        model.addAttribute("labelsExclude", labelExclude);
+    }
+
+    private List<Label> labelsNameToEntities(List<String> names) {
+        return names.stream()
+                .map(l -> R.label().findByName(l).orElse(null))
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     // example http://localhost:8080/list
     @RequestMapping(value = {"/list", "/pub/html"}, produces = {"text/html"})
-    public String index(Model model, @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance) {
-        prepareTemplate(model, lat, lon, distance);
+    public String index(Model model, @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance
+            , @RequestParam(defaultValue = "", name = "labelInclude") List<String> labelNamesInclude, @RequestParam(defaultValue = "", name = "labelExclude") List<String> labelNamesExclude) {
+
+        List<Label> labelsInclude = labelsNameToEntities(labelNamesInclude);
+        List<Label> labelsExclude = labelsNameToEntities(labelNamesExclude);
+        prepareTemplate(model, lat, lon, distance, labelsInclude, labelsExclude);
 
         // Collect events
-        List<CalendarEvent> events = filterEventsOnDistance(lat, lon, distance);
+        List<CalendarEvent> events = R.calendarEvent().findAll().stream()
+                .filter(ce -> filterEventOnDistance(ce, lat, lon, distance))
+                .filter(ce -> filterEventOnLabels(ce, labelsInclude, labelsExclude))
+                .toList();
 
         // List
         Map<LocalDate, List<CalendarEvent>> dateToEvents = events.stream()
@@ -75,8 +93,12 @@ public class CalendarController {
     // example http://localhost:8080/month
     @RequestMapping(value = {"/", "/month", "/htmlmonth"}, produces = {"text/html"})
     public String month(Model model, @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance
+            , @RequestParam(defaultValue = "", name = "labelInclude") List<String> labelNamesInclude, @RequestParam(defaultValue = "", name = "labelExclude") List<String> labelNamesExclude
             , @RequestParam(defaultValue = "") Integer year, @RequestParam(defaultValue = "") Integer month) {
-        prepareTemplate(model, lat, lon, distance);
+
+        List<Label> labelsInclude = labelsNameToEntities(labelNamesInclude);
+        List<Label> labelsExclude = labelsNameToEntities(labelNamesExclude);
+        prepareTemplate(model, lat, lon, distance, labelsInclude, labelsExclude);
         DateTimeFormatter yyyy = DateTimeFormatter.ofPattern("yyyy", Locale.ENGLISH);
         DateTimeFormatter mmm = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH);
         DateTimeFormatter dd = DateTimeFormatter.ofPattern("d", Locale.ENGLISH);
@@ -110,7 +132,10 @@ public class CalendarController {
         model.addAttribute("weekOfDates", weeksOfDates);
 
         // Collect events
-        List<CalendarEvent> events = filterEventsOnDistance(lat, lon, distance);
+        List<CalendarEvent> events = R.calendarEvent().findAll().stream()
+                .filter(ce -> filterEventOnDistance(ce, lat, lon, distance))
+                .filter(ce -> filterEventOnLabels(ce, labelsInclude, labelsExclude))
+                .toList();
         Map<LocalDate, List<CalendarEvent>> dateToEventsWithPossibleEmptyDates = events.stream()
                 .filter(ce -> !ce.startDateTime().toLocalDate().isAfter(renderEnd))
                 .filter(ce -> !ce.endDateTime().toLocalDate().isBefore(renderStart))
@@ -139,15 +164,8 @@ public class CalendarController {
         model.addAttribute("eventToTooltip", eventToTooltip);
 
         // labels
-        Map<CalendarEvent, List<Label>> eventToLabels = events.stream()
-                .map(ce -> {
-                    String description = ce.determineSubject();
-                    List<Label> labels = ce.calendarSource().labelAssignments().stream()
-                            .filter(la -> la.subjectRegexp().isBlank() || description.matches(la.subjectRegexp()))
-                            .map(CalendarSourceLabelAssignment::label)
-                            .toList();
-                    return Pair.of(ce, labels);
-                })
+        Map<CalendarEvent, Set<Label>> eventToLabels = events.stream()
+                .map(ce -> Pair.of(ce, ce.labels()))
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
         model.addAttribute("eventToLabels", eventToLabels);
 
@@ -156,12 +174,25 @@ public class CalendarController {
         return "month";
     }
 
-    static List<CalendarEvent> filterEventsOnDistance(Double lat, Double lon, Integer d) {
+    static boolean filterEventOnDistance(CalendarEvent ce, Double lat, Double lon, Integer d) {
         LocalDateTime threshold = LocalDateTime.now().minusHours(2);
-        return R.calendarEvent().findAll().stream()
-                .filter(ce -> ce.startDateTime().isAfter(threshold))
-                .filter(ce -> lat == null || lon == null || d == null || d == 0 || d > (int) calculateDistance(lat, lon, ce.calendarSource().calendarLocation().lat(), ce.calendarSource().calendarLocation().lon()))
-                .toList();
+        return (ce.startDateTime().isAfter(threshold))
+            && (lat == null || lon == null || d == null || d == 0 || d > (int) calculateDistance(lat, lon, ce.calendarSource().calendarLocation().lat(), ce.calendarSource().calendarLocation().lon()));
+    }
+
+    static boolean filterEventOnLabels(CalendarEvent ce, List<Label> labelsInclude, List<Label> labelsExclude) {
+        Set<Label> labels = ce.labels();
+        for (Label label : labelsInclude) {
+            if (!labels.contains(label)) {
+                return false;
+            }
+        }
+        for (Label label : labelsExclude) {
+            if (labels.contains(label)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // https://www.baeldung.com/java-find-distance-between-points
