@@ -67,6 +67,22 @@
             top: -8px;
             left: 102%;
         }
+        .tooltip-top-left {
+            top: -40px;
+            right: 102%;
+        }
+        .tooltip-top-right {
+            top: -40px;
+            left: 102%;
+        }
+        .tooltip-bottom-left {
+            top: 15px;
+            right: 102%;
+        }
+        .tooltip-bottom-right {
+            top: 15px;
+            left: 102%;
+        }
     </style>
 </head>
 <body>
@@ -108,12 +124,12 @@
                                 <li th:each="event : ${#lists.sort(dateToEvents.get(date), eventStartDateTimeComparator)}">
                                     <div class="tooltipped">
                                         <span th:text="${eventToText.get(event)}">...</span>
-                                        <span class="tooltiptext" th:classappend="${dateIterStat.index < 4 ? 'tooltip-right' : 'tooltip-left'}" th:text="${eventToTooltip.get(event)}">...</span>
+                                        <span class="tooltiptext" th:classappend="${dateIterStat.index == 0 ? 'tooltip-right' : 'tooltip-left'}" th:text="${eventToTooltip.get(event)}">...</span>
                                     </div>
                                     <span class="icon" th:style="${'width:' + (eventToLabels.get(event).size() * 14) + 'px; height:10px; margin-left:2px;'}">
                                         <div class="tooltipped" th:each="label : ${eventToLabels.get(event)}">
                                             <i class="css-icon" th:style="${'color:' + label.labelGroup().color() + '; background:' + label.labelGroup().background() + ';'}"><span th:text="${label.icon()}">...</span></i>
-                                            <span class="tooltiptext" th:classappend="${dateIterStat.index < 4 ? 'tooltip-right' : 'tooltip-left'}" th:text="${label.description()}">...</span>
+                                            <span class="tooltiptext" th:classappend="${dateIterStat.index == 0 ? 'tooltip-bottom-right' : 'tooltip-bottom-left'}" th:text="${label.description()}">...</span>
                                         </div>
                                     </span>
                                     <span class="icon" style="width:14px; height:14px;">
