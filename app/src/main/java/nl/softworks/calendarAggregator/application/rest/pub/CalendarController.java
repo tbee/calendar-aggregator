@@ -1,6 +1,7 @@
 package nl.softworks.calendarAggregator.application.rest.pub;
 
 import com.google.common.collect.Lists;
+import jakarta.servlet.http.HttpServletRequest;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.Label;
@@ -13,6 +14,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,14 +35,23 @@ public class CalendarController {
 
     private static int EARTH_RADIUS = 6371;
 
-    private void prepareTemplate(Model model, Double lat, Double lon, Integer distance, List<Label> labelInclude, List<Label> labelExclude) {
+    private void prepareTemplate(Model model, HttpServletRequest request, Double lat, Double lon, Integer distance, List<Label> labelInclude, List<Label> labelExclude) {
         model.addAttribute("settings", Settings.get());
+        model.addAttribute("request", request);
         model.addAttribute("lat", lat);
         model.addAttribute("lon", lon);
         model.addAttribute("distance", distance);
         model.addAttribute("labels", R.label().findAllByOrderBySeqnrAsc());
         model.addAttribute("labelsInclude", labelInclude);
         model.addAttribute("labelsExclude", labelExclude);
+        model.addAttribute("paramsQueryString", "lat=" + nullToEmpty(lat) + "&lon=" + nullToEmpty(lon) + "&distance=" + nullToEmpty(distance)
+                + labelInclude.stream().map(l -> "&labelInclude=" + URLEncoder.encode(l.name(), StandardCharsets.UTF_8)).collect(Collectors.joining())
+                + labelExclude.stream().map(l -> "&labelExclude=" + URLEncoder.encode(l.name(), StandardCharsets.UTF_8)).collect(Collectors.joining())
+        );
+    }
+
+    private <T> String nullToEmpty(T obj) {
+        return obj == null ? "" : obj.toString();
     }
 
     static List<Label> labelsNameToEntities(List<String> names) {
@@ -51,12 +63,13 @@ public class CalendarController {
 
     // example http://localhost:8080/list
     @RequestMapping(value = {"/list", "/pub/html"}, produces = {"text/html"})
-    public String index(Model model, @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance
+    public String index(Model model, HttpServletRequest request
+            , @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance
             , @RequestParam(defaultValue = "", name = "labelInclude") List<String> labelNamesInclude, @RequestParam(defaultValue = "", name = "labelExclude") List<String> labelNamesExclude) {
 
         List<Label> labelsInclude = labelsNameToEntities(labelNamesInclude);
         List<Label> labelsExclude = labelsNameToEntities(labelNamesExclude);
-        prepareTemplate(model, lat, lon, distance, labelsInclude, labelsExclude);
+        prepareTemplate(model, request, lat, lon, distance, labelsInclude, labelsExclude);
 
         // Collect events
         List<CalendarEvent> events = R.calendarEvent().findAll().stream()
@@ -92,13 +105,14 @@ public class CalendarController {
 
     // example http://localhost:8080/month
     @RequestMapping(value = {"/", "/month", "/htmlmonth"}, produces = {"text/html"})
-    public String month(Model model, @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance
+    public String month(Model model, HttpServletRequest request
+            , @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance
             , @RequestParam(defaultValue = "", name = "labelInclude") List<String> labelNamesInclude, @RequestParam(defaultValue = "", name = "labelExclude") List<String> labelNamesExclude
             , @RequestParam(defaultValue = "") Integer year, @RequestParam(defaultValue = "") Integer month) {
 
         List<Label> labelsInclude = labelsNameToEntities(labelNamesInclude);
         List<Label> labelsExclude = labelsNameToEntities(labelNamesExclude);
-        prepareTemplate(model, lat, lon, distance, labelsInclude, labelsExclude);
+        prepareTemplate(model, request, lat, lon, distance, labelsInclude, labelsExclude);
         DateTimeFormatter yyyy = DateTimeFormatter.ofPattern("yyyy", Locale.ENGLISH);
         DateTimeFormatter mmm = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH);
         DateTimeFormatter dd = DateTimeFormatter.ofPattern("d", Locale.ENGLISH);

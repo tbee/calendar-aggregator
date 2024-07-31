@@ -56,10 +56,10 @@
     <div class="block pagewidth" th:text="${settings.disclaimer()}">...</div>
     <div id="iconbar" class="block alignright pagewidth">
             <span class="icon">
-                <a th:href="${settings.websiteBaseurl() + '/list'}"><i class="fas fa-list fa-xl"></i></a>
+                <a th:href="${settings.websiteBaseurl() + '/list?' + paramsQueryString}"><i class="fas fa-list fa-xl"></i></a>
             </span>
         <span class="icon">
-                <a th:href="${settings.websiteBaseurl() + '/'}"><i class="fas fa-calendar-days fa-xl"></i></a>
+                <a th:href="${settings.websiteBaseurl() + '/?' + paramsQueryString}"><i class="fas fa-calendar-days fa-xl"></i></a>
             </span>
     </div>
 
@@ -70,9 +70,9 @@
             This data is available in:
         </p>
         <ul>
-            <li class="bullet"><a th:href="${settings.websiteBaseurl() + '/list'}">List</a> form</li>
-            <li class="bullet"><a th:href="${settings.websiteBaseurl() + '/'}">Calendar</a> form</li>
-            <li class="bullet">For including in e.g. Google calendar by adding an external URL calendar using the following URL: <a th:href="${settings.websiteBaseurl() + '/ical'}" target="_blank" th:text="${settings.websiteBaseurl() + '/ical'}">...</a></li>
+            <li class="bullet"><a th:href="${settings.websiteBaseurl() + '/list?' + paramsQueryString}">List</a> form</li>
+            <li class="bullet"><a th:href="${settings.websiteBaseurl() + '/?' + paramsQueryString}">Calendar</a> form</li>
+            <li class="bullet">For including in e.g. Google calendar by adding an external URL calendar using the following URL: <a th:href="${settings.websiteBaseurl() + '/ical?' + paramsQueryString}" target="_blank" th:text="${settings.websiteBaseurl() + '/ical'}">...</a></li>
         </ul>
     </div>
     <div class="notification pagewidth">
