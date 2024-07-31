@@ -51,6 +51,22 @@
         .tooltipped:hover .tooltiptext {
             visibility: visible;
         }
+        .tooltip-top {
+            top: -40px;
+            left: -50%;
+        }
+        .tooltip-bottom {
+            top: 25px;
+            left: -50%;
+        }
+        .tooltip-left {
+            top: -8px;
+            right: 102%;
+        }
+        .tooltip-right {
+            top: -8px;
+            left: 102%;
+        }
     </style>
 </head>
 <body>
@@ -85,19 +101,19 @@
             </thead>
             <tbody>
                 <tr th:each="dates : ${weekOfDates}">
-                    <td th:each="date : ${dates}" th:classappend="${(dateIsOutsideMonth.get(date) ? 'outside-month' : 'inside-month') + ' ' + (today.equals(date) ? 'today': '')}">
+                    <td th:each="date,dateIterStat : ${dates}" th:classappend="${(dateIsOutsideMonth.get(date) ? 'outside-month' : 'inside-month') + ' ' + (today.equals(date) ? 'today': '')}">
                         <h5 class="title is-5" th:text="${#temporals.format(date,'d')}">...</h5>
                         <div class="">
                             <ul>
                                 <li th:each="event : ${#lists.sort(dateToEvents.get(date), eventStartDateTimeComparator)}">
                                     <div class="tooltipped">
                                         <span th:text="${eventToText.get(event)}">...</span>
-                                        <span class="tooltiptext" th:text="${eventToTooltip.get(event)}">...</span>
+                                        <span class="tooltiptext" th:classappend="${dateIterStat.index < 4 ? 'tooltip-right' : 'tooltip-left'}" th:text="${eventToTooltip.get(event)}">...</span>
                                     </div>
                                     <span class="icon" th:style="${'width:' + (eventToLabels.get(event).size() * 14) + 'px; height:10px; margin-left:2px;'}">
                                         <div class="tooltipped" th:each="label : ${eventToLabels.get(event)}">
                                             <i class="css-icon" th:style="${'color:' + label.labelGroup().color() + '; background:' + label.labelGroup().background() + ';'}"><span th:text="${label.icon()}">...</span></i>
-                                            <span class="tooltiptext" th:text="${label.description()}">...</span>
+                                            <span class="tooltiptext" th:classappend="${dateIterStat.index < 4 ? 'tooltip-right' : 'tooltip-left'}" th:text="${label.description()}">...</span>
                                         </div>
                                     </span>
                                     <span class="icon" style="width:14px; height:14px;">
