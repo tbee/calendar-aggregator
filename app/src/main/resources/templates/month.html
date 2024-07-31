@@ -74,13 +74,13 @@
         <table id="calendar" class="table">
             <thead>
             <tr>
-                <td width="12%">Monday</td>
-                <td width="12%">Tuesday</td>
-                <td width="12%">Wednesday</td>
-                <td width="12%">Thursday</td>
-                <td width="12%">Friday</td>
-                <td width="12%">Saturday</td>
-                <td width="12%">Sunday</td>
+                <td style="width:12%;">Monday</td>
+                <td style="width:12%;">Tuesday</td>
+                <td style="width:12%;">Wednesday</td>
+                <td style="width:12%;">Thursday</td>
+                <td style="width:12%;">Friday</td>
+                <td style="width:12%;">Saturday</td>
+                <td style="width:12%;">Sunday</td>
             </tr>
             </thead>
             <tbody>
@@ -100,8 +100,8 @@
                                             <span class="tooltiptext" th:text="${label.description()}">...</span>
                                         </div>
                                     </span>
-                                    <span class="icon" style="width:12px; height:10px;">
-                                        <a th:href="${event.calendarSource().determineUrl()}" target="_blank"><i class="fas fa-arrow-up-right-from-square fa-xs"></i></a>
+                                    <span class="icon" style="width:14px; height:14px;">
+                                        <a th:href="${event.calendarSource().determineUrl()}" target="_blank"><i class="fas fa-arrow-up-right-from-square fa-sm"></i></a>
                                    </span>
                                 </li>
                             </ul>
