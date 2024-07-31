@@ -342,7 +342,10 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
     }
 
     private String describe(XdmValue xdmValue) {
-        return describe((XdmNode)xdmValue);
+        if (xdmValue instanceof XdmNode xdmNode) {
+            return describe(xdmNode);
+        }
+        return "" + xdmValue;
     }
 
     private String describe(XdmNode node) {
