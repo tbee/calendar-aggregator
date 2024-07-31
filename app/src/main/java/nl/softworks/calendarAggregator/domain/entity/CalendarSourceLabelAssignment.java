@@ -44,7 +44,7 @@ public class CalendarSourceLabelAssignment extends EntityBase<CalendarSourceLabe
 	}
 
 	@NotNull
-	private String subjectRegexp;
+	private String subjectRegexp = "";
 	static public final String SUBJECTREGEXP = "subjectRegexp";
 	public String subjectRegexp() {
 		return subjectRegexp;
