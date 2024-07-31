@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
@@ -169,7 +168,7 @@ public class CalendarController {
         model.addAttribute("eventToTooltip", eventToTooltip);
 
         // labels
-        Map<CalendarEvent, Set<Label>> eventToLabels = events.stream()
+        Map<CalendarEvent, List<Label>> eventToLabels = events.stream()
                 .map(ce -> Pair.of(ce, ce.labels()))
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
         model.addAttribute("eventToLabels", eventToLabels);
@@ -186,7 +185,7 @@ public class CalendarController {
     }
 
     static boolean filterEventOnLabels(CalendarEvent ce, List<Label> labelsInclude, List<Label> labelsExclude) {
-        Set<Label> labels = ce.labels();
+        List<Label> labels = ce.labels();
         for (Label label : labelsInclude) {
             if (!labels.contains(label)) {
                 return false;

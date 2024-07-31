@@ -7,8 +7,8 @@ import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Comparator;
+import java.util.List;
 
 @Entity
 public class CalendarEvent extends EntityBase<CalendarEvent> {
@@ -88,13 +88,14 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 	/**
 	 * Get the labels (taking subjectRegex into account)
 	 *
-	 * @return
+	 * @return List (not Set, because the labels are sorted)
 	 */
-	public Set<Label> labels() {
+	public List<Label> labels() {
 		String description = determineSubject();
 		return calendarSource().labelAssignments().stream()
 				.filter(la -> la.subjectRegexp().isBlank() || description.matches(la.subjectRegexp()))
 				.map(CalendarSourceLabelAssignment::label)
-				.collect(Collectors.toSet());
+				.sorted(Comparator.comparing(Label::seqnr))
+				.toList();
 	}
 }
