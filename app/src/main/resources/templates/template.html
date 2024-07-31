@@ -55,12 +55,12 @@
     <h2 class="subtitle" th:text="${settings.subtitle()}">...</h2>
     <div class="block pagewidth" th:text="${settings.disclaimer()}">...</div>
     <div id="iconbar" class="block alignright pagewidth">
-            <span class="icon">
-                <a th:href="${settings.websiteBaseurl() + '/list?' + paramsQueryString}"><i class="fas fa-list fa-xl"></i></a>
-            </span>
+		<span class="icon">
+			<a th:href="${settings.websiteBaseurl() + '/list?' + paramsQueryString}"><i class="fas fa-list fa-xl"></i></a>
+		</span>
         <span class="icon">
                 <a th:href="${settings.websiteBaseurl() + '/?' + paramsQueryString}"><i class="fas fa-calendar-days fa-xl"></i></a>
-            </span>
+		</span>
     </div>
 
     <th:block th:replace="${body}" />
