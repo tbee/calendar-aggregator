@@ -50,17 +50,6 @@ public class CalendarController {
         );
     }
 
-    private <T> String nullToEmpty(T obj) {
-        return obj == null ? "" : obj.toString();
-    }
-
-    static List<Label> labelsNameToEntities(List<String> names) {
-        return names.stream()
-                .map(l -> R.label().findByName(l).orElse(null))
-                .filter(Objects::nonNull)
-                .toList();
-    }
-
     // example http://localhost:8080/list
     @RequestMapping(value = {"/list", "/pub/html"}, produces = {"text/html"})
     public String index(Model model, HttpServletRequest request
@@ -108,7 +97,8 @@ public class CalendarController {
     public String month(Model model, HttpServletRequest request
             , @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance
             , @RequestParam(defaultValue = "", name = "labelInclude") List<String> labelNamesInclude, @RequestParam(defaultValue = "", name = "labelExclude") List<String> labelNamesExclude
-            , @RequestParam(defaultValue = "") Integer year, @RequestParam(defaultValue = "") Integer month) {
+            , @RequestParam(defaultValue = "") Integer year, @RequestParam(defaultValue = "") Integer month
+            , @RequestParam(defaultValue = "0") Integer moreWeeks) {
 
         List<Label> labelsInclude = labelsNameToEntities(labelNamesInclude);
         List<Label> labelsExclude = labelsNameToEntities(labelNamesExclude);
@@ -123,6 +113,7 @@ public class CalendarController {
             LocalDate now = LocalDate.now();
             year = now.getYear();
             month = now.getMonthValue();
+            moreWeeks = (30 - now.getDayOfWeek().getValue()) / 7;
         }
         LocalDate monthStart = LocalDate.of(year, month, 1);
         LocalDate monthEnd = monthStart.plusMonths(1).minusDays(1);
@@ -138,7 +129,7 @@ public class CalendarController {
 
         // start at monday
         LocalDate renderStart = monthStart.minusDays(monthStart.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
-        LocalDate renderEnd = monthEnd.plusDays(DayOfWeek.SUNDAY.getValue() - monthEnd.getDayOfWeek().getValue());
+        LocalDate renderEnd = monthEnd.plusDays(DayOfWeek.SUNDAY.getValue() - monthEnd.getDayOfWeek().getValue()).plusDays(moreWeeks * 7);
 
         // Split into weeks
         List<LocalDate> toBeRenderedDates = renderStart.datesUntil(renderEnd.plusDays(1)).toList();
@@ -207,6 +198,17 @@ public class CalendarController {
             }
         }
         return true;
+    }
+
+    private <T> String nullToEmpty(T obj) {
+        return obj == null ? "" : obj.toString();
+    }
+
+    static List<Label> labelsNameToEntities(List<String> names) {
+        return names.stream()
+                .map(l -> R.label().findByName(l).orElse(null))
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     // https://www.baeldung.com/java-find-distance-between-points
