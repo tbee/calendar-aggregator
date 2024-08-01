@@ -112,7 +112,7 @@ public class CalendarController {
             LocalDate now = LocalDate.now();
             year = now.getYear();
             month = now.getMonthValue();
-            moreWeeks = (30 - now.getDayOfWeek().getValue()) / 7;
+            moreWeeks = now.getDayOfMonth() / 7;
         }
         LocalDate monthStart = LocalDate.of(year, month, 1);
         LocalDate monthEnd = monthStart.plusMonths(1).minusDays(1);
