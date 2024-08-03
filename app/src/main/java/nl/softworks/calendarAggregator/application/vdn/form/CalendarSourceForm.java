@@ -1,11 +1,13 @@
 package nl.softworks.calendarAggregator.application.vdn.form;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -58,7 +60,7 @@ abstract public class CalendarSourceForm extends FormLayout {
 		labelAssignGrid.addComponentColumn(LabelAssignmentGridRow::selected).setHeader("").setWidth("60px").setFlexGrow(0);
 		labelAssignGrid.addColumn(LabelAssignmentGridRow::name).setHeader("Label");
 		labelAssignGrid.addComponentColumn(LabelAssignmentGridRow::editButton).setHeader("").setWidth("60px").setFlexGrow(0);
-		labelAssignGrid.addColumn(LabelAssignmentGridRow::subjectRegexp).setHeader("Subject regexp");
+		Grid.Column<LabelAssignmentGridRow> subjectRegexpColumn = labelAssignGrid.addColumn(LabelAssignmentGridRow::subjectRegexp).setHeader("Subject regexp");
 
 		binder.forField(descriptionTextfield).bind(CalendarSource::description, CalendarSource::description);
 		binder.forField(statusTextField).bind(CalendarSource::status, CalendarSource::status);
@@ -67,6 +69,33 @@ abstract public class CalendarSourceForm extends FormLayout {
 		labelAssignGridItems = R.label().findAllByOrderByNameAsc().stream().map(LabelAssignmentGridRow::new).toList();
 		labelAssignListDataProvider = new ListDataProvider<>(labelAssignGridItems);
 		labelAssignGrid.setItems(labelAssignListDataProvider);
+
+
+		// Also allow inline editing. See what is more pleasant (because it is a different UX).
+		// See https://vaadin.com/forum/t/consume-key-event/166801/6
+		Editor<LabelAssignmentGridRow> labelAssignGridEditor = labelAssignGrid.getEditor();
+
+		TextField subjectRegexpTextField = new TextField();
+		subjectRegexpTextField.setWidthFull();
+		subjectRegexpColumn.setEditorComponent(subjectRegexpTextField);
+		subjectRegexpTextField.getElement().addEventListener("keydown", e -> {
+			labelAssignGridEditor.cancel();
+		}).setFilter("event.code === 'Escape'").addEventData("event.stopPropagation()");
+		subjectRegexpTextField.addBlurListener(e -> {
+			if (labelAssignGridEditor.isOpen()) {
+				labelAssignGridEditor.getItem().subjectRegexp(subjectRegexpTextField.getValue());
+				labelAssignGridEditor.closeEditor();
+			}
+		});
+
+		labelAssignGrid.addItemDoubleClickListener(e -> {
+			labelAssignGridEditor.editItem(e.getItem());
+			subjectRegexpTextField.setValue(e.getItem().subjectRegexp());
+			Component editorComponent = e.getColumn().getEditorComponent();
+			if (editorComponent instanceof Focusable) {
+				((Focusable) editorComponent).focus();
+			}
+		});
 	}
 
 	public CalendarSourceForm populateWith(CalendarSource calendarSource) {
@@ -150,6 +179,9 @@ abstract public class CalendarSourceForm extends FormLayout {
 
 		public String subjectRegexp() {
 			return assign == null ? "" : assign.subjectRegexp();
+		}
+		public void subjectRegexp(String v) {
+			assign.subjectRegexp(v);
 		}
 
 		public Component selected() {
