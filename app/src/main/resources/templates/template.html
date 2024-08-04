@@ -46,6 +46,62 @@
         .border {
             border: 2px solid;
         }
+
+        .tooltipped {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltipped .tooltiptext {
+            visibility: hidden;
+            background-color: gray;
+            color: white;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+
+            /* the width creates the scrollbar under the month for the overflow on the right, so we limit it */
+            width: 150px;
+            text-wrap: pretty;
+
+            /* Position the tooltip */
+            position: absolute;
+            z-index: 1;
+        }
+        .tooltipped:hover .tooltiptext {
+            visibility: visible;
+        }
+        .tooltip-top {
+            top: -40px;
+            left: -50%;
+        }
+        .tooltip-bottom {
+            top: 25px;
+            left: -50%;
+        }
+        .tooltip-left {
+            top: -8px;
+            right: 102%;
+        }
+        .tooltip-right {
+            top: -8px;
+            left: 102%;
+        }
+        .tooltip-top-left {
+            top: -40px;
+            right: 102%;
+        }
+        .tooltip-top-right {
+            top: -40px;
+            left: 102%;
+        }
+        .tooltip-bottom-left {
+            top: 15px;
+            right: 102%;
+        }
+        .tooltip-bottom-right {
+            top: 15px;
+            left: 102%;
+        }
     </style>
     <th:block th:replace="${header}" />
 </head>
@@ -129,7 +185,10 @@
                         <label class="b-checkbox checkbox" th:each="label : ${labels}" style="padding-top: 7px;">
                             <input type="checkbox" name="labelInclude" th:value="${label.name}" th:checked="${labelsInclude.contains(label)}">
                             <span class="check"></span>
-                            <span class="control-label" th:text="${label.name}">...</span>
+                            <div class="tooltipped">
+                                <span class="tag is-info" th:text="${label.name()}" th:style="${'color:' + label.labelGroup().color() + '; background-color:' + label.labelGroup().background() + '; margin-left:2px;'}"></span>
+                                <span class="tooltiptext tooltip-bottom" th:text="${label.description()}">...</span>
+                            </div>
                         </label>
                     </div>
                 </div>
@@ -143,7 +202,10 @@
                         <label class="b-checkbox checkbox" th:each="label : ${labels}" style="padding-top: 7px;">
                             <input type="checkbox" name="labelExclude" th:value="${label.name}" th:checked="${labelsExclude.contains(label)}">
                             <span class="check is-danger"></span>
-                            <span class="control-label" th:text="${label.name}">...</span>
+                            <div class="tooltipped">
+                                <span class="tag is-info" th:text="${label.name()}" th:style="${'color:' + label.labelGroup().color() + '; background-color:' + label.labelGroup().background() + '; margin-left:2px;'}"></span>
+                                <span class="tooltiptext tooltip-bottom" th:text="${label.description()}">...</span>
+                            </div>
                         </label>
                     </div>
                 </div>

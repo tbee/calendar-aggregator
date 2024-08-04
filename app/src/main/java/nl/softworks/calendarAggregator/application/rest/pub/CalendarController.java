@@ -88,6 +88,13 @@ public class CalendarController {
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
         model.addAttribute("eventToWhat", eventToWhat);
 
+        // labels
+        Map<CalendarEvent, List<Label>> eventToLabels = events.stream()
+                .map(ce -> Pair.of(ce, ce.labels()))
+                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+        model.addAttribute("eventToLabels", eventToLabels);
+        model.addAttribute("labelGroups", R.labelGroup().findAllByOrderByNameAsc());
+
         return "list";
     }
 
