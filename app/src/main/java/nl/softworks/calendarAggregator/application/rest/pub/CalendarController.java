@@ -172,6 +172,7 @@ public class CalendarController {
                 .map(ce -> Pair.of(ce, ce.labels()))
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
         model.addAttribute("eventToLabels", eventToLabels);
+        model.addAttribute("labelGroups", R.labelGroup().findAllByOrderByNameAsc());
 
         // done
         model.addAttribute("eventStartDateTimeComparator", Comparator.comparing((CalendarEvent e) -> e.startDateTime()));

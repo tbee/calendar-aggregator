@@ -102,6 +102,13 @@
             </span>
         </div>
     </div>
+    <div id="legenda">
+        <span class="icon" th:each="labelGroup : ${labelGroups}" th:style="${'width:' + (labelGroup.name.length() * 10) + 'px; margin-right:5px;'}">
+            <div>
+                <i class="css-icon" th:style="${'color:' + labelGroup.color() + '; background:' + labelGroup.background() + ';width:' + (labelGroup.name.length() * 10) + 'px;'}"><span th:text="${labelGroup.name()}">...</span></i>
+            </div>
+        </span>
+    </div>
     <div id="calendarwrapper">
         <table id="calendar" class="table">
             <thead>
