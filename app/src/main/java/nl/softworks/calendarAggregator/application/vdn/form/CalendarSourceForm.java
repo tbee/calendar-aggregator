@@ -74,23 +74,25 @@ abstract public class CalendarSourceForm extends FormLayout {
 		// Also allow inline editing. See what is more pleasant (because it is a different UX).
 		// See https://vaadin.com/forum/t/consume-key-event/166801/6
 		Editor<LabelAssignmentGridRow> labelAssignGridEditor = labelAssignGrid.getEditor();
+		Binder<LabelAssignmentGridRow> labelAssignGridBinder = new Binder<>(LabelAssignmentGridRow.class);
+		labelAssignGridEditor.setBinder(labelAssignGridBinder);
+		labelAssignGridEditor.setBuffered(true);
 
 		TextField subjectRegexpTextField = new TextField();
 		subjectRegexpTextField.setWidthFull();
 		subjectRegexpColumn.setEditorComponent(subjectRegexpTextField);
+		labelAssignGridBinder.forField(subjectRegexpTextField).bind(LabelAssignmentGridRow::subjectRegexp, LabelAssignmentGridRow::subjectRegexp);
 		subjectRegexpTextField.getElement().addEventListener("keydown", e -> {
 			labelAssignGridEditor.cancel();
 		}).setFilter("event.code === 'Escape'").addEventData("event.stopPropagation()");
 		subjectRegexpTextField.addBlurListener(e -> {
 			if (labelAssignGridEditor.isOpen()) {
-				labelAssignGridEditor.getItem().subjectRegexp(subjectRegexpTextField.getValue());
-				labelAssignGridEditor.closeEditor();
+				labelAssignGridEditor.save();
 			}
 		});
 
 		labelAssignGrid.addItemDoubleClickListener(e -> {
 			labelAssignGridEditor.editItem(e.getItem());
-			subjectRegexpTextField.setValue(e.getItem().subjectRegexp());
 			Component editorComponent = e.getColumn().getEditorComponent();
 			if (editorComponent instanceof Focusable) {
 				((Focusable) editorComponent).focus();
