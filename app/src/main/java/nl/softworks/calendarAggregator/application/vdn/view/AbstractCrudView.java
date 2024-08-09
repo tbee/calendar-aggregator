@@ -38,6 +38,7 @@ implements AfterNavigationObserver {
 		this.finder = finder;
 
 		// treeGrid
+		// not needed: treeGrid.setHeightFull();
 		treeGrid.setMultiSort(true); // SHIFT click adds columns
 		treeGrid.addItemDoubleClickListener(e -> edit());
 		setupTreeGrid.accept(treeGrid); // do the default setup first, so it may be overridden here
@@ -50,7 +51,9 @@ implements AfterNavigationObserver {
 				.onDelete(this::delete);
 
 		// content
-		setContent(new VerticalLayout(crudButtonbar, treeGrid));
+		VerticalLayout verticalLayout = new VerticalLayout(crudButtonbar, treeGrid);
+		verticalLayout.setSizeFull();
+		setContent(verticalLayout);
 	}
 
 	@Override
