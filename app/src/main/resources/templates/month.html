@@ -74,7 +74,7 @@
                             <ul>
                                 <li th:each="event : ${#lists.sort(dateToEvents.get(date), eventStartDateTimeComparator)}">
                                     <div class="tooltipped">
-                                        <span th:text="${eventToText.get(event)}">...</span>
+                                        <span th:text="${(event.firstDateOfEvent(date) ? hhmm.format(event.startDateTime()) : '00:00') + ' ' + eventToText.get(event)}">...</span>
                                         <span class="tooltiptext" th:classappend="${dateIterStat.index == 0 ? 'tooltip-right' : 'tooltip-left'}" th:text="${eventToTooltip.get(event)}">...</span>
                                     </div>
                                     <span class="icon" th:style="${'width:' + (eventToLabels.get(event).size() * 14) + 'px; height:10px; margin-left:2px;'}">

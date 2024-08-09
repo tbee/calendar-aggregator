@@ -6,6 +6,7 @@ import jakarta.validation.ValidationException;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
@@ -97,5 +98,19 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 				.map(CalendarSourceLabelAssignment::label)
 				.sorted(Comparator.comparing(Label::seqnr))
 				.toList();
+	}
+
+	public boolean firstDateOfEvent(LocalDate pivotLocalDate) {
+		return startDateTime.toLocalDate().equals(pivotLocalDate);
+	}
+
+	public boolean occursOn(LocalDate pivotLocalDate) {
+		return !startDateTime.toLocalDate().isAfter(pivotLocalDate)
+				&& !endDateTime.toLocalDate().isBefore(pivotLocalDate);
+	}
+
+	public List<LocalDate> eventDates() {
+		// minus 1 minute to prevent 00:00 to skip over to the next day
+		return startDateTime.toLocalDate().datesUntil(endDateTime.minusMinutes(1).toLocalDate().plusDays(1)).toList();
 	}
 }

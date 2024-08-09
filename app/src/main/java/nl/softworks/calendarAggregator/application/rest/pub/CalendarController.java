@@ -113,6 +113,7 @@ public class CalendarController {
         DateTimeFormatter mmm = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH);
         DateTimeFormatter dd = DateTimeFormatter.ofPattern("d", Locale.ENGLISH);
         DateTimeFormatter hhmm = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH);
+        model.addAttribute("hhmm", hhmm);
 
         // Default parameter values
         if (year == null || month == null) {
@@ -150,7 +151,8 @@ public class CalendarController {
         Map<LocalDate, List<CalendarEvent>> dateToEventsWithPossibleEmptyDates = events.stream()
                 .filter(ce -> !ce.startDateTime().toLocalDate().isAfter(renderEnd))
                 .filter(ce -> !ce.endDateTime().toLocalDate().isBefore(renderStart))
-                .collect(Collectors.groupingBy(ce -> ce.startDateTime().toLocalDate()));
+                .flatMap(ce -> ce.eventDates().stream().map(d -> Pair.of(d, ce))) // an event can span multiple dates, so introduce the event on every date
+                .collect(Collectors.groupingBy(Pair::getLeft, Collectors.mapping(Pair::getRight, Collectors.toList())));
         Map<LocalDate, List<CalendarEvent>> dateToEvents = toBeRenderedDates.stream()
                 .map(date -> Pair.of(date, dateToEventsWithPossibleEmptyDates.get(date) == null ? new ArrayList<CalendarEvent>() : dateToEventsWithPossibleEmptyDates.get(date)))
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
@@ -164,7 +166,7 @@ public class CalendarController {
 
         // The text of an event
         Map<CalendarEvent, String> eventToText = events.stream()
-                .map(ce -> Pair.of(ce, hhmm.format(ce.startDateTime()) + " " + ce.calendarSource().calendarLocation().name()))
+                .map(ce -> Pair.of(ce, ce.calendarSource().calendarLocation().name()))
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
         model.addAttribute("eventToText", eventToText);
 
