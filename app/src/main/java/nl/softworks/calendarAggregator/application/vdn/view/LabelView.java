@@ -4,6 +4,7 @@ import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.html.NativeLabel;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.Route;
@@ -38,6 +39,13 @@ public class LabelView extends AbstractCrudView<Label> {
 						return nativeLabel;
 					})).setHeader("Group");
 					grid.addColumn(Label::icon).setHeader("Icon").setSortable(true);
+					grid.addColumn(new ComponentRenderer<>(label -> {
+						Span badge = new Span(label.icon());
+						badge.getElement().getThemeList().add("badge primary");
+						badge.getElement().getStyle().set("color", label.labelGroup().color());
+						badge.getElement().getStyle().set("background", label.labelGroup().background());
+						return badge;
+					})).setHeader("Icon visual");
 					grid.sort(List.of(new GridSortOrder<>(seqnrColumn, SortDirection.ASCENDING)));
 				});
 		tabs.setSelectedTab(labelTab);
