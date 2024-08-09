@@ -38,8 +38,9 @@ implements AfterNavigationObserver {
 		this.finder = finder;
 
 		// treeGrid
-		setupTreeGrid.accept(treeGrid);
+		treeGrid.setMultiSort(true); // SHIFT click adds columns
 		treeGrid.addItemDoubleClickListener(e -> edit());
+		setupTreeGrid.accept(treeGrid); // do the default setup first, so it may be overridden here
 
 		// crudButtonbar
 		CrudButtonbar crudButtonbar = new CrudButtonbar()

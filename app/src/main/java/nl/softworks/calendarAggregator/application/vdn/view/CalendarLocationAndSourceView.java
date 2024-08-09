@@ -91,6 +91,7 @@ implements AfterNavigationObserver
 		treeGrid.addComponentColumn(TreeNode::status).setHeader("Status").setFlexGrow(30);
 		treeGrid.addColumn(TreeNode::updated).setHeader("Updated").setFlexGrow(30);
 		treeGrid.addColumn(TreeNode::childrenCount).setHeader("Children").setFlexGrow(10);
+		treeGrid.addItemDoubleClickListener(e -> edit());
 
 		// buttonbar
 		CrudButtonbar crudButtonbar = new CrudButtonbar()
@@ -102,6 +103,14 @@ implements AfterNavigationObserver
 		VerticalLayout verticalLayout = new VerticalLayout(crudButtonbar, treeGrid);
 		verticalLayout.setSizeFull();
 		setContent(verticalLayout);
+	}
+
+	private void edit() {
+		Set<TreeNode> selectedItems = treeGrid.getSelectedItems();
+		if (selectedItems.isEmpty()) {
+			return;
+		}
+		selectedItems.iterator().next().edit();
 	}
 
 	private void generate() {
@@ -191,6 +200,7 @@ implements AfterNavigationObserver
 		Collection<TreeNode> getChildren();
 
 		Component crudButtons();
+		void edit();
 	}
 
 	final class TreeNodeCalendarLocation implements TreeNode {
@@ -320,7 +330,7 @@ implements AfterNavigationObserver
 			CalendarLocationAndSourceView.this.showInsertForm(calendarLocation, calendarSource, calendarSourceForm, calendarSourceDefault);
 		}
 
-		private void edit() {
+		public void edit() {
 			treeGrid.select(this); // for reselect after reload
 			CalendarLocationForm calendarLocationForm = new CalendarLocationForm().populateWith(calendarLocation);
 			showEditForm("Location", calendarLocationForm, () -> {
@@ -451,7 +461,7 @@ implements AfterNavigationObserver
 			});
 		}
 
-		private void edit() {
+		public void edit() {
 			treeGrid.select(this); // for reselect after reload
 			final CalendarSourceForm calendarSourceForm;
 			final String title;
@@ -571,6 +581,9 @@ implements AfterNavigationObserver
 		public Component crudButtons() {
 			return null;
 		}
+
+		@Override
+		public void edit() {}
 	}
 
 	private static <T> List<TreeNode> treeNodes(Collection<T> businessObjects, Function<T, TreeNode> converter) {
