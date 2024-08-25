@@ -66,7 +66,7 @@ abstract public class CalendarSourceForm extends FormLayout {
 		binder.forField(statusTextField).bind(CalendarSource::status, CalendarSource::status);
 		binder.forField(enabledCheckbox).bind(CalendarSource::enabled, CalendarSource::enabled);
 		binder.forField(urlTextField).bind(CalendarSource::url, CalendarSource::url);
-		labelAssignGridItems = R.label().findAllByOrderByNameAsc().stream().map(LabelAssignmentGridRow::new).toList();
+		labelAssignGridItems = R.label().findAllByOrderBySeqnrAsc().stream().map(LabelAssignmentGridRow::new).toList();
 		labelAssignListDataProvider = new ListDataProvider<>(labelAssignGridItems);
 		labelAssignGrid.setItems(labelAssignListDataProvider);
 
