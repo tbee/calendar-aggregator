@@ -34,7 +34,10 @@ public class CalendarController {
 
     private static int EARTH_RADIUS = 6371;
 
-    private void prepareTemplate(Model model, HttpServletRequest request, Double lat, Double lon, Integer distance, List<Label> labelInclude, List<Label> labelExclude) {
+    private void prepareTemplate(Model model, HttpServletRequest request,
+                                 Double lat, Double lon, Integer distance,
+                                 List<Label> labelInclude, List<Label> labelExclude,
+                                 Integer year, Integer month) {
         model.addAttribute("settings", Settings.get());
         model.addAttribute("request", request);
         model.addAttribute("lat", lat);
@@ -43,21 +46,28 @@ public class CalendarController {
         model.addAttribute("labels", R.label().findAllByOrderBySeqnrAsc());
         model.addAttribute("labelsInclude", labelInclude);
         model.addAttribute("labelsExclude", labelExclude);
-        model.addAttribute("paramsQueryString", "lat=" + nullToEmpty(lat) + "&lon=" + nullToEmpty(lon) + "&distance=" + nullToEmpty(distance)
+        model.addAttribute("year", year == null ? "" : year.toString());
+        model.addAttribute("month", month == null ? "" : month.toString());
+
+        String filterQueryString = "lat=" + nullToEmpty(lat) + "&lon=" + nullToEmpty(lon) + "&distance=" + nullToEmpty(distance)
                 + labelInclude.stream().map(l -> "&labelInclude=" + URLEncoder.encode(l.name(), StandardCharsets.UTF_8)).collect(Collectors.joining())
-                + labelExclude.stream().map(l -> "&labelExclude=" + URLEncoder.encode(l.name(), StandardCharsets.UTF_8)).collect(Collectors.joining())
-        );
+                + labelExclude.stream().map(l -> "&labelExclude=" + URLEncoder.encode(l.name(), StandardCharsets.UTF_8)).collect(Collectors.joining());
+        String ymQueryString = "year=" + (year == null ? "" : year.toString()) + "&month=" + (month == null ? "" : month.toString());
+        String filterPlusYMQueryString = filterQueryString + "&" + ymQueryString;
+        model.addAttribute("filterQueryString", filterQueryString);
+        model.addAttribute("ymQueryString", ymQueryString);
+        model.addAttribute("filterPlusYMQueryString", filterPlusYMQueryString);
     }
 
     // example http://localhost:8080/list
     @RequestMapping(value = {"/list", "/pub/html"}, produces = {"text/html"})
-    public String index(Model model, HttpServletRequest request
+    public String list(Model model, HttpServletRequest request
             , @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance
             , @RequestParam(defaultValue = "", name = "labelInclude") List<String> labelNamesInclude, @RequestParam(defaultValue = "", name = "labelExclude") List<String> labelNamesExclude) {
 
         List<Label> labelsInclude = labelsNameToEntities(labelNamesInclude);
         List<Label> labelsExclude = labelsNameToEntities(labelNamesExclude);
-        prepareTemplate(model, request, lat, lon, distance, labelsInclude, labelsExclude);
+        prepareTemplate(model, request, lat, lon, distance, labelsInclude, labelsExclude, null, null);
 
         // Collect events
         List<CalendarEvent> events = R.calendarEvent().findAll().stream()
@@ -108,11 +118,13 @@ public class CalendarController {
 
         List<Label> labelsInclude = labelsNameToEntities(labelNamesInclude);
         List<Label> labelsExclude = labelsNameToEntities(labelNamesExclude);
-        prepareTemplate(model, request, lat, lon, distance, labelsInclude, labelsExclude);
+        prepareTemplate(model, request, lat, lon, distance, labelsInclude, labelsExclude, year, month);
         DateTimeFormatter yyyy = DateTimeFormatter.ofPattern("yyyy", Locale.ENGLISH);
         DateTimeFormatter mmm = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH);
         DateTimeFormatter dd = DateTimeFormatter.ofPattern("d", Locale.ENGLISH);
         DateTimeFormatter hhmm = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH);
+        model.addAttribute("yyyy", yyyy);
+        model.addAttribute("mmm", mmm);
         model.addAttribute("hhmm", hhmm);
 
         // Default parameter values
@@ -127,8 +139,7 @@ public class CalendarController {
         LocalDate prevMonth = monthStart.minusMonths(1);
         LocalDate nextMonth = monthStart.plusMonths(1);
         model.addAttribute("today", LocalDate.now());
-        model.addAttribute("year", yyyy.format(monthStart));
-        model.addAttribute("month", mmm.format(monthStart));
+        model.addAttribute("monthStart", monthStart);
         model.addAttribute("prevyear", "" + prevMonth.getYear());
         model.addAttribute("prevmonth", "" + prevMonth.getMonthValue());
         model.addAttribute("nextyear", "" + nextMonth.getYear());
