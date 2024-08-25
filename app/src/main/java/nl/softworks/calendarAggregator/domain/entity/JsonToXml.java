@@ -27,6 +27,11 @@ public class JsonToXml {
     }
 
     public String convert(String json) {
+        // if the json starts with an array, prefix a node to name each entry in the array
+        if (json.trim().startsWith("[")) {
+            json = "{\"entry\":" + json + "}";
+        }
+
         Object o = new JSONTokener(json).nextValue();
         return convert(0, "root", o);
     }
