@@ -70,7 +70,9 @@ public class CalendarController {
         prepareTemplate(model, request, lat, lon, distance, labelsInclude, labelsExclude, null, null);
 
         // Collect events
+        LocalDateTime threshold = LocalDateTime.now().minusHours(2);
         List<CalendarEvent> events = R.calendarEvent().findAll().stream()
+                .filter(ce -> ce.startDateTime().isAfter(threshold))
                 .filter(ce -> filterEventOnDistance(ce, lat, lon, distance))
                 .filter(ce -> filterEventOnLabels(ce, labelsInclude, labelsExclude))
                 .toList();
@@ -155,7 +157,9 @@ public class CalendarController {
         model.addAttribute("weekOfDates", weeksOfDates);
 
         // Collect events
+        LocalDateTime threshold = LocalDateTime.now().minusHours(2);
         List<CalendarEvent> events = R.calendarEvent().findAll().stream()
+                .filter(ce -> ce.startDateTime().isAfter(threshold))
                 .filter(ce -> filterEventOnDistance(ce, lat, lon, distance))
                 .filter(ce -> filterEventOnLabels(ce, labelsInclude, labelsExclude))
                 .toList();
@@ -200,9 +204,9 @@ public class CalendarController {
     }
 
     static boolean filterEventOnDistance(CalendarEvent ce, Double lat, Double lon, Integer d) {
-        LocalDateTime threshold = LocalDateTime.now().minusHours(2);
-        return (ce.startDateTime().isAfter(threshold))
-            && (lat == null || lon == null || d == null || d == 0 || d > (int) calculateDistance(lat, lon, ce.calendarSource().calendarLocation().lat(), ce.calendarSource().calendarLocation().lon()));
+        System.out.println(lat + " / " + lon + " / " + d);
+        return lat == null || lon == null || d == null || d == 0
+            || d > (int) calculateDistance(lat, lon, ce.calendarSource().calendarLocation().lat(), ce.calendarSource().calendarLocation().lon());
     }
 
     static boolean filterEventOnLabels(CalendarEvent ce, List<Label> labelsInclude, List<Label> labelsExclude) {
