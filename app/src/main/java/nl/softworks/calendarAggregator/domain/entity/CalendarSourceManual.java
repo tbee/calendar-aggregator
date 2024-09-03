@@ -125,6 +125,7 @@ public class CalendarSourceManual extends CalendarSource {
 
 			// Nothing in the distant past
 			dropExpiredEvents();
+			sanatizeEvents();
 			if (calendarEvents.isEmpty()) {
 				status("No events");
 			}

@@ -257,6 +257,15 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 		logAppend("Dropped events before " + aBitBack + ", " + calendarEvents.size() + " events remaining\n");
 	}
 
+	protected void sanatizeEvents() {
+		for (CalendarEvent event : calendarEvents) {
+			if (event.startDateTime().equals(event.endDateTime())) {
+				event.endDateTime(event.endDateTime().plusMinutes(1));
+				logAppend("Event " + event + " had identical start and end, added one minute to the end\n");
+			}
+		}
+	}
+
 	protected void logMatcher(Matcher matcher, String content) {
 		logAppend("---\n");
 		logAppend("Start index: " + matcher.start() + "\n");

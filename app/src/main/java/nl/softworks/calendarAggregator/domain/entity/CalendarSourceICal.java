@@ -140,6 +140,7 @@ public class CalendarSourceICal extends CalendarSource {
 			}
 
 			dropExpiredEvents();
+			sanatizeEvents();
 
 			logAppend("Done\n");
 			if (calendarEvents().isEmpty()) {

@@ -201,6 +201,7 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
                 lastMatchEnd = matcher.end();
             }
             dropExpiredEvents();
+            sanatizeEvents();
             logAppend("Done\n");
             if (calendarEvents().isEmpty()) {
                 status("No events");

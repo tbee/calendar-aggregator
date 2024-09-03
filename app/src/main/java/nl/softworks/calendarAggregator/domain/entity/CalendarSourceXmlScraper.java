@@ -287,6 +287,7 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
                 }
             }
             dropExpiredEvents();
+            sanatizeEvents();
             logAppend("Done\n");
 
             // set status

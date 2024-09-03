@@ -263,6 +263,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
                 }
             }
             dropExpiredEvents();
+            sanatizeEvents();
             logAppend("Done\n");
 
             // set status
