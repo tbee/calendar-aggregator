@@ -156,6 +156,8 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
                 }
 
                 // Then scan al day notations
+                wholeString = wholeString.replaceAll("\\(.*\\)", "");
+                logAppend("> Cleaned up wholestring: " + wholeString + "\n");
                 Matcher dayMatcher = Pattern.compile("[0-9][0-9]? ").matcher(wholeString);
                 while (dayMatcher.find()) {
                     String matchedDayString = wholeString.substring(dayMatcher.start(), dayMatcher.end());

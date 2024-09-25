@@ -6,6 +6,7 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
+import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceMultipleDaysScraper;
 import org.slf4j.Logger;
@@ -44,7 +45,9 @@ public class CalendarSourceMultipleDaysScraperForm extends CalendarSourceScraper
 	}
 
 	private void testRegex() {
-		generateAndShowTrace(new CalendarSourceMultipleDaysScraper());
+		CalendarSourceMultipleDaysScraper calendarSource = new CalendarSourceMultipleDaysScraper();
+		new CalendarLocation().enabled(true).addCalendarSource(calendarSource);
+		generateAndShowTrace(calendarSource);
 	}
 
 	@Override
