@@ -8,19 +8,13 @@ import jakarta.persistence.OneToMany;
 import jakarta.validation.ValidationException;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
-import net.fortuna.ical4j.model.Date;
-import net.fortuna.ical4j.model.DateList;
-import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Recur;
-import net.fortuna.ical4j.model.parameter.Value;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.ParseException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -148,42 +142,30 @@ public class CalendarSourceManual extends CalendarSource {
 
 		// Duration is needed to calculate end from start
 		Duration duration = Duration.between(startDateTime, endDateTime);
-		try {
-			// Limit the amount of events generated
-			LocalDateTime pastTreshold = now.minusMonths(1);
-			LocalDateTime futureTreshold = now.plusMonths(5);
 
-			// Create the recurrence rule
-			Recur recur = new Recur(rrule);
-			DateTime recurStartDateTime = toDateTime(startDateTime);
-			Date recurEndDateTime = recur.getUntil();
-			if (recurEndDateTime == null) {
-				recurEndDateTime = toDateTime(futureTreshold);
-			}
-			DateList dateList = recur.getDates(recurStartDateTime, recurEndDateTime, Value.DATE_TIME);
+		// Limit the amount of events generated
+		LocalDateTime pastTreshold = now.minusMonths(1);
+		LocalDateTime futureTreshold = now.plusMonths(5);
 
-			// Convert dates to events
-			List<CalendarEvent> calendarEvents = dateList.stream()
-					.map(d -> new CalendarEvent(CalendarSourceManual.this)
-							.startDateTime(toLocalDateTime(d))
-							.endDateTime(toLocalDateTime(d).plus(duration))
-							.subject(CalendarSourceManual.this.subject))
-					.filter(ce -> ce.startDateTime.isAfter(pastTreshold))
-					.filter(ce -> ce.startDateTime.isBefore(futureTreshold))
-					.filter(ce -> !excludedLocalDates.contains(ce.startDateTime.toLocalDate()))
-					.toList();
-			return calendarEvents;
+		// Create the recurrence rule
+		Recur<LocalDateTime> recur = new Recur<>(rrule);
+		LocalDateTime recurStartDateTime = startDateTime;
+		LocalDateTime recurEndDateTime = recur.getUntil();
+		if (recurEndDateTime == null) {
+			recurEndDateTime = futureTreshold;
 		}
-		catch (ParseException e) {
-			throw new RuntimeException(e);
-		}
-	}
+		List<LocalDateTime> localDateTimes = recur.getDates(recurStartDateTime, recurEndDateTime);
 
-	private DateTime toDateTime(LocalDateTime localDateTime) {
-		return new DateTime(java.sql.Timestamp.valueOf(localDateTime));
-	}
-	private LocalDateTime toLocalDateTime(Date date) {
-		return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
+		// Convert dates to events
+		return localDateTimes.stream()
+				.map(ldt -> new CalendarEvent(CalendarSourceManual.this)
+						.startDateTime(ldt)
+						.endDateTime(ldt.plus(duration))
+						.subject(CalendarSourceManual.this.subject))
+				.filter(ce -> ce.startDateTime().isAfter(pastTreshold))
+				.filter(ce -> ce.startDateTime.isBefore(futureTreshold))
+				.filter(ce -> !excludedLocalDates.contains(ce.startDateTime.toLocalDate()))
+				.toList();
 	}
 
 	@Override

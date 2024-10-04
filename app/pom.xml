@@ -103,11 +103,10 @@
 			<version>12.4</version>
 		</dependency>
 
-
 		<dependency>
 			<groupId>org.mnode.ical4j</groupId>
 			<artifactId>ical4j</artifactId>
-			<version>3.2.14</version>
+			<version>4.0.4</version>
 		</dependency>
 
 		<!-- for evaluating expressions in e.g. URLs -->

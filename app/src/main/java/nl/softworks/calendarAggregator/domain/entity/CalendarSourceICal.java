@@ -8,8 +8,6 @@ import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
-import net.fortuna.ical4j.model.ComponentList;
-import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.DtEnd;
@@ -21,6 +19,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.temporal.Temporal;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -88,7 +87,7 @@ public class CalendarSourceICal extends CalendarSource {
 			Pattern pattern = regex == null || regex.isEmpty() ? null : Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
 
 			// Loop over components and find events
-			ComponentList<CalendarComponent> components = calendar.getComponents();
+			List<CalendarComponent> components = calendar.getComponents();
 			logAppend("#components = " + components.size() + "\n");
 			for (Component component : components) {
 				if (!(component instanceof VEvent vEvent)) {
@@ -97,21 +96,21 @@ public class CalendarSourceICal extends CalendarSource {
 				logAppend("---" + "\n");
 
 				// Validate startDate
-				DtStart startDate = vEvent.getStartDate();
+				DtStart<Temporal> startDate = vEvent.getStartDate().orElseThrow();
 				logAppend("startDate = " + startDate);
-				LocalDateTime startLocalDateTime = LocalDateTime.ofInstant(startDate.getDate().toInstant(), ZoneId.systemDefault());
+				LocalDateTime startLocalDateTime = LocalDateTime.from(startDate.getDate());
 				if (startLocalDateTime.isBefore(pastThreshold) || startLocalDateTime.isAfter(futureThreshold)) {
 					logAppend("Outside threshold\n");
 					continue;
 				}
 
 				// Get endDate
-				DtEnd endDate = vEvent.getEndDate();
+				DtEnd endDate = vEvent.getEndDate().orElseThrow();
 				logAppend("endDate = " + endDate);
-				LocalDateTime endLocalDateTime = LocalDateTime.ofInstant(endDate.getDate().toInstant(), ZoneId.systemDefault());
+				LocalDateTime endLocalDateTime = LocalDateTime.from(endDate.getDate());
 
 				// Validate summary
-				String summary = vEvent.getSummary().getValue();
+				String summary = vEvent.getSummary().orElseThrow().getValue();
 				logAppend("summary = " + summary + "\n");
 				if (pattern != null) {
 					Matcher matcher = pattern.matcher(summary);
@@ -123,9 +122,9 @@ public class CalendarSourceICal extends CalendarSource {
 				}
 
 				// Determine timezone
-				TimeZone timeZone = startDate.getTimeZone();
+				ZoneId timeZone = ZoneId.from(startDate.getDate());
 				if (timeZone != null) {
-					String timezoneName = timeZone.getVTimeZone().getTimeZoneId().getValue();
+					String timezoneName = timeZone.getId();
 //					if (!timezone().name().equals(timezoneName)) {
 //						throw new RuntimeException("Source's timezone is not equal to " + timezoneName);
 //					}
