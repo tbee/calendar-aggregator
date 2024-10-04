@@ -114,11 +114,11 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 
 			// extract block
 			if (scrapeBlockStart != null && !scrapeBlockStart.isBlank()) {
-				text = text.substring(text.indexOf(scrapeBlockStart.trim()));
+				text = text.substring(text.indexOf(scrapeBlockStart));
 				logAppend("Content after block start: " + text.length() + "\n");
 			}
 			if (scrapeBlockEnd != null && !scrapeBlockEnd.isBlank()) {
-				text = text.substring(0, text.indexOf(scrapeBlockEnd.trim()));
+				text = text.substring(0, text.indexOf(scrapeBlockEnd));
 				logAppend("Content after block end: " + text.length() + "\n");
 			}
 			return text;
