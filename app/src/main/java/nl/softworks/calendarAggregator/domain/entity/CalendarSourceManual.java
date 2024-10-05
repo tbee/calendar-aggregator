@@ -15,6 +15,8 @@ import java.io.StringWriter;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -150,7 +152,7 @@ public class CalendarSourceManual extends CalendarSource {
 		// Create the recurrence rule
 		Recur<LocalDateTime> recur = new Recur<>(rrule);
 		LocalDateTime recurStartDateTime = startDateTime;
-		LocalDateTime recurEndDateTime = recur.getUntil();
+		LocalDateTime recurEndDateTime = toLocalDateTime(recur.getUntil());
 		if (recurEndDateTime == null) {
 			recurEndDateTime = futureTreshold;
 		}
@@ -166,6 +168,19 @@ public class CalendarSourceManual extends CalendarSource {
 				.filter(ce -> ce.startDateTime.isBefore(futureTreshold))
 				.filter(ce -> !excludedLocalDates.contains(ce.startDateTime.toLocalDate()))
 				.toList();
+	}
+
+	private LocalDateTime toLocalDateTime(Temporal temporal) {
+		if (temporal == null) {
+			return null;
+		}
+		if (temporal instanceof OffsetDateTime offsetDateTime) {
+			return offsetDateTime.toLocalDateTime();
+		}
+		if (temporal instanceof LocalDateTime localDateTime) {
+			return localDateTime;
+		}
+		throw new IllegalArgumentException("Don't know how to convert " + temporal);
 	}
 
 	@Override

@@ -106,7 +106,7 @@
 		<dependency>
 			<groupId>org.mnode.ical4j</groupId>
 			<artifactId>ical4j</artifactId>
-			<version>4.0.4</version>
+			<version>4.0.5-develop-SNAPSHOT</version>
 		</dependency>
 
 		<!-- for evaluating expressions in e.g. URLs -->
