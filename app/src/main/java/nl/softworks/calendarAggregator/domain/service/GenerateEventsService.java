@@ -13,6 +13,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class GenerateEventsService {
@@ -20,6 +21,26 @@ public class GenerateEventsService {
 
     private static final ThreadFactory virtualThreadFactory = Thread.ofVirtual().name("virtual-thread-", 0).factory(); // needed to name virtual threads
     private static final ExecutorService executorService = Executors.newThreadPerTaskExecutor(virtualThreadFactory);
+
+    static {
+        // Handle clean shutdown
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (LOGGER.isInfoEnabled())  LOGGER.info("GenerateEventsService shutting down");
+            executorService.shutdown();
+            try {
+                if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
+                    executorService.shutdownNow();
+                    if (!executorService.awaitTermination(5, TimeUnit.SECONDS)) {
+                        throw new IllegalStateException("GenerateEventsService did not terminate");
+                    }
+                }
+                if (LOGGER.isInfoEnabled())  LOGGER.info("GenerateEventsService shutdown");
+            }
+            catch (InterruptedException e) {
+                if (LOGGER.isInfoEnabled())  LOGGER.info("GenerateEventsService shutdown failure", e);
+            }
+        }));
+    }
 
     public void generateEvents() {
         generateEvents(null);
