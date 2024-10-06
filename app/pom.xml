@@ -18,7 +18,7 @@
 		<java.version>21</java.version> <!-- https://vaadin.com/docs/latest/configuration/live-reload/hotswap-agent -->
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
-		<vaadin.version>24.4.7</vaadin.version> <!-- https://vaadin.com/releases -->
+		<vaadin.version>24.4.13</vaadin.version> <!-- https://vaadin.com/releases -->
 		<testcontainers.version>1.17.3</testcontainers.version>
 		<start-class>nl.softworks.calendarAggregator.CalendarAggregateApplication</start-class> <!-- needed for the shade plugin -->
 	</properties>
