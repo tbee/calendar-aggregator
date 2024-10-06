@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 /**
- * Components
+ * Components, this can be used where Spring does not support injection
  */
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)

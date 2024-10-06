@@ -1,8 +1,11 @@
 package nl.softworks.calendarAggregator.domain.service;
 
+import org.springframework.stereotype.Service;
+
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
+@Service
 public class ICalService {
 
     public String sanatize(String ical) {
