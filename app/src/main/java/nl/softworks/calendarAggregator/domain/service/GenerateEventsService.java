@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ExecutorService;
@@ -52,15 +54,26 @@ public class GenerateEventsService {
                 calendarSource.generateEvents();
                  if (LOGGER.isInfoEnabled())  LOGGER.info("Generating events for " + calendarSource.calendarLocation().name() + " in " + Thread.currentThread().getName() + " finished");
             } catch (RuntimeException e) {
-                LOGGER.error("Problem generating events for " + calendarSource.calendarLocation().name(), e);
+                LOGGER.error("Problem generating events for " + calendarSourceId + " " + calendarSource.calendarLocation().name(), e);
                 calendarSource = R.calendarSource().findById(calendarSource.id()).orElseThrow(); // fresh does not work
-                calendarSource.log(e.toString());
+                calendarSource.log(exceptionToString(e));
                 calendarSource.status("Exception: " + e.getMessage());
             }
             calendarSource.lastRun(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
             R.calendarSource().save(calendarSource);
         } catch (RuntimeException e) {
+            // constraints are only validated upon save, so we need to handle and store those exceptions as well
             LOGGER.error("Problem generating events for CalendarSource " + calendarSourceId, e);
+            CalendarSource calendarSource = R.calendarSource().findById(calendarSourceId).orElseThrow(); // fresh does not work
+            calendarSource.log(exceptionToString(e));
+            calendarSource.status("Exception: " + e.getMessage());
+            R.calendarSource().save(calendarSource);
         }
+    }
+
+    private String exceptionToString(Throwable e) {
+        StringWriter stringWriter = new StringWriter();
+        e.printStackTrace(new PrintWriter(stringWriter));
+        return stringWriter.toString();
     }
 }

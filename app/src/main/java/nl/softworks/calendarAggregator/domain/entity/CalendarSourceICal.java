@@ -14,6 +14,7 @@ import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.DateProperty;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
+import nl.softworks.calendarAggregator.domain.service.ICalService;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -68,7 +69,7 @@ public class CalendarSourceICal extends CalendarSource {
 			// Get ical as string
 			String url = resolveUrl(icalUrl);
 			logAppend("url = " + url);
-			String icalContent = getUrl(url);
+			String icalContent = new ICalService().sanatize(getUrl(url));
 			String logContent = (icalContent.length() > 10000 ? icalContent.substring(0, 10000) + "\n...\n" : icalContent);
 			logAppend(logContent + "\n");
 			if (icalContent.isBlank()) {

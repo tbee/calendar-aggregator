@@ -106,6 +106,7 @@
 		<dependency>
 			<groupId>org.mnode.ical4j</groupId>
 			<artifactId>ical4j</artifactId>
+			<!-- we need 4.0.4+ because of https://github.com/ical4j/ical4j/issues/745 -->
 			<version>4.0.5-develop-SNAPSHOT</version>
 		</dependency>
 

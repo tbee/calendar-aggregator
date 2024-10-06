@@ -64,6 +64,10 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 	}
 
 	public CalendarEvent subject(String v) {
+		if (v != null && v.length() > 255) {
+			v = v.substring(0, 255);
+			LOGGER.warn("Subject truncated to 255 characters: " + v);
+		}
 		this.subject = v;
 		return this;
 	}
