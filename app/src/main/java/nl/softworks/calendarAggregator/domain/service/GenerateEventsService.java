@@ -18,7 +18,7 @@ import java.util.concurrent.Future;
 public class GenerateEventsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEventsService.class);
 
-    private static final ExecutorService executorService = Executors.newCachedThreadPool();
+    private static final ExecutorService executorService = Executors.newVirtualThreadPerTaskExecutor();
 
     public void generateEvents() {
         generateEvents(null);
