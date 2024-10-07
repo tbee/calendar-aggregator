@@ -67,6 +67,9 @@ public class CalendarController {
             , @RequestParam(defaultValue = "false") Boolean showHidden
             , @RequestParam(defaultValue = "", name = "labelInclude") List<String> labelNamesInclude, @RequestParam(defaultValue = "", name = "labelExclude") List<String> labelNamesExclude) {
 
+        final ZoneId viewZoneId = ZoneId.of("Europe/Amsterdam"); // TODO: can the browser tell us this? Show the timezone in the page.
+        model.addAttribute("viewZoneId", viewZoneId);
+
         List<Label> labelsInclude = labelsNameToEntities(labelNamesInclude);
         List<Label> labelsExclude = labelsNameToEntities(labelNamesExclude);
         prepareTemplate(model, request, lat, lon, distance, labelsInclude, labelsExclude, null, null);
@@ -74,7 +77,7 @@ public class CalendarController {
         // Collect events
         LocalDateTime threshold = LocalDateTime.now().minusHours(2);
         List<CalendarEvent> events = R.calendarEvent().findAll().stream()
-                .filter(ce -> ce.startDateTime().isAfter(threshold))
+                .filter(ce -> ce.startDateTimeInZone(viewZoneId).isAfter(threshold))
                 .filter(ce -> showHidden || !ce.calendarSource().hidden())
                 .filter(ce -> filterEventOnDistance(ce, lat, lon, distance))
                 .filter(ce -> filterEventOnLabels(ce, labelsInclude, labelsExclude))
@@ -82,18 +85,18 @@ public class CalendarController {
 
         // List
         Map<LocalDate, List<CalendarEvent>> dateToEvents = events.stream()
-                .collect(Collectors.groupingBy(ce -> ce.startDateTime().toLocalDate()));
+                .collect(Collectors.groupingBy(ce -> ce.startDateTimeInZone(viewZoneId).toLocalDate()));
         model.addAttribute("dateToEvents", dateToEvents);
-        model.addAttribute("eventStartDateTimeComparator", Comparator.comparing((CalendarEvent e) -> e.startDateTime()));
+        model.addAttribute("eventStartDateTimeComparator", Comparator.comparing((CalendarEvent e) -> e.startDateTimeInZone(viewZoneId)));
 
         // When
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("E yyyy-MM-dd HH:mm");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         Map<CalendarEvent, String> eventToWhen = events.stream()
                 .map(event -> Pair.of(event,
-                        dateTimeFormatter.format(event.startDateTime())
+                        dateTimeFormatter.format(event.startDateTimeInZone(viewZoneId))
                                 + " - "
-                                + (event.startDateTime().toLocalDate().equals(event.endDateTime().toLocalDate()) ? timeFormatter : dateTimeFormatter).format(event.endDateTime())))
+                                + (event.startDateTimeInZone(viewZoneId).toLocalDate().equals(event.endDateTimeInZone(viewZoneId).toLocalDate()) ? timeFormatter : dateTimeFormatter).format(event.endDateTimeInZone(viewZoneId))))
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
         model.addAttribute("eventToWhen", eventToWhen);
 
@@ -121,6 +124,7 @@ public class CalendarController {
             , @RequestParam(defaultValue = "", name = "labelInclude") List<String> labelNamesInclude, @RequestParam(defaultValue = "", name = "labelExclude") List<String> labelNamesExclude
             , @RequestParam(defaultValue = "") Integer year, @RequestParam(defaultValue = "") Integer month
             , @RequestParam(defaultValue = "0") Integer moreWeeks) {
+
         final ZoneId viewZoneId = ZoneId.of("Europe/Amsterdam"); // TODO: can the browser tell us this? Show the timezone in the page.
         model.addAttribute("viewZoneId", viewZoneId);
 

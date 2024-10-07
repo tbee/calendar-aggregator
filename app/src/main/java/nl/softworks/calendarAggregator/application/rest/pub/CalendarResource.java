@@ -24,16 +24,19 @@ public class CalendarResource {
     // example http://localhost:8080/ical
     @GetMapping(path = {"/ical", "/pub/calendar", "/pub/ical"}, produces = {"text/calendar"})
     public String ical(@RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance
+            , @RequestParam(defaultValue = "false") Boolean showHidden
             , @RequestParam(defaultValue = "", name = "labelInclude") List<String> labelNamesInclude, @RequestParam(defaultValue = "", name = "labelExclude") List<String> labelNamesExclude) {
 
         List<Label> labelsInclude = CalendarController.labelsNameToEntities(labelNamesInclude);
         List<Label> labelsExclude = CalendarController.labelsNameToEntities(labelNamesExclude);
         String timezones = R.timezone().findAll().stream()
+                .filter(tz -> tz.ical() != null && !tz.ical().isBlank())
                 .map(tz -> tz.ical())
                 .collect(Collectors.joining());
 
         // Collect events
         List<CalendarEvent> events = R.calendarEvent().findAll().stream()
+                .filter(ce -> showHidden || !ce.calendarSource().hidden())
                 .filter(ce -> CalendarController.filterEventOnDistance(ce, lat, lon, distance))
                 .filter(ce -> CalendarController.filterEventOnLabels(ce, labelsInclude, labelsExclude))
                 .toList();
