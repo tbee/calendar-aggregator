@@ -5,13 +5,16 @@ import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.editor.Editor;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import nl.softworks.calendarAggregator.application.vdn.component.IconButton;
 import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
@@ -21,6 +24,7 @@ import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceLabelAssignment;
 import nl.softworks.calendarAggregator.domain.entity.Label;
+import nl.softworks.calendarAggregator.domain.entity.Timezone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +46,8 @@ abstract public class CalendarSourceForm extends FormLayout {
 	private final Grid<LabelAssignmentGridRow> labelAssignGrid = new Grid<>(LabelAssignmentGridRow.class, false);
 	private final List<LabelAssignmentGridRow> labelAssignGridItems;
 	private final ListDataProvider<LabelAssignmentGridRow> labelAssignListDataProvider;
+	private final Checkbox hiddenCheckbox = new Checkbox("Hidden");
+	private final ComboBox<Timezone> timezoneComboBox = new ComboBox<>("Timezone");
 
 	private CalendarSource calendarSource;
 
@@ -50,7 +56,14 @@ abstract public class CalendarSourceForm extends FormLayout {
 		setColspan(labelAssignGrid, 2);
 		setColspan(urlTextField, 2);
 		urlTextField.setTooltipText("If more-info URL differs from the one in location");
-		add(descriptionTextfield, enabledCheckbox, urlTextField, labelAssignGrid, statusTextField);
+		timezoneComboBox.setItemLabelGenerator(timezone -> timezone == null ? "-" : timezone.name());
+		timezoneComboBox.setRenderer(new ComponentRenderer<>(timezone -> {
+			Span nameSpan = new Span(timezone == null ? "-" : timezone.name());
+			return nameSpan;
+		}));
+		timezoneComboBox.setClearButtonVisible(true);
+		timezoneComboBox.setTooltipText("This is the timezone in which the data is provided, this may deviate from the timezone the location is in.");
+		add(descriptionTextfield, enabledCheckbox, timezoneComboBox, hiddenCheckbox, urlTextField, labelAssignGrid, statusTextField);
 
 		Button generateButton = new Button("Generate", evt -> generate());
 		setColspan(generateButton, 2);
@@ -66,6 +79,8 @@ abstract public class CalendarSourceForm extends FormLayout {
 		binder.forField(statusTextField).bind(CalendarSource::status, CalendarSource::status);
 		binder.forField(enabledCheckbox).bind(CalendarSource::enabled, CalendarSource::enabled);
 		binder.forField(urlTextField).bind(CalendarSource::url, CalendarSource::url);
+		binder.forField(hiddenCheckbox).bind(CalendarSource::hidden, CalendarSource::hidden);
+		binder.forField(timezoneComboBox).bind(CalendarSource::timezone, CalendarSource::timezone);
 		labelAssignGridItems = R.label().findAllByOrderBySeqnrAsc().stream().map(LabelAssignmentGridRow::new).toList();
 		labelAssignListDataProvider = new ListDataProvider<>(labelAssignGridItems);
 		labelAssignGrid.setItems(labelAssignListDataProvider);
@@ -101,6 +116,7 @@ abstract public class CalendarSourceForm extends FormLayout {
 	}
 
 	public CalendarSourceForm populateWith(CalendarSource calendarSource) {
+		timezoneComboBox.setItems(R.timezone().findAll());
 		binder.readBean(calendarSource);
 		this.calendarSource = calendarSource;
 

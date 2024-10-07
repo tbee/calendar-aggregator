@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -63,6 +64,7 @@ public class CalendarController {
     @RequestMapping(value = {"/list", "/pub/html"}, produces = {"text/html"})
     public String list(Model model, HttpServletRequest request
             , @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance
+            , @RequestParam(defaultValue = "false") Boolean showHidden
             , @RequestParam(defaultValue = "", name = "labelInclude") List<String> labelNamesInclude, @RequestParam(defaultValue = "", name = "labelExclude") List<String> labelNamesExclude) {
 
         List<Label> labelsInclude = labelsNameToEntities(labelNamesInclude);
@@ -73,6 +75,7 @@ public class CalendarController {
         LocalDateTime threshold = LocalDateTime.now().minusHours(2);
         List<CalendarEvent> events = R.calendarEvent().findAll().stream()
                 .filter(ce -> ce.startDateTime().isAfter(threshold))
+                .filter(ce -> showHidden || !ce.calendarSource().hidden())
                 .filter(ce -> filterEventOnDistance(ce, lat, lon, distance))
                 .filter(ce -> filterEventOnLabels(ce, labelsInclude, labelsExclude))
                 .toList();
@@ -114,9 +117,12 @@ public class CalendarController {
     @RequestMapping(value = {"/", "/month", "/htmlmonth"}, produces = {"text/html"})
     public String month(Model model, HttpServletRequest request
             , @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance
+            , @RequestParam(defaultValue = "false") Boolean showHidden
             , @RequestParam(defaultValue = "", name = "labelInclude") List<String> labelNamesInclude, @RequestParam(defaultValue = "", name = "labelExclude") List<String> labelNamesExclude
             , @RequestParam(defaultValue = "") Integer year, @RequestParam(defaultValue = "") Integer month
             , @RequestParam(defaultValue = "0") Integer moreWeeks) {
+        final ZoneId viewZoneId = ZoneId.of("Europe/Amsterdam"); // TODO: can the browser tell us this? Show the timezone in the page.
+        model.addAttribute("viewZoneId", viewZoneId);
 
         List<Label> labelsInclude = labelsNameToEntities(labelNamesInclude);
         List<Label> labelsExclude = labelsNameToEntities(labelNamesExclude);
@@ -159,13 +165,14 @@ public class CalendarController {
         // Collect events
         LocalDateTime threshold = LocalDateTime.now().minusHours(2);
         List<CalendarEvent> events = R.calendarEvent().findAll().stream()
-                .filter(ce -> ce.startDateTime().isAfter(threshold))
+                .filter(ce -> ce.startDateTimeInZone(viewZoneId).isAfter(threshold))
+                .filter(ce -> showHidden || !ce.calendarSource().hidden())
                 .filter(ce -> filterEventOnDistance(ce, lat, lon, distance))
                 .filter(ce -> filterEventOnLabels(ce, labelsInclude, labelsExclude))
                 .toList();
         Map<LocalDate, List<CalendarEvent>> dateToEventsWithPossibleEmptyDates = events.stream()
-                .filter(ce -> !ce.startDateTime().toLocalDate().isAfter(renderEnd))
-                .filter(ce -> !ce.endDateTime().toLocalDate().isBefore(renderStart))
+                .filter(ce -> !ce.startDateTimeInZone(viewZoneId).toLocalDate().isAfter(renderEnd))
+                .filter(ce -> !ce.endDateTimeInZone(viewZoneId).toLocalDate().isBefore(renderStart))
                 .flatMap(ce -> ce.eventDates().stream().map(d -> Pair.of(d, ce))) // an event can span multiple dates, so introduce the event on every date
                 .collect(Collectors.groupingBy(Pair::getLeft, Collectors.mapping(Pair::getRight, Collectors.toList())));
         Map<LocalDate, List<CalendarEvent>> dateToEvents = toBeRenderedDates.stream()
@@ -199,7 +206,7 @@ public class CalendarController {
         model.addAttribute("labelGroups", R.labelGroup().findAllByOrderByNameAsc());
 
         // done
-        model.addAttribute("eventStartDateTimeComparator", Comparator.comparing((CalendarEvent e) -> e.startDateTime()));
+        model.addAttribute("eventStartDateTimeComparator", Comparator.comparing((CalendarEvent e) -> e.startDateTimeInZone(viewZoneId)));
         return "month";
     }
 

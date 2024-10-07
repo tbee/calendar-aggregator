@@ -3,6 +3,8 @@ package nl.softworks.calendarAggregator.domain.entity;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.ZoneId;
+
 @Entity
 public class Timezone extends EntityBase<Timezone> {
 
@@ -37,6 +39,10 @@ public class Timezone extends EntityBase<Timezone> {
 				+ "TZID:" + name + "\n"
 				+ content
 				+ "END:VTIMEZONE\n";
+	}
+
+	public ZoneId zoneId() {
+		return ZoneId.of(name);
 	}
 
 	@Override

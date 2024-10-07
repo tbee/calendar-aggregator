@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
@@ -142,6 +143,38 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 	public void logAppend(String s) {
 		log += s;
 	}
+
+	@JoinColumn(name = "timezone_id", nullable = false)
+	@ManyToOne(targetEntity=Timezone.class, fetch=FetchType.LAZY)
+	protected Timezone timezone;
+	static public final String TIMEZONE = "timezone";
+	public Timezone timezone() {
+		return timezone;
+	}
+	public CalendarSource timezone(Timezone v) {
+		this.timezone = v;
+		return this;
+	}
+	public Timezone determineTimezone() {
+		if (timezone != null) {
+			return timezone;
+		}
+		return calendarLocation.timezone();
+	}
+
+	@NotNull
+	protected boolean hidden = false;
+	static public final String HIDDEN = "hidden";
+	public boolean hidden() {
+		return hidden;
+	}
+	public CalendarSource hidden(boolean v) {
+		this.hidden = v;
+		return this;
+	}
+//	public boolean isHidden() {
+//		return hidden();
+//	}
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.EAGER)
     protected final List<CalendarEvent> calendarEvents = new ArrayList<>();

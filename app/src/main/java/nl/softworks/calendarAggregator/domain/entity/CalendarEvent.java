@@ -2,12 +2,15 @@ package nl.softworks.calendarAggregator.domain.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Transient;
 import jakarta.validation.ValidationException;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
 
@@ -36,8 +39,22 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 	}
 	public CalendarEvent startDateTime(LocalDateTime v) {
 		this.startDateTime = v;
+		this.startDateTimeInZone = null;
 		return this;
 	}
+	public LocalDateTime startDateTimeInZone(ZoneId viewerZoneId) {
+		if (startDateTime == null) {
+			return null;
+		}
+		if (startDateTimeInZone == null) {
+			ZonedDateTime locationZDT = ZonedDateTime.of(startDateTime, calendarSource.determineTimezone().zoneId());
+			ZonedDateTime viewerZDT = locationZDT.withZoneSameInstant(viewerZoneId);
+			startDateTimeInZone = viewerZDT.toLocalDateTime();
+		}
+		return startDateTimeInZone;
+	}
+	@Transient
+	private LocalDateTime startDateTimeInZone;
 
 	@NotNull
 	private LocalDateTime endDateTime;
@@ -49,6 +66,19 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 		this.endDateTime = v;
 		return this;
 	}
+	public LocalDateTime endDateTimeInZone(ZoneId viewerZoneId) {
+		if (endDateTime == null) {
+			return null;
+		}
+		if (endDateTimeInZone == null) {
+			ZonedDateTime locationZDT = ZonedDateTime.of(endDateTime, calendarSource.determineTimezone().zoneId());
+			ZonedDateTime viewerZDT = locationZDT.withZoneSameInstant(viewerZoneId);
+			endDateTimeInZone = viewerZDT.toLocalDateTime();
+		}
+		return endDateTimeInZone;
+	}
+	@Transient
+	private LocalDateTime endDateTimeInZone;
 
 	@NotNull
 	private String subject = "";
