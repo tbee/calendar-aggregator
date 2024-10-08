@@ -2,7 +2,6 @@ package nl.softworks.calendarAggregator.domain.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Transient;
 import jakarta.validation.ValidationException;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
@@ -39,22 +38,20 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 	}
 	public CalendarEvent startDateTime(LocalDateTime v) {
 		this.startDateTime = v;
-		this.startDateTimeInZone = null;
 		return this;
 	}
 	public LocalDateTime startDateTimeInZone(ZoneId viewerZoneId) {
 		if (startDateTime == null) {
 			return null;
 		}
-		if (startDateTimeInZone == null) {
-			ZonedDateTime locationZDT = ZonedDateTime.of(startDateTime, calendarSource.determineTimezone().zoneId());
-			ZonedDateTime viewerZDT = locationZDT.withZoneSameInstant(viewerZoneId);
-			startDateTimeInZone = viewerZDT.toLocalDateTime();
+		ZoneId zoneId = calendarSource.determineTimezone().zoneId();
+		if (zoneId.equals(viewerZoneId)) {
+			return startDateTime;
 		}
-		return startDateTimeInZone;
+		return ZonedDateTime.of(startDateTime, zoneId)
+				.withZoneSameInstant(viewerZoneId)
+				.toLocalDateTime();
 	}
-	@Transient
-	private LocalDateTime startDateTimeInZone;
 
 	@NotNull
 	private LocalDateTime endDateTime;
@@ -70,15 +67,14 @@ public class CalendarEvent extends EntityBase<CalendarEvent> {
 		if (endDateTime == null) {
 			return null;
 		}
-		if (endDateTimeInZone == null) {
-			ZonedDateTime locationZDT = ZonedDateTime.of(endDateTime, calendarSource.determineTimezone().zoneId());
-			ZonedDateTime viewerZDT = locationZDT.withZoneSameInstant(viewerZoneId);
-			endDateTimeInZone = viewerZDT.toLocalDateTime();
+		ZoneId zoneId = calendarSource.determineTimezone().zoneId();
+		if (zoneId.equals(viewerZoneId)) {
+			return endDateTime;
 		}
-		return endDateTimeInZone;
+		return ZonedDateTime.of(endDateTime, zoneId)
+				.withZoneSameInstant(viewerZoneId)
+				.toLocalDateTime();
 	}
-	@Transient
-	private LocalDateTime endDateTimeInZone;
 
 	@NotNull
 	private String subject = "";

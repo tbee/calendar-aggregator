@@ -6,6 +6,7 @@ import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.Label;
 import nl.softworks.calendarAggregator.domain.entity.Settings;
+import nl.softworks.calendarAggregator.domain.entity.Timezone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,8 +32,8 @@ public class CalendarResource {
         List<Label> labelsExclude = CalendarController.labelsNameToEntities(labelNamesExclude);
         String timezones = R.timezone().findAll().stream()
                 .filter(tz -> tz.ical() != null && !tz.ical().isBlank())
-                .map(tz -> tz.ical())
-                .collect(Collectors.joining());
+                .map(Timezone::ical)
+                .collect(Collectors.joining("\n"));
 
         // Collect events
         List<CalendarEvent> events = R.calendarEvent().findAll().stream()
@@ -87,7 +88,7 @@ public class CalendarResource {
 				END:VEVENT
 				"""
                 .replace("%uid%", calendarEvent.id() + "@dancemoments.softworks.nl")
-                .replace("%tzid%", calendarLocation.timezone().name())
+                .replace("%tzid%", calendarSource.determineTimezone().name())
                 .replace("%dtStart%", dateTimeFormatter.format(calendarEvent.startDateTime()))
                 .replace("%dtEnd%", dateTimeFormatter.format(calendarEvent.endDateTime()))
                 .replace("%summary%", (calendarLocation.name() + " " + calendarEvent.subject()).trim())

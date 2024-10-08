@@ -14,7 +14,7 @@ public class TimezoneForm extends AbstractCrudForm<Timezone> {
 	private final Binder<Timezone> binder = new Binder<>();
 
 	private final TextField nameTextField = new TextField("Name");
-	private final TextArea contentTextField = new TextArea("Content");
+	private final TextArea contentTextField = new TextArea("ICal definition");
 
 	public TimezoneForm() {
 		contentTextField.setWidthFull();
