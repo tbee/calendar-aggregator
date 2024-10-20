@@ -29,7 +29,11 @@ Future sources may include JSON and/or XML scraping.
 ## Views
 The result is a list of events, that can be viewed as simple HTML:
 
-<img src="readme/html.png?raw=true" width="600"/>
+<img src="readme/list.png?raw=true" width="600"/>
+
+Or in a week calendar style:
+
+<img src="readme/month.png?raw=true" width="600"/>
 
 Or can be exported in iCal format to be included in Google calendar.
 
