@@ -35,6 +35,7 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 
 	public CalendarSourceRegexScraperForm() {
 		setColspan(regexTextField, 2);
+		endTimeDefaultTextField.setTooltipText("Either an absolute time or a relative time to the start time (e.g. +01:30)");
 
 		Button testButton = new Button("Test", evt -> test());
 		setColspan(testButton, 2);

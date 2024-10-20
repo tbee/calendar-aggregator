@@ -6,12 +6,14 @@ import jakarta.validation.constraints.NotNull;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAmount;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -224,7 +226,15 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
                         continue;
                     }
 
-                    LocalTime endLocalTime = parseLocalTime(endTimeString, timeFormatter);
+                    LocalTime endLocalTime = null;
+                    if (endTimeString != null && endTimeString.startsWith("+")) {
+                        LocalTime endLocalTimeAddition = parseLocalTime(endTimeString.substring(1), timeFormatter);
+                        Duration duration = Duration.between(LocalTime.of(0, 0, 0), endLocalTimeAddition);
+                        endLocalTime = startLocalTime.plus(duration);
+                    }
+                    else {
+                        endLocalTime = parseLocalTime(endTimeString, timeFormatter);
+                    }
                     if (endLocalTime == null) {
                         logAppend("Not able to determine an endtime for " + endTimeString);
                         continue;
