@@ -11,6 +11,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -35,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-abstract public class CalendarSourceForm extends FormLayout {
+abstract public class CalendarSourceForm extends VerticalLayout {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourceForm.class);
 
 	private final Binder<CalendarSource> binder = new Binder<>();
@@ -55,9 +56,6 @@ abstract public class CalendarSourceForm extends FormLayout {
 	public CalendarSourceForm() {
 		setWidthFull();
 
-		setColspan(statusTextField, 2);
-		setColspan(labelAssignGrid, 2);
-		setColspan(urlTextField, 2);
 		urlTextField.setTooltipText("If more-info URL differs from the one in location");
 		timezoneComboBox.setItemLabelGenerator(timezone -> timezone == null ? "-" : timezone.name());
 		timezoneComboBox.setRenderer(new ComponentRenderer<>(timezone -> {
@@ -67,12 +65,15 @@ abstract public class CalendarSourceForm extends FormLayout {
 		timezoneComboBox.setClearButtonVisible(true);
 		timezoneComboBox.setTooltipText("This is the timezone in which the data is provided, this may deviate from the timezone the location is in.");
 
-		addAsFormlayoutInAccordion("Source", descriptionTextfield, enabledCheckbox, timezoneComboBox, hiddenCheckbox, urlTextField, statusTextField);
-		addAsFormlayoutInAccordion("Labels", true, labelAssignGrid);
-
 		Button generateButton = new Button("Generate", evt -> generate());
-		setColspan(generateButton, 2);
-		add(generateButton);
+
+		FormLayout formLayout = addAsFormlayoutInAccordion("Source", true, descriptionTextfield, enabledCheckbox, timezoneComboBox, hiddenCheckbox, urlTextField, statusTextField, generateButton);
+		formLayout.setColspan(statusTextField, 2);
+		formLayout.setColspan(labelAssignGrid, 2);
+		formLayout.setColspan(urlTextField, 2);
+		formLayout.setColspan(generateButton, 2);
+
+		addAsFormlayoutInAccordion("Labels", true, labelAssignGrid);
 
 		// Setup labelAssignGrid
 		labelAssignGrid.addComponentColumn(LabelAssignmentGridRow::selected).setHeader("").setWidth("60px").setFlexGrow(0);
@@ -244,8 +245,8 @@ abstract public class CalendarSourceForm extends FormLayout {
 		Accordion accordion = new Accordion();
 		FormLayout layout = new FormLayout(components);
 		accordion.add(title, layout);
-		setColspan(accordion, 2);
 		add(accordion);
+		accordion.setWidthFull();
 
 		if (folded) {
 			accordion.close();

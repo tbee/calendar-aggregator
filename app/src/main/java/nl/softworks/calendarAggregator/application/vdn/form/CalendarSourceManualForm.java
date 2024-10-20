@@ -54,9 +54,10 @@ public class CalendarSourceManualForm extends CalendarSourceForm {
 			return excludedDateSpan;
 		}));
 
-		setColspan(subjectTextField, 2);
 
 		FormLayout formLayout = addAsFormlayoutInAccordion("Manual", subjectTextField, startDateTimePicker, endDateTimePicker, rruleTextField, rruleHelpAnchor);
+		formLayout.setColspan(subjectTextField, 2);
+
 		HorizontalLayout exdateGroup = new HorizontalLayout(calendarEventExdateListBox, crudButtonbar);
 		formLayout.addFormItem(exdateGroup, "Exdates");
 

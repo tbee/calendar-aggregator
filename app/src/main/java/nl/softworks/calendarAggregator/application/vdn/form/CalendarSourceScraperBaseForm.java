@@ -21,8 +21,8 @@ public class CalendarSourceScraperBaseForm extends CalendarSourceForm {
 	private final TextField removeCharsTextField = new TextField("Remove chars");
 
 	public CalendarSourceScraperBaseForm() {
-		setColspan(scrapeURLTextField, 2);
-		addAsFormlayoutInAccordion("Scrape", scrapeURLTextField, scrapeBlockStartTextField, scrapeBlockEndTextField, removeCharsTextField);
+		FormLayout formLayout = addAsFormlayoutInAccordion("Scrape", scrapeURLTextField, scrapeBlockStartTextField, scrapeBlockEndTextField, removeCharsTextField);
+		formLayout.setColspan(scrapeURLTextField, 2);
 
 		binder.forField(scrapeURLTextField)
 				//.withValidator(s -> UrlValidatorImpl.isValid(s), "Illegal URL") // conflicts with MVEL expressions, moved to the entity

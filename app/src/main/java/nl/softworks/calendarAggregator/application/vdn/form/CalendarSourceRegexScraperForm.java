@@ -36,13 +36,13 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 
 
 	public CalendarSourceRegexScraperForm() {
-		setColspan(regexTextField, 2);
 		endTimeDefaultTextField.setTooltipText("Either an absolute time or a relative time to the start time (e.g. +01:30)");
 
 		Button testButton = new Button("Test", evt -> test());
-		setColspan(testButton, 2);
 
-		addAsFormlayoutInAccordion("Regex", regexTextField, testButton,subjectGroupIdxIntegerField, datePatternTextField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, shortMonthNotationTextField, nearestYearCheckbox, dateTimeLocaleTextField, timePatternTextField, startTimeGroupIdxIntegerField, endTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeDefaultTextField);
+		FormLayout formLayout = addAsFormlayoutInAccordion("Regex", regexTextField, testButton, subjectGroupIdxIntegerField, datePatternTextField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, shortMonthNotationTextField, nearestYearCheckbox, dateTimeLocaleTextField, timePatternTextField, startTimeGroupIdxIntegerField, endTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeDefaultTextField);
+		formLayout.setColspan(regexTextField, 2);
+		formLayout.setColspan(testButton, 2);
 
 		binder.forField(regexTextField).bind(CalendarSourceRegexScraper::regex, CalendarSourceRegexScraper::regex);
 		binder.forField(subjectGroupIdxIntegerField).bind(CalendarSourceRegexScraper::subjectGroupIdx, CalendarSourceRegexScraper::subjectGroupIdx);

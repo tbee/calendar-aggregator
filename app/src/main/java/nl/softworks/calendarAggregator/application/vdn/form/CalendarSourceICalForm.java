@@ -1,6 +1,7 @@
 package nl.softworks.calendarAggregator.application.vdn.form;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -19,13 +20,13 @@ public class CalendarSourceICalForm extends CalendarSourceForm {
 	private final TextField regexTextField = new TextField("Regex");
 
 	public CalendarSourceICalForm() {
-		setColspan(icalUrlTextfield, 2);
-		setColspan(regexTextField, 2);
 
 		Button testButton = new Button("Test", evt -> test());
-		setColspan(testButton, 2);
 
-		addAsFormlayoutInAccordion("ICal", icalUrlTextfield, regexTextField, testButton);
+		FormLayout formLayout = addAsFormlayoutInAccordion("ICal", icalUrlTextfield, regexTextField, testButton);
+		formLayout.setColspan(icalUrlTextfield, 2);
+		formLayout.setColspan(regexTextField, 2);
+		formLayout.setColspan(testButton, 2);
 
 		binder.forField(icalUrlTextfield).bind(CalendarSourceICal::icalUrl, CalendarSourceICal::icalUrl);
 		binder.forField(regexTextField).bind(CalendarSourceICal::regex, CalendarSourceICal::regex);
