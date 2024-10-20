@@ -3,6 +3,7 @@ package nl.softworks.calendarAggregator.application.vdn.form;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.Unit;
+import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -52,6 +53,8 @@ abstract public class CalendarSourceForm extends FormLayout {
 	private CalendarSource calendarSource;
 
 	public CalendarSourceForm() {
+		setWidthFull();
+
 		setColspan(statusTextField, 2);
 		setColspan(labelAssignGrid, 2);
 		setColspan(urlTextField, 2);
@@ -63,7 +66,9 @@ abstract public class CalendarSourceForm extends FormLayout {
 		}));
 		timezoneComboBox.setClearButtonVisible(true);
 		timezoneComboBox.setTooltipText("This is the timezone in which the data is provided, this may deviate from the timezone the location is in.");
-		add(descriptionTextfield, enabledCheckbox, timezoneComboBox, hiddenCheckbox, urlTextField, labelAssignGrid, statusTextField);
+
+		addAsFormlayoutInAccordion("Source", descriptionTextfield, enabledCheckbox, timezoneComboBox, hiddenCheckbox, urlTextField, statusTextField);
+		addAsFormlayoutInAccordion("Labels", true, labelAssignGrid);
 
 		Button generateButton = new Button("Generate", evt -> generate());
 		setColspan(generateButton, 2);
@@ -229,5 +234,22 @@ abstract public class CalendarSourceForm extends FormLayout {
 					})
 					.open();
 		}
+	}
+
+	protected FormLayout addAsFormlayoutInAccordion(String title, Component... components) {
+		return addAsFormlayoutInAccordion(title, false, components);
+	}
+
+	protected FormLayout addAsFormlayoutInAccordion(String title, boolean folded, Component... components) {
+		Accordion accordion = new Accordion();
+		FormLayout layout = new FormLayout(components);
+		accordion.add(title, layout);
+		setColspan(accordion, 2);
+		add(accordion);
+
+		if (folded) {
+			accordion.close();
+		}
+		return layout;
 	}
 }

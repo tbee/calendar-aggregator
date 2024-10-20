@@ -24,7 +24,8 @@ public class CalendarSourceICalForm extends CalendarSourceForm {
 
 		Button testButton = new Button("Test", evt -> test());
 		setColspan(testButton, 2);
-		add(icalUrlTextfield, regexTextField, testButton);
+
+		addAsFormlayoutInAccordion("ICal", icalUrlTextfield, regexTextField, testButton);
 
 		binder.forField(icalUrlTextfield).bind(CalendarSourceICal::icalUrl, CalendarSourceICal::icalUrl);
 		binder.forField(regexTextField).bind(CalendarSourceICal::regex, CalendarSourceICal::regex);

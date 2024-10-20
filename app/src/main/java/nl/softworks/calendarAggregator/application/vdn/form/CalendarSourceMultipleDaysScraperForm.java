@@ -33,7 +33,8 @@ public class CalendarSourceMultipleDaysScraperForm extends CalendarSourceScraper
 
 		Button testButton = new Button("Test Regex", evt -> testRegex());
 		setColspan(testButton, 2);
-		add(regexTextField, testButton, datePatternTextField, nearestYearCheckbox, startTimeDefaultTextField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
+
+		addAsFormlayoutInAccordion("Multiple days", regexTextField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, datePatternTextField, nearestYearCheckbox, startTimeDefaultTextField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
 
 		binder.forField(regexTextField).bind(CalendarSourceMultipleDaysScraper::regex, CalendarSourceMultipleDaysScraper::regex);
 		binder.forField(datePatternTextField).bind(CalendarSourceMultipleDaysScraper::datePattern, CalendarSourceMultipleDaysScraper::datePattern);

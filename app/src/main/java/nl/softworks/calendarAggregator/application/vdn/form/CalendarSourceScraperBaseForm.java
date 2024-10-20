@@ -1,5 +1,7 @@
 package nl.softworks.calendarAggregator.application.vdn.form;
 
+import com.vaadin.flow.component.accordion.Accordion;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -20,7 +22,7 @@ public class CalendarSourceScraperBaseForm extends CalendarSourceForm {
 
 	public CalendarSourceScraperBaseForm() {
 		setColspan(scrapeURLTextField, 2);
-		add(scrapeURLTextField, scrapeBlockStartTextField, scrapeBlockEndTextField, removeCharsTextField);
+		addAsFormlayoutInAccordion("Scrape", scrapeURLTextField, scrapeBlockStartTextField, scrapeBlockEndTextField, removeCharsTextField);
 
 		binder.forField(scrapeURLTextField)
 				//.withValidator(s -> UrlValidatorImpl.isValid(s), "Illegal URL") // conflicts with MVEL expressions, moved to the entity

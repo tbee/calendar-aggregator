@@ -1,7 +1,9 @@
 package nl.softworks.calendarAggregator.application.vdn.form;
 
+import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -39,7 +41,8 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 
 		Button testButton = new Button("Test", evt -> test());
 		setColspan(testButton, 2);
-		add(regexTextField, testButton,subjectGroupIdxIntegerField, datePatternTextField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, shortMonthNotationTextField, nearestYearCheckbox, dateTimeLocaleTextField, timePatternTextField, startTimeGroupIdxIntegerField, endTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeDefaultTextField);
+
+		addAsFormlayoutInAccordion("Regex", regexTextField, testButton,subjectGroupIdxIntegerField, datePatternTextField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, shortMonthNotationTextField, nearestYearCheckbox, dateTimeLocaleTextField, timePatternTextField, startTimeGroupIdxIntegerField, endTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeDefaultTextField);
 
 		binder.forField(regexTextField).bind(CalendarSourceRegexScraper::regex, CalendarSourceRegexScraper::regex);
 		binder.forField(subjectGroupIdxIntegerField).bind(CalendarSourceRegexScraper::subjectGroupIdx, CalendarSourceRegexScraper::subjectGroupIdx);
