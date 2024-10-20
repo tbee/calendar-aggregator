@@ -39,7 +39,9 @@ Both HTML and iCal views can be filtered using a lat/lon position and a as-the-c
 
 ## Getting started
 
-Running `mvn package` will create a fat-jar that can be started using `java -jar`, optionally provide some configuration parameters via -D (like the HTTP ports as Spring has it), and that's it.
+To run locally create an application-default.properties file in the `app/src/main/resources` folder and set the database credentials `spring.datasource.password`.
+
+Running `mvn package` will create a bootable-jar that can be started using `java -jar`, optionally provide some configuration parameters via -D (like the HTTP ports as Spring has it), and that's it.
 Do search the log of the first start for 'note down' to get the password of the automatically created administrator user.
 
 ## Technology
