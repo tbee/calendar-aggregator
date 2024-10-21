@@ -49,17 +49,11 @@ public class CalendarSourceManualForm extends CalendarSourceForm {
 		startDateTimePicker.setDatePickerI18n(datePickerIsoFormat);
 		endDateTimePicker.setDatePickerI18n(datePickerIsoFormat);
 
-		calendarEventExdateListBox.setRenderer(new ComponentRenderer<>(cee -> {
-			Span excludedDateSpan = new Span(cee.excludedDate().toString());
-			return excludedDateSpan;
-		}));
-
-
 		FormLayout formLayout = addAsFormlayoutInAccordion("Manual", subjectTextField, startDateTimePicker, endDateTimePicker, rruleTextField, rruleHelpAnchor);
 		formLayout.setColspan(subjectTextField, 2);
 
-		HorizontalLayout exdateGroup = new HorizontalLayout(calendarEventExdateListBox, crudButtonbar);
-		formLayout.addFormItem(exdateGroup, "Exdates");
+		calendarEventExdateListBox.setRenderer(new ComponentRenderer<>(cee -> new Span(cee.excludedDate().toString())));
+		formLayout.addFormItem(new HorizontalLayout(calendarEventExdateListBox, crudButtonbar), "Exdates");
 
 		binder.forField(startDateTimePicker).bind(CalendarSourceManual::startDateTime, CalendarSourceManual::startDateTime);
 		binder.forField(endDateTimePicker).bind(CalendarSourceManual::endDateTime, CalendarSourceManual::endDateTime);
