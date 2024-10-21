@@ -1,6 +1,9 @@
 package nl.softworks.calendarAggregator.domain.entity;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import org.jsoup.Jsoup;
@@ -21,9 +24,15 @@ import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @MappedSuperclass
 abstract public class CalendarSourceScraperBaseHTML extends CalendarSourceScraperBase {
@@ -73,6 +82,25 @@ abstract public class CalendarSourceScraperBaseHTML extends CalendarSourceScrape
 	public CalendarSourceScraperBaseHTML removeChars(String v) {
 		this.removeChars = v;
 		return this;
+	}
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.EAGER)
+	protected final List<CalendarSourcePreprocess> calendarSourcePreprocesses = new ArrayList<>();
+	public List<CalendarSourcePreprocess> calendarSourcePreprocesses() {
+		return Collections.unmodifiableList(calendarSourcePreprocesses);
+	}
+	public void calendarSourcePreprocesses(Collection<CalendarSourcePreprocess> v) {
+		// TODO this can be done more efficient
+		calendarSourcePreprocesses.forEach(la -> la.calendarSource = null); // delete
+		calendarSourcePreprocesses.clear();
+		v.forEach(la -> la.calendarSource = this);
+		calendarSourcePreprocesses.addAll(v);
+	}
+	public void addLabelAssignment(CalendarSourcePreprocess v) {
+		calendarSourcePreprocesses.add(v);
+	}
+	public void removeLabelAssignment(CalendarSourcePreprocess v) {
+		calendarSourcePreprocesses.remove(v);
 	}
 
 	protected String readScrapeUrlHTML() {

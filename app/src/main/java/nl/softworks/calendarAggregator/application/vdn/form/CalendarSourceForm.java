@@ -69,11 +69,11 @@ abstract public class CalendarSourceForm extends VerticalLayout {
 
 		FormLayout formLayout = addAsFormlayoutInAccordion("Source", true, descriptionTextfield, enabledCheckbox, timezoneComboBox, hiddenCheckbox, urlTextField, statusTextField, generateButton);
 		formLayout.setColspan(statusTextField, 2);
-		formLayout.setColspan(labelAssignGrid, 2);
 		formLayout.setColspan(urlTextField, 2);
 		formLayout.setColspan(generateButton, 2);
 
-		addAsFormlayoutInAccordion("Labels", true, labelAssignGrid);
+		FormLayout formLayoutLabelAssign = addAsFormlayoutInAccordion("Labels", true, labelAssignGrid);
+		formLayoutLabelAssign.setColspan(labelAssignGrid, 2);
 
 		// Setup labelAssignGrid
 		labelAssignGrid.addComponentColumn(LabelAssignmentGridRow::selected).setHeader("").setWidth("60px").setFlexGrow(0);
