@@ -53,14 +53,14 @@ public class ApplicationPrepared implements ApplicationListener<ApplicationPrepa
             return;
         }
         dbServer.start();
-         if (LOGGER.isInfoEnabled())  LOGGER.info("HSQLDB started");
+        if (LOGGER.isInfoEnabled()) LOGGER.info("HSQLDB started");
 
         // Handle clean shutdown
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             if (!dbServer.isNotRunning()) {
-                 if (LOGGER.isInfoEnabled())  LOGGER.info("HSQLDB shutting down");
+                if (LOGGER.isInfoEnabled()) LOGGER.info("HSQLDB shutting down");
                 dbServer.shutdown();
-                 if (LOGGER.isInfoEnabled())  LOGGER.info("HSQLDB shutdown");
+                if (LOGGER.isInfoEnabled()) LOGGER.info("HSQLDB shutdown");
             }
         }));
     }
@@ -71,7 +71,7 @@ public class ApplicationPrepared implements ApplicationListener<ApplicationPrepa
             aclFile.deleteOnExit();
             URL serverACLResourceURL = ApplicationPrepared.class.getResource("/hsqldb.acl");
             IOUtils.copy(serverACLResourceURL, aclFile);
-             if (LOGGER.isInfoEnabled())  LOGGER.info("HSQLDB using " + aclFile.getAbsolutePath());
+            if (LOGGER.isInfoEnabled()) LOGGER.info("HSQLDB using " + aclFile.getAbsolutePath());
             return aclFile.getAbsolutePath();
         } catch (IOException e) {
             throw new RuntimeException(e);
