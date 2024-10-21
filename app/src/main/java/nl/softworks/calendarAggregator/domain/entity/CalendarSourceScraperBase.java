@@ -92,39 +92,41 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 
 	protected String readScrapeUrl() {
 		try {
-
-			// Get URL
 			String url = resolveUrl(scrapeUrl);
 			logAppend("Reading: " + url + "\n");
-			String html = getUrl(url);
-
-			// Extract text information
-			Document doc = Jsoup.parse(html);
-			String text = doc.text();
-			logAppend("Content: " + text.length() + "\n");
-
-			// special handling for certain elements: <eventbrite-modal :events="html escaped string"
-			for (Element eventbrightModalElement : doc.selectXpath("//eventbrite-modal")) {
-				Attribute eventsAttribute = eventbrightModalElement.attribute(":events");
-				if (eventsAttribute != null) {
-					text = "{\"event\":" + HtmlUtils.htmlUnescape(eventsAttribute.getValue()) + "}";
-					logAppend("Content, added eventbrite-modal\n");
-				}
-			}
-
-			// extract block
-			if (scrapeBlockStart != null && !scrapeBlockStart.isBlank()) {
-				text = text.substring(text.indexOf(scrapeBlockStart));
-				logAppend("Content after block start: " + text.length() + "\n");
-			}
-			if (scrapeBlockEnd != null && !scrapeBlockEnd.isBlank()) {
-				text = text.substring(0, text.indexOf(scrapeBlockEnd));
-				logAppend("Content after block end: " + text.length() + "\n");
-			}
-			return text;
+            return getUrl(url);
 		} catch (IOException | InterruptedException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	protected String readScrapeUrlHTML() {
+		String html = readScrapeUrl();
+
+		// Extract text information
+		Document doc = Jsoup.parse(html);
+		String text = doc.text();
+		logAppend("Content: " + text.length() + "\n");
+
+		// special handling for certain elements: <eventbrite-modal :events="html escaped string"
+		for (Element eventbrightModalElement : doc.selectXpath("//eventbrite-modal")) {
+			Attribute eventsAttribute = eventbrightModalElement.attribute(":events");
+			if (eventsAttribute != null) {
+				text = "{\"event\":" + HtmlUtils.htmlUnescape(eventsAttribute.getValue()) + "}";
+				logAppend("Content, added eventbrite-modal\n");
+			}
+		}
+
+		// extract block
+		if (scrapeBlockStart != null && !scrapeBlockStart.isBlank()) {
+			text = text.substring(text.indexOf(scrapeBlockStart));
+			logAppend("Content after block start: " + text.length() + "\n");
+		}
+		if (scrapeBlockEnd != null && !scrapeBlockEnd.isBlank()) {
+			text = text.substring(0, text.indexOf(scrapeBlockEnd));
+			logAppend("Content after block end: " + text.length() + "\n");
+		}
+		return text;
 	}
 
 	protected String sanatizeContent(String content) {

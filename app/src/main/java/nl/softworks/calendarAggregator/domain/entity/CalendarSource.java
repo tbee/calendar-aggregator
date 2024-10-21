@@ -326,4 +326,3 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 		     ;
 	}
 }
-

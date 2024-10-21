@@ -13,7 +13,6 @@ import java.time.LocalTime;
 import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.time.temporal.TemporalAmount;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -181,7 +180,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
             DateTimeFormatter timeFormatter = createTimeFormatter(timePattern, locale);
 
             // Get contents
-            String content = readScrapeUrl();
+            String content = readScrapeUrlHTML();
             if (content.isBlank()) {
                 status("No contents");
                 return List.of();
