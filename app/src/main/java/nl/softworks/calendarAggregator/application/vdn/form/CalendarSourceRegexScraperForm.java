@@ -15,7 +15,7 @@ import nl.softworks.calendarAggregator.domain.entity.CalendarSourceScraperBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseForm {
+public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseHTMLForm {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourceRegexScraperForm.class);
 
 	private final Binder<CalendarSourceRegexScraper> binder = new Binder<>();

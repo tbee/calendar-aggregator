@@ -13,7 +13,7 @@ import nl.softworks.calendarAggregator.domain.entity.CalendarSourceMultipleDaysS
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CalendarSourceMultipleDaysScraperForm extends CalendarSourceScraperBaseForm {
+public class CalendarSourceMultipleDaysScraperForm extends CalendarSourceScraperBaseHTMLForm {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourceMultipleDaysScraperForm.class);
 
 	private final Binder<CalendarSourceMultipleDaysScraper> binder = new Binder<>();

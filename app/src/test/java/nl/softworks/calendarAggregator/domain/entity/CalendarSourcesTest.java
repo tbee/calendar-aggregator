@@ -42,9 +42,10 @@ public class CalendarSourcesTest {
                 .startTimeDefault("14:30")
                 .endTimeDefault("18:00")
                 .dateTimeLocale("NL")
-                .scrapeUrl(this.getClass().getResource("/webSnapshots/deDanssalon_20231127a.html").toExternalForm())
                 .scrapeBlockStart("Locatie de Bilt")
-                .scrapeBlockEnd("Entree:");
+                .scrapeBlockEnd("Entree:")
+                .scrapeUrl(this.getClass().getResource("/webSnapshots/deDanssalon_20231127a.html").toExternalForm())
+                ;
         calendarSource.localDateTimeNowSupplier = () -> LocalDateTime.of(2023, 10, 01, 12, 34, 56);
         new CalendarLocation().addCalendarSource(calendarSource);
         List<CalendarEvent> calendarEvents = calendarSource.generateEvents();
@@ -66,9 +67,10 @@ public class CalendarSourcesTest {
                 .endTimeDefault("23:59")
                 .dateTimeLocale("NL")
                 .removeChars("*,")
-                .scrapeUrl(this.getClass().getResource("/webSnapshots/verhoeven_20231127a.html").toExternalForm())
                 .scrapeBlockStart("2024:")
-                .scrapeBlockEnd("Zie agenda");
+                .scrapeBlockEnd("Zie agenda")
+                .scrapeUrl(this.getClass().getResource("/webSnapshots/verhoeven_20231127a.html").toExternalForm())
+                ;
         calendarSource.localDateTimeNowSupplier = () -> LocalDateTime.of(2023, 12, 01, 12, 34, 56);
         new CalendarLocation().addCalendarSource(calendarSource);
         List<CalendarEvent> calendarEvents = calendarSource.generateEvents();
@@ -121,8 +123,9 @@ public class CalendarSourcesTest {
                 .endTimeDefault("23:59")
                 .dateTimeLocale("NL")
                 .removeChars("'")
+                .scrapeBlockStart("Agenda")
                 .scrapeUrl(this.getClass().getResource("/webSnapshots/wijgers_20231201a.html").toExternalForm())
-                .scrapeBlockStart("Agenda");
+                ;
         calendarSource.localDateTimeNowSupplier = () -> LocalDateTime.of(2023, 10, 01, 12, 34, 56);
         new CalendarLocation().addCalendarSource(calendarSource);
         List<CalendarEvent> calendarEvents = calendarSource.generateEvents();
@@ -136,29 +139,29 @@ public class CalendarSourcesTest {
     }
 
     @Test
-    public void danshotspot_20240203() {
+    public void danshotspot_20241021() {
         CalendarSourceScraperBase calendarSource = new CalendarSourceXmlScraper()
-                .xpath("//event/name/text/text()[contains(., 'Vrijdansen') or ends-with(., 'bal')]")
-                .startdateXpath("../../../start/local")
-                .enddateXpath("../../../end/local")
-                .starttimeXpath("../../../start/local")
-                .endtimeXpath("../../../end/local")
+                .xpath("//event/name/text()[contains(., 'Vrijdansen') or contains(., 'Danscaf') or ends-with(., 'bal') or ends-with(., ' Gala')]")
+                .startdateXpath("../../startsat")
+                .enddateXpath("../../endsat")
+                .starttimeXpath("../../startsat")
+                .endtimeXpath("../../endsat")
                 .subjectXpath(".")
                 .jsonToXml(true)
-                .datePattern("yyyy-MM-dd'T'HH:mm:ss")
-                .timePattern("yyyy-MM-dd'T'HH:mm:ss")
+                .datePattern("yyyy-MM-dd'T'HH:mm:ss.nX")
+                .timePattern("yyyy-MM-dd'T'HH:mm:ss.nX")
                 .dateTimeLocale("NL")
-                .scrapeUrl(this.getClass().getResource("/webSnapshots/danshotspot_20240203.html").toExternalForm());
-        calendarSource.localDateTimeNowSupplier = () -> LocalDateTime.of(2023, 12, 01, 12, 34, 56);
+                .scrapeUrl(this.getClass().getResource("/webSnapshots/danshotspot_20241021a.json").toExternalForm());
+        calendarSource.localDateTimeNowSupplier = () -> LocalDateTime.of(2024, 10, 21, 12, 34, 56);
         new CalendarLocation().addCalendarSource(calendarSource);
         List<CalendarEvent> calendarEvents = calendarSource.generateEvents();
         System.out.println(calendarSource.log());
         System.out.println(calendarEvents);
 
         Assertions.assertEquals(7, calendarEvents.size());
-        Assertions.assertEquals("Vrijdansen, stijldansavond", calendarEvents.get(0).subject());
-        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 5, 16, 19, 0, 0), calendarEvents.get(0).startDateTime());
-        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 5, 16, 22, 0, 0), calendarEvents.get(0).endDateTime());
+        Assertions.assertEquals("Danscafe Ginger", calendarEvents.get(0).subject());
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 22, 12, 0, 0), calendarEvents.get(0).startDateTime());
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 22, 15, 0, 0), calendarEvents.get(0).endDateTime());
     }
 
     private void assertLocalDateTimeNearestYear(LocalDateTime expectedLocalDateTime, LocalDateTime actualLocalDateTime) {

@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 
 @Entity
 @DiscriminatorValue("regex")
-public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
+public class CalendarSourceRegexScraper extends CalendarSourceScraperBaseHTML {
 
     public String type() {
         return "Regex";

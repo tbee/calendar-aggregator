@@ -205,7 +205,6 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
                 status("No contents");
                 return List.of();
             }
-            content = sanatizeContent(content);
 
             // Json to XML conversion?
             if (jsonToXml) {

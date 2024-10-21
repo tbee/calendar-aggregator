@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 
 @Entity
 @DiscriminatorValue("multidays")
-public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase {
+public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBaseHTML {
 
     public String type() {
         return "Multiple days";
