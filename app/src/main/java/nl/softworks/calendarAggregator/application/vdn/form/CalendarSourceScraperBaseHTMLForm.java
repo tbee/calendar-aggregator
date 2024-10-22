@@ -7,10 +7,13 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.editor.Editor;
+import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.provider.ListDataProvider;
+import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import nl.softworks.calendarAggregator.application.vdn.component.CrudIconButtonbar;
 import nl.softworks.calendarAggregator.application.vdn.component.EditingGrid;
@@ -24,6 +27,10 @@ import nl.softworks.calendarAggregator.domain.entity.Label;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +56,8 @@ public class CalendarSourceScraperBaseHTMLForm extends CalendarSourceScraperBase
 		preprocessGrid.addStringColumn(CalendarSourcePreprocess::oldValue, CalendarSourcePreprocess::oldValue).setHeader("Regexp");
 		preprocessGrid.addStringColumn(CalendarSourcePreprocess::newValue, CalendarSourcePreprocess::newValue).setHeader("Replacement");
 		preprocessGrid.addCrudIconButtonbarColumn();
+		preprocessGrid.addComponentColumn((ValueProvider<CalendarSourcePreprocess, Component>) bean -> createUrlAnchor("https://www.baeldung.com/string/replace-all")).setWidth("20px");
+
 		preprocessGrid.onEdit(item -> {
 			CalendarSourcePreprocessForm form = new CalendarSourcePreprocessForm().populateWith(item);
 			new OkCancelDialog("Preprocess", form)
@@ -88,6 +97,26 @@ public class CalendarSourceScraperBaseHTMLForm extends CalendarSourceScraperBase
 			calendarSourceScraperBaseHTML.calendarSourcePreprocesses(preprocessGrid.getItems());
 		}
 		return this;
+	}
+
+
+	// multiple versions, move to util or make component?
+	private Anchor createUrlAnchor(String url) {
+		if (url == null) {
+			return null;
+		}
+
+		Span spanIcon = new Span();
+		spanIcon.addClassName("fas");
+		spanIcon.addClassName("fa-arrow-up-right-from-square");
+
+		Span spanWrapper = new Span(spanIcon);
+		spanWrapper.addClassName("icon");
+
+		Anchor anchor = new Anchor(url, spanWrapper);
+		anchor.setTarget("_blank");
+
+		return anchor;
 	}
 
 }
