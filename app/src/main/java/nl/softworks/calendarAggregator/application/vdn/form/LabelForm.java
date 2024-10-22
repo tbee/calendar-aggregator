@@ -44,14 +44,14 @@ public class LabelForm extends AbstractCrudForm<Label> {
 	}
 
 	@Override
-	public LabelForm populateWith(Label timezone) {
-		binder.readBean(timezone);
+	public LabelForm populateWith(Label label) {
+		binder.readBean(label);
 		return this;
 	}
 
 	@Override
-	public LabelForm writeTo(Label timezone) throws ValidationException {
-		binder.writeBean(timezone);
+	public LabelForm writeTo(Label label) throws ValidationException {
+		binder.writeBean(label);
 		return this;
 	}
 }

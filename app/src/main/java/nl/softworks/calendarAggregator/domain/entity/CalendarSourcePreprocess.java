@@ -7,9 +7,6 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 public class CalendarSourcePreprocess extends EntityBase<CalendarSourcePreprocess> {
 
-	public CalendarSourcePreprocess() {
-	}
-
 	@ManyToOne
 	@NotNull
 	CalendarSource calendarSource;
