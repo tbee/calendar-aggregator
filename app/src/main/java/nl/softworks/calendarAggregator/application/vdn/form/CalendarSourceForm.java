@@ -18,6 +18,7 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.theme.lumo.LumoIcon;
+import nl.softworks.calendarAggregator.application.vdn.component.Harmonica;
 import nl.softworks.calendarAggregator.application.vdn.component.IconButton;
 import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.application.vdn.component.ResultDialog;
@@ -36,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-abstract public class CalendarSourceForm extends VerticalLayout {
+abstract public class CalendarSourceForm extends Harmonica {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourceForm.class);
 
 	private final Binder<CalendarSource> binder = new Binder<>();
@@ -241,16 +242,12 @@ abstract public class CalendarSourceForm extends VerticalLayout {
 		return addAsFormlayoutInAccordion(title, false, components);
 	}
 
-	protected FormLayout addAsFormlayoutInAccordion(String title, boolean folded, Component... components) {
-		Accordion accordion = new Accordion();
-		FormLayout layout = new FormLayout(components);
-		accordion.add(title, layout);
-		add(accordion);
-		accordion.setWidthFull();
-
-		if (folded) {
-			accordion.close();
+	protected FormLayout addAsFormlayoutInAccordion(String title, boolean closed, Component... components) {
+		FormLayout formLayout = new FormLayout(components);
+		add(title, formLayout);
+		if (closed) {
+			close(title);
 		}
-		return layout;
+		return formLayout;
 	}
 }
