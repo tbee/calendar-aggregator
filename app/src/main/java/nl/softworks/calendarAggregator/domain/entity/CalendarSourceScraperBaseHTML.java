@@ -106,6 +106,12 @@ abstract public class CalendarSourceScraperBaseHTML extends CalendarSourceScrape
 	protected String readScrapeUrlHTML() {
 		String html = readScrapeUrl();
 
+		// Preprocess
+		for (CalendarSourcePreprocess calendarSourcePreprocess : calendarSourcePreprocesses) {
+			html = calendarSourcePreprocess.preprocess(html);
+		}
+		//if (!calendarSourcePreprocesses.isEmpty()) logAppend("Preprocessed: " + html + "\n");
+
 		// Extract text information
 		Document doc = Jsoup.parse(html);
 		String text = doc.text();

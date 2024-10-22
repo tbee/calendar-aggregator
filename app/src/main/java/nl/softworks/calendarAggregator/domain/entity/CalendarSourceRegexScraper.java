@@ -219,7 +219,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBaseHTML {
                         continue;
                     }
 
-                    LocalTime startLocalTime = parseLocalTime(startTimeString, timeFormatter);
+                    LocalTime startLocalTime = parseLocalTime(startTimeString != null ? startTimeString : startTimeDefault, timeFormatter);
                     if (startLocalTime == null) {
                         logAppend("Not able to determine a starttime for " + startTimeString);
                         continue;
@@ -232,7 +232,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBaseHTML {
                         endLocalTime = startLocalTime.plus(duration);
                     }
                     else {
-                        endLocalTime = parseLocalTime(endTimeString, timeFormatter);
+                        endLocalTime = parseLocalTime(endTimeString != null ? endTimeString : endTimeDefault, timeFormatter);
                     }
                     if (endLocalTime == null) {
                         logAppend("Not able to determine an endtime for " + endTimeString);
