@@ -31,7 +31,7 @@ public class CalendarSourceMultipleDaysScraperForm extends CalendarSourceScraper
 
 	public CalendarSourceMultipleDaysScraperForm() {
 
-		Button testButton = new Button("Test Regex", evt -> testRegex());
+		Button testButton = new Button("Test", evt -> testRegex());
 
 		FormLayout formLayout = addAsFormlayoutInAccordion("Multiple days", regexTextField, testButton, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, datePatternTextField, nearestYearCheckbox, startTimeDefaultTextField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
 		formLayout.setColspan(regexTextField, 2);
