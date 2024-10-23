@@ -24,6 +24,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import jakarta.annotation.security.RolesAllowed;
 import nl.softworks.calendarAggregator.application.vdn.CalendarAggregatorAppLayout;
+import nl.softworks.calendarAggregator.application.vdn.component.AnchorIcon;
 import nl.softworks.calendarAggregator.application.vdn.component.CancelDialog;
 import nl.softworks.calendarAggregator.application.vdn.component.CrudButtonbar;
 import nl.softworks.calendarAggregator.application.vdn.component.CrudIconButtonbar;
@@ -232,7 +233,7 @@ implements AfterNavigationObserver
 
 		@Override
 		public Component url() {
-			return createUrlAnchor(calendarLocation.url());
+			return AnchorIcon.jumpOut(calendarLocation.url());
 		}
 
 		@Override
@@ -632,23 +633,5 @@ implements AfterNavigationObserver
 					reloadTreeGrid();
 				})
 				.open();
-	}
-
-	private Anchor createUrlAnchor(String url) {
-		if (url == null) {
-			return null;
-		}
-
-		Span spanIcon = new Span();
-		spanIcon.addClassName("fas");
-		spanIcon.addClassName("fa-arrow-up-right-from-square");
-
-		Span spanWrapper = new Span(spanIcon);
-		spanWrapper.addClassName("icon");
-
-		Anchor anchor = new Anchor(url, spanWrapper);
-		anchor.setTarget("_blank");
-
-		return anchor;
 	}
 }

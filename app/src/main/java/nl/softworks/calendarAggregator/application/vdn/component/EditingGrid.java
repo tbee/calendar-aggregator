@@ -87,14 +87,12 @@ public class EditingGrid<BEAN> extends Grid<BEAN> {
     public Column<BEAN> addCrudIconButtonbarColumn() {
         return addComponentColumn((ValueProvider<BEAN, Component>) bean -> new CrudIconButtonbar()
                 .onEdit(EditingGrid.this.onEdit == null ? null : () -> EditingGrid.this.onEdit.accept(bean))
-                .onDelete(() -> {
-                    new OkCancelDialog("Remove item", new NativeLabel("Are you sure?"))
-                            .okLabel("Yes")
-                            .onOk(() -> {
-                                removeItems(bean);
-                            })
-                            .open();
-                }));
+                .onDelete(() -> new OkCancelDialog("Remove item", new NativeLabel("Are you sure?"))
+                                    .okLabel("Yes")
+                                    .onOk(() -> {
+                                        removeItems(bean);
+                                    })
+                                    .open()));
     }
 
     public void onEdit(Consumer<BEAN> consumer) {
