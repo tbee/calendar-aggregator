@@ -10,6 +10,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.Setter;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.function.ValueProvider;
+import nl.softworks.calendarAggregator.application.vdn.form.CalendarSourceForm;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -57,6 +58,10 @@ public class EditingGrid<BEAN> extends Grid<BEAN> {
 
     public void refresh() {
         setItems(new ListDataProvider<>(this.items));
+    }
+
+    public void refresh(BEAN item) {
+        getDataProvider().refreshItem(item);
     }
 
     public List<BEAN> getItems() {

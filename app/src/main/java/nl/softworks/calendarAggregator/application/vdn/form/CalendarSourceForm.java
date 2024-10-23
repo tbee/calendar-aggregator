@@ -18,6 +18,7 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.theme.lumo.LumoIcon;
+import nl.softworks.calendarAggregator.application.vdn.component.EditingGrid;
 import nl.softworks.calendarAggregator.application.vdn.component.Harmonica;
 import nl.softworks.calendarAggregator.application.vdn.component.IconButton;
 import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
@@ -46,9 +47,7 @@ abstract public class CalendarSourceForm extends Harmonica {
 	private final TextField statusTextField = new TextField("Status");
 	private final Checkbox enabledCheckbox = new Checkbox("Enabled");
 	private final TextField urlTextField = new TextField("URL");
-	private final Grid<LabelAssignmentGridRow> labelAssignGrid = new Grid<>(LabelAssignmentGridRow.class, false);
-	private final List<LabelAssignmentGridRow> labelAssignGridItems;
-	private final ListDataProvider<LabelAssignmentGridRow> labelAssignListDataProvider;
+	private final EditingGrid<LabelAssignmentGridRow> labelAssignGrid = new EditingGrid<>(LabelAssignmentGridRow.class, false);
 	private final Checkbox hiddenCheckbox = new Checkbox("Hidden");
 	private final ComboBox<Timezone> timezoneComboBox = new ComboBox<>("Timezone");
 
@@ -80,7 +79,7 @@ abstract public class CalendarSourceForm extends Harmonica {
 		labelAssignGrid.addComponentColumn(LabelAssignmentGridRow::selected).setHeader("").setWidth("60px").setFlexGrow(0);
 		labelAssignGrid.addColumn(LabelAssignmentGridRow::name).setHeader("Label");
 		labelAssignGrid.addComponentColumn(LabelAssignmentGridRow::editButton).setHeader("").setWidth("60px").setFlexGrow(0);
-		Grid.Column<LabelAssignmentGridRow> subjectRegexpColumn = labelAssignGrid.addColumn(LabelAssignmentGridRow::subjectRegexp).setHeader("Subject regexp");
+		labelAssignGrid.addStringColumn(LabelAssignmentGridRow::subjectRegexp, LabelAssignmentGridRow::subjectRegexp).setHeader("Subject regexp");
 
 		binder.forField(descriptionTextfield).bind(CalendarSource::description, CalendarSource::description);
 		binder.forField(statusTextField).bind(CalendarSource::status, CalendarSource::status);
@@ -88,38 +87,7 @@ abstract public class CalendarSourceForm extends Harmonica {
 		binder.forField(urlTextField).bind(CalendarSource::url, CalendarSource::url);
 		binder.forField(hiddenCheckbox).bind(CalendarSource::hidden, CalendarSource::hidden);
 		binder.forField(timezoneComboBox).bind(CalendarSource::timezone, CalendarSource::timezone);
-		labelAssignGridItems = R.label().findAllByOrderBySeqnrAsc().stream().map(LabelAssignmentGridRow::new).toList();
-		labelAssignListDataProvider = new ListDataProvider<>(labelAssignGridItems);
-		labelAssignGrid.setItems(labelAssignListDataProvider);
-
-
-		// Also allow inline editing. See what is more pleasant (because it is a different UX).
-		// See https://vaadin.com/forum/t/consume-key-event/166801/6
-		Editor<LabelAssignmentGridRow> labelAssignGridEditor = labelAssignGrid.getEditor();
-		Binder<LabelAssignmentGridRow> labelAssignGridBinder = new Binder<>(LabelAssignmentGridRow.class);
-		labelAssignGridEditor.setBinder(labelAssignGridBinder);
-		labelAssignGridEditor.setBuffered(true);
-
-		TextField subjectRegexpTextField = new TextField();
-		subjectRegexpTextField.setWidthFull();
-		subjectRegexpColumn.setEditorComponent(subjectRegexpTextField);
-		labelAssignGridBinder.forField(subjectRegexpTextField).bind(LabelAssignmentGridRow::subjectRegexp, LabelAssignmentGridRow::subjectRegexp);
-		subjectRegexpTextField.getElement().addEventListener("keydown", e -> {
-			labelAssignGridEditor.cancel();
-		}).setFilter("event.code === 'Escape'").addEventData("event.stopPropagation()");
-		subjectRegexpTextField.addBlurListener(e -> {
-			if (labelAssignGridEditor.isOpen()) {
-				labelAssignGridEditor.save();
-			}
-		});
-
-		labelAssignGrid.addItemDoubleClickListener(e -> {
-			labelAssignGridEditor.editItem(e.getItem());
-			Component editorComponent = e.getColumn().getEditorComponent();
-			if (editorComponent instanceof Focusable) {
-				((Focusable) editorComponent).focus();
-			}
-		});
+		labelAssignGrid.setItems(R.label().findAllByOrderBySeqnrAsc().stream().map(LabelAssignmentGridRow::new).toList());
 	}
 
 	public CalendarSourceForm populateWith(CalendarSource calendarSource) {
@@ -128,7 +96,7 @@ abstract public class CalendarSourceForm extends Harmonica {
 		this.calendarSource = calendarSource;
 
 		Map<Label, CalendarSourceLabelAssignment> assignedLabels = calendarSource.labelAssignments().stream().collect(Collectors.toMap(CalendarSourceLabelAssignment::label, la -> la));
-		labelAssignGridItems.forEach(la -> {
+		labelAssignGrid.getItems().forEach(la -> {
 			la.clear();
 			if (assignedLabels.containsKey(la.label)) {
 				la.populateWith(assignedLabels.get(la.label));
@@ -139,7 +107,7 @@ abstract public class CalendarSourceForm extends Harmonica {
 
 	public CalendarSourceForm writeTo(CalendarSource calendarSource) throws ValidationException {
 		binder.writeBean(calendarSource);
-		List<CalendarSourceLabelAssignment> selectedLabelAssignments = labelAssignGridItems.stream()
+		List<CalendarSourceLabelAssignment> selectedLabelAssignments = labelAssignGrid.getItems().stream()
 				.filter(la -> la.selectedCheckbox.getValue())
 				.map(la -> la.assign)
 				.toList();
@@ -229,7 +197,7 @@ abstract public class CalendarSourceForm extends Harmonica {
 						try {
 							assign.subjectRegexp(textField.getValue());
 							LabelAssignmentGridRow.this.selectedCheckbox.setValue(true);
-							labelAssignListDataProvider.refreshItem(LabelAssignmentGridRow.this);
+							labelAssignGrid.refresh(LabelAssignmentGridRow.this);
 						} catch (Exception e) {
 							throw new RuntimeException(e);
 						}
