@@ -40,6 +40,8 @@ public class EditingGrid<BEAN> extends Grid<BEAN> {
     }
 
     public void construct(Class<BEAN> beanType) {
+        setEmptyStateText("No data");
+
         // Also allow inline editing. See what is more pleasant (because it is a different UX).
         // See https://vaadin.com/forum/t/consume-key-event/166801/6
         editor.setBinder(binder);
