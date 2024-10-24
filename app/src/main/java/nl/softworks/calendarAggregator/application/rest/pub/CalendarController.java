@@ -38,6 +38,7 @@ public class CalendarController {
     private void prepareTemplate(Model model, HttpServletRequest request,
                                  Double lat, Double lon, Integer distance,
                                  List<Label> labelInclude, List<Label> labelExclude,
+                                 Boolean showHidden,
                                  Integer year, Integer month) {
         model.addAttribute("settings", Settings.get());
         model.addAttribute("request", request);
@@ -52,7 +53,8 @@ public class CalendarController {
 
         String filterQueryString = "lat=" + nullToEmpty(lat) + "&lon=" + nullToEmpty(lon) + "&distance=" + nullToEmpty(distance)
                 + labelInclude.stream().map(l -> "&labelInclude=" + URLEncoder.encode(l.name(), StandardCharsets.UTF_8)).collect(Collectors.joining())
-                + labelExclude.stream().map(l -> "&labelExclude=" + URLEncoder.encode(l.name(), StandardCharsets.UTF_8)).collect(Collectors.joining());
+                + labelExclude.stream().map(l -> "&labelExclude=" + URLEncoder.encode(l.name(), StandardCharsets.UTF_8)).collect(Collectors.joining())
+                + (showHidden == null ? "" : "&showHidden=" + showHidden);
         String ymQueryString = "year=" + (year == null ? "" : year.toString()) + "&month=" + (month == null ? "" : month.toString());
         String filterPlusYMQueryString = filterQueryString + "&" + ymQueryString;
         model.addAttribute("filterQueryString", filterQueryString);
@@ -64,7 +66,7 @@ public class CalendarController {
     @RequestMapping(value = {"/list", "/pub/html"}, produces = {"text/html"})
     public String list(Model model, HttpServletRequest request
             , @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance
-            , @RequestParam(defaultValue = "false") Boolean showHidden
+            , @RequestParam(required = false) Boolean showHidden
             , @RequestParam(defaultValue = "", name = "labelInclude") List<String> labelNamesInclude, @RequestParam(defaultValue = "", name = "labelExclude") List<String> labelNamesExclude) {
 
         final ZoneId viewZoneId = ZoneId.of("Europe/Amsterdam"); // TODO: can the browser tell us this? Show the timezone in the page.
@@ -72,13 +74,13 @@ public class CalendarController {
 
         List<Label> labelsInclude = labelsNameToEntities(labelNamesInclude);
         List<Label> labelsExclude = labelsNameToEntities(labelNamesExclude);
-        prepareTemplate(model, request, lat, lon, distance, labelsInclude, labelsExclude, null, null);
+        prepareTemplate(model, request, lat, lon, distance, labelsInclude, labelsExclude, showHidden, null, null);
 
         // Collect events
         LocalDateTime threshold = LocalDateTime.now().minusHours(2);
         List<CalendarEvent> events = R.calendarEvent().findAll().stream()
                 .filter(ce -> ce.startDateTimeInZone(viewZoneId).isAfter(threshold))
-                .filter(ce -> showHidden || !ce.calendarSource().hidden())
+                .filter(ce -> showHidden != null && showHidden || !ce.calendarSource().hidden())
                 .filter(ce -> filterEventOnDistance(ce, lat, lon, distance))
                 .filter(ce -> filterEventOnLabels(ce, labelsInclude, labelsExclude))
                 .toList();
@@ -120,7 +122,7 @@ public class CalendarController {
     @RequestMapping(value = {"/", "/month", "/htmlmonth"}, produces = {"text/html"})
     public String month(Model model, HttpServletRequest request
             , @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance
-            , @RequestParam(defaultValue = "false") Boolean showHidden
+            , @RequestParam(required = false) Boolean showHidden
             , @RequestParam(defaultValue = "", name = "labelInclude") List<String> labelNamesInclude, @RequestParam(defaultValue = "", name = "labelExclude") List<String> labelNamesExclude
             , @RequestParam(defaultValue = "") Integer year, @RequestParam(defaultValue = "") Integer month
             , @RequestParam(defaultValue = "0") Integer moreWeeks) {
@@ -130,7 +132,7 @@ public class CalendarController {
 
         List<Label> labelsInclude = labelsNameToEntities(labelNamesInclude);
         List<Label> labelsExclude = labelsNameToEntities(labelNamesExclude);
-        prepareTemplate(model, request, lat, lon, distance, labelsInclude, labelsExclude, year, month);
+        prepareTemplate(model, request, lat, lon, distance, labelsInclude, labelsExclude, showHidden, year, month);
         DateTimeFormatter yyyy = DateTimeFormatter.ofPattern("yyyy", Locale.ENGLISH);
         DateTimeFormatter mmm = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH);
         DateTimeFormatter dd = DateTimeFormatter.ofPattern("d", Locale.ENGLISH);
@@ -170,7 +172,7 @@ public class CalendarController {
         LocalDateTime threshold = LocalDateTime.now().minusHours(2);
         List<CalendarEvent> events = R.calendarEvent().findAll().stream()
                 .filter(ce -> ce.startDateTimeInZone(viewZoneId).isAfter(threshold))
-                .filter(ce -> showHidden || !ce.calendarSource().hidden())
+                .filter(ce -> showHidden != null && showHidden || !ce.calendarSource().hidden())
                 .filter(ce -> filterEventOnDistance(ce, lat, lon, distance))
                 .filter(ce -> filterEventOnLabels(ce, labelsInclude, labelsExclude))
                 .toList();
