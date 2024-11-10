@@ -53,7 +53,8 @@ public class GenerateEventsService {
                     .flatMap(cl -> cl.calendarSources().stream())
                     .forEach(cs -> {
                         if (LOGGER.isInfoEnabled()) LOGGER.info("Scheduled " + cs.calendarLocation().name());
-                        cs.status("Scheduled");
+                        cs.status("Scheduled")
+                          .log("");
                         R.calendarSource().saveAndFlush(cs);
                         executorService.submit(() -> generateEvents(cs.id()));
                     });

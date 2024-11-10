@@ -91,6 +91,7 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 
 
 	protected String readScrapeUrl() {
+		String text = null;
 		try {
 
 			// Get URL
@@ -100,7 +101,7 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 
 			// Extract text information
 			Document doc = Jsoup.parse(html);
-			String text = doc.text();
+			text = doc.text();
 			logAppend("Content: " + text.length() + "\n");
 
 			// special handling for certain elements: <eventbrite-modal :events="html escaped string"
@@ -123,7 +124,12 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 			}
 			return text;
 		} catch (IOException | InterruptedException e) {
+			if (text != null) logAppend(text);
 			throw new RuntimeException(e);
+		}
+		catch (RuntimeException e) {
+			if (text != null) logAppend(text + "\n");
+			throw e;
 		}
 	}
 

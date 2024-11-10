@@ -22,7 +22,11 @@ import org.mvel2.templates.TemplateRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -34,6 +38,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -43,6 +48,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
 import java.util.stream.Collectors;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -134,14 +141,48 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 	private String log;
 	static public final String LOG = "log";
 	public String log() {
-		return log;
+		try {
+			if (log == null || log.isBlank()) {
+				return "";
+			}
+
+			byte[] bytes = Base64.getDecoder().decode(log);
+
+			// Decompress
+			GZIPInputStream gzipInputStream = new GZIPInputStream(new ByteArrayInputStream(bytes));
+			InputStreamReader inputStreamReader = new InputStreamReader(gzipInputStream);
+			BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+			String uncompressed = IOUtils.toString(bufferedReader);
+			return uncompressed;
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	public CalendarSource log(String v) {
-		this.log = v;
-		return this;
+		try {
+			if (v == null || v.isBlank()) {
+				log = v;
+				return this;
+			}
+
+			// Compress
+			ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(v.length());
+			GZIPOutputStream gzipOutputStream = new GZIPOutputStream(byteArrayOutputStream);
+			gzipOutputStream.write(v.getBytes());
+			gzipOutputStream.close();
+			byte[] bytes = byteArrayOutputStream.toByteArray();
+			byteArrayOutputStream.close();
+
+			this.log = Base64.getEncoder().encodeToString(bytes);
+			return this;
+		}
+		catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 	public void logAppend(String s) {
-		log += s;
+		log(log() + s);
 	}
 
 	@JoinColumn(name = "timezone_id", nullable = false)
