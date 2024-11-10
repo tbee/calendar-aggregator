@@ -1,10 +1,9 @@
 package nl.softworks.calendarAggregator.domain.entity;
 
 import jakarta.persistence.MappedSuperclass;
-import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tbee.jakarta.validator.UrlValidatorImpl;
 
 import java.io.IOException;
 import java.time.DateTimeException;
@@ -38,6 +37,7 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 			"ISO_TIME", DateTimeFormatter.ISO_TIME
 		);
 
+	@NotNull
 	protected String scrapeUrl;
 	static public final String SCRAPEURL = "scrapeUrl";
 	public String scrapeUrl() {
@@ -47,10 +47,11 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 		this.scrapeUrl = v;
 		return this;
 	}
-	@AssertTrue(message = "Scraper URL is not a valid URL")
-	public boolean isValidScraperURL() {
-		return scrapeUrl == null || scrapeUrl.isBlank() || UrlValidatorImpl.isValid(resolveUrl(scrapeUrl));
-	}
+//	// dit wordt aangeroepen als onderdeel van de save, maar resolveURL past het log veld aan
+//	@AssertTrue(message = "Scraper URL is not a valid URL")
+//	public boolean isValidScraperURL() {
+//		return scrapeUrl == null || scrapeUrl.isBlank() || UrlValidatorImpl.isValid(resolveUrl(scrapeUrl));
+//	}
 
 	protected String readScrapeUrl() {
 		try {

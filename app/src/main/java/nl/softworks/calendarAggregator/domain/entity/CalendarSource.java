@@ -319,7 +319,7 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 	}
 
 	public List<CalendarEvent> generateEvents() {
-		log = "";
+		log("");
 		status(OK);
 		calendarEvents.clear();
 		return calendarEvents;
