@@ -1,5 +1,6 @@
 package nl.softworks.calendarAggregator.application.vdn.form;
 
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -14,20 +15,16 @@ public class CalendarSourceScraperBaseForm extends CalendarSourceForm {
 	private final Binder<CalendarSourceScraperBase> binder = new Binder<>();
 
 	private final TextField scrapeURLTextField = new TextField("Scrape URL");
-	private final TextField scrapeBlockStartTextField = new TextField("Scrape block start");
-	private final TextField scrapeBlockEndTextField = new TextField("Scrape block end");
-	private final TextField removeCharsTextField = new TextField("Remove chars");
+
+	protected final FormLayout scrapeFormLayout;
 
 	public CalendarSourceScraperBaseForm() {
-		setColspan(scrapeURLTextField, 2);
-		add(scrapeURLTextField, scrapeBlockStartTextField, scrapeBlockEndTextField, removeCharsTextField);
+		scrapeFormLayout = addAsFormlayoutInAccordion("Scrape", scrapeURLTextField);
+		scrapeFormLayout.setColspan(scrapeURLTextField, 2);
 
 		binder.forField(scrapeURLTextField)
 				//.withValidator(s -> UrlValidatorImpl.isValid(s), "Illegal URL") // conflicts with MVEL expressions, moved to the entity
 				.bind(CalendarSourceScraperBase::scrapeUrl, CalendarSourceScraperBase::scrapeUrl);
-		binder.forField(scrapeBlockStartTextField).bind(CalendarSourceScraperBase::scrapeBlockStart, CalendarSourceScraperBase::scrapeBlockStart);
-		binder.forField(scrapeBlockEndTextField).bind(CalendarSourceScraperBase::scrapeBlockEnd, CalendarSourceScraperBase::scrapeBlockEnd);
-		binder.forField(removeCharsTextField).bind(CalendarSourceScraperBase::removeChars, CalendarSourceScraperBase::removeChars);
 	}
 
 	@Override

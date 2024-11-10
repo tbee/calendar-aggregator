@@ -2,6 +2,7 @@ package nl.softworks.calendarAggregator.application.vdn.form;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -12,7 +13,7 @@ import nl.softworks.calendarAggregator.domain.entity.CalendarSourceMultipleDaysS
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CalendarSourceMultipleDaysScraperForm extends CalendarSourceScraperBaseForm {
+public class CalendarSourceMultipleDaysScraperForm extends CalendarSourceScraperBaseHTMLForm {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourceMultipleDaysScraperForm.class);
 
 	private final Binder<CalendarSourceMultipleDaysScraper> binder = new Binder<>();
@@ -29,11 +30,12 @@ public class CalendarSourceMultipleDaysScraperForm extends CalendarSourceScraper
 
 
 	public CalendarSourceMultipleDaysScraperForm() {
-		setColspan(regexTextField, 2);
 
-		Button testButton = new Button("Test Regex", evt -> testRegex());
-		setColspan(testButton, 2);
-		add(regexTextField, testButton, datePatternTextField, nearestYearCheckbox, startTimeDefaultTextField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
+		Button testButton = new Button("Test", evt -> testRegex());
+
+		FormLayout formLayout = addAsFormlayoutInAccordion("Multiple days", regexTextField, testButton, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, datePatternTextField, nearestYearCheckbox, startTimeDefaultTextField, endTimeDefaultTextField, timePatternTextField, dateTimeLocaleTextField);
+		formLayout.setColspan(regexTextField, 2);
+		formLayout.setColspan(testButton, 2);
 
 		binder.forField(regexTextField).bind(CalendarSourceMultipleDaysScraper::regex, CalendarSourceMultipleDaysScraper::regex);
 		binder.forField(datePatternTextField).bind(CalendarSourceMultipleDaysScraper::datePattern, CalendarSourceMultipleDaysScraper::datePattern);

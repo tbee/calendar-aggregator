@@ -33,7 +33,7 @@ public class CalendarSourceManualExdate extends EntityBase<CalendarSourceManualE
 	@Override
 	public String toString() {
 		return super.toString() //
-			+ ",startDateTime=" + excludedDate
+			+ ",excludedDate=" + excludedDate
 		    ;
 	}
 }

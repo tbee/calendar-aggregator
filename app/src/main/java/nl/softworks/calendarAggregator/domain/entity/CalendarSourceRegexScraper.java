@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -19,7 +20,7 @@ import java.util.regex.Pattern;
 
 @Entity
 @DiscriminatorValue("regex")
-public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
+public class CalendarSourceRegexScraper extends CalendarSourceScraperBaseHTML {
 
     public String type() {
         return "Regex";
@@ -179,7 +180,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
             DateTimeFormatter timeFormatter = createTimeFormatter(timePattern, locale);
 
             // Get contents
-            String content = readScrapeUrl();
+            String content = readScrapeUrlHTML();
             if (content.isBlank()) {
                 status("No contents");
                 return List.of();
@@ -218,13 +219,21 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBase {
                         continue;
                     }
 
-                    LocalTime startLocalTime = parseLocalTime(startTimeString, timeFormatter);
+                    LocalTime startLocalTime = parseLocalTime(startTimeString != null ? startTimeString : startTimeDefault, timeFormatter);
                     if (startLocalTime == null) {
                         logAppend("Not able to determine a starttime for " + startTimeString);
                         continue;
                     }
 
-                    LocalTime endLocalTime = parseLocalTime(endTimeString, timeFormatter);
+                    LocalTime endLocalTime = null;
+                    if (endTimeString != null && endTimeString.startsWith("+")) {
+                        LocalTime endLocalTimeAddition = parseLocalTime(endTimeString.substring(1), timeFormatter);
+                        Duration duration = Duration.between(LocalTime.of(0, 0, 0), endLocalTimeAddition);
+                        endLocalTime = startLocalTime.plus(duration);
+                    }
+                    else {
+                        endLocalTime = parseLocalTime(endTimeString != null ? endTimeString : endTimeDefault, timeFormatter);
+                    }
                     if (endLocalTime == null) {
                         logAppend("Not able to determine an endtime for " + endTimeString);
                         continue;

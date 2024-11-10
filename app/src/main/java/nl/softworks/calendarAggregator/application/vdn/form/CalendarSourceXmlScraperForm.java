@@ -2,6 +2,7 @@ package nl.softworks.calendarAggregator.application.vdn.form;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -34,11 +35,12 @@ public class CalendarSourceXmlScraperForm extends CalendarSourceScraperBaseForm 
 
 
 	public CalendarSourceXmlScraperForm() {
-		setColspan(xpathTextField, 2);
 
 		Button testButton = new Button("Test", evt -> test());
-		setColspan(testButton, 2);
-		add(jsonToXmlCheckbox, xpathTextField, testButton, subjectXpatjField, datePatternTextField, startDateXpathField, endDateXpathField, shortMonthNotationTextField, nearestYearCheckbox, dateTimeLocaleTextField, timePatternTextField, startTimeXpathField,  endTimeXpathField, startTimeDefaultTextField, endTimeDefaultTextField);
+
+		FormLayout formLayout = addAsFormlayoutInAccordion("XML", xpathTextField, testButton, subjectXpatjField, datePatternTextField, startDateXpathField, endDateXpathField, shortMonthNotationTextField, nearestYearCheckbox, dateTimeLocaleTextField, timePatternTextField, startTimeXpathField, endTimeXpathField, startTimeDefaultTextField, endTimeDefaultTextField);
+		formLayout.setColspan(xpathTextField, 2);
+		formLayout.setColspan(testButton, 2);
 
 		binder.forField(xpathTextField).bind(CalendarSourceXmlScraper::xpath, CalendarSourceXmlScraper::xpath);
 		binder.forField(subjectXpatjField).bind(CalendarSourceXmlScraper::subjectXpath, CalendarSourceXmlScraper::subjectXpath);

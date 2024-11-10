@@ -1,7 +1,9 @@
 package nl.softworks.calendarAggregator.application.vdn.form;
 
+import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -13,7 +15,7 @@ import nl.softworks.calendarAggregator.domain.entity.CalendarSourceScraperBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseForm {
+public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseHTMLForm {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourceRegexScraperForm.class);
 
 	private final Binder<CalendarSourceRegexScraper> binder = new Binder<>();
@@ -34,11 +36,13 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseFor
 
 
 	public CalendarSourceRegexScraperForm() {
-		setColspan(regexTextField, 2);
+		endTimeDefaultTextField.setTooltipText("Either an absolute time or a relative time to the start time (e.g. +01:30)");
 
 		Button testButton = new Button("Test", evt -> test());
-		setColspan(testButton, 2);
-		add(regexTextField, testButton,subjectGroupIdxIntegerField, datePatternTextField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, shortMonthNotationTextField, nearestYearCheckbox, dateTimeLocaleTextField, timePatternTextField, startTimeGroupIdxIntegerField, endTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeDefaultTextField);
+
+		FormLayout formLayout = addAsFormlayoutInAccordion("Regex", regexTextField, testButton, subjectGroupIdxIntegerField, datePatternTextField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, shortMonthNotationTextField, nearestYearCheckbox, dateTimeLocaleTextField, timePatternTextField, startTimeGroupIdxIntegerField, endTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeDefaultTextField);
+		formLayout.setColspan(regexTextField, 2);
+		formLayout.setColspan(testButton, 2);
 
 		binder.forField(regexTextField).bind(CalendarSourceRegexScraper::regex, CalendarSourceRegexScraper::regex);
 		binder.forField(subjectGroupIdxIntegerField).bind(CalendarSourceRegexScraper::subjectGroupIdx, CalendarSourceRegexScraper::subjectGroupIdx);

@@ -2,6 +2,7 @@ package nl.softworks.calendarAggregator.application.vdn.form;
 
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.AnchorTarget;
 import com.vaadin.flow.component.html.NativeLabel;
@@ -48,15 +49,11 @@ public class CalendarSourceManualForm extends CalendarSourceForm {
 		startDateTimePicker.setDatePickerI18n(datePickerIsoFormat);
 		endDateTimePicker.setDatePickerI18n(datePickerIsoFormat);
 
-		calendarEventExdateListBox.setRenderer(new ComponentRenderer<>(cee -> {
-			Span excludedDateSpan = new Span(cee.excludedDate().toString());
-			return excludedDateSpan;
-		}));
+		FormLayout formLayout = addAsFormlayoutInAccordion("Manual", subjectTextField, startDateTimePicker, endDateTimePicker, rruleTextField, rruleHelpAnchor);
+		formLayout.setColspan(subjectTextField, 2);
 
-		add(subjectTextField, 2);
-		add(startDateTimePicker, endDateTimePicker, rruleTextField, rruleHelpAnchor);
-		HorizontalLayout exdateGroup = new HorizontalLayout(calendarEventExdateListBox, crudButtonbar);
-		addFormItem(exdateGroup, "Exdates");
+		calendarEventExdateListBox.setRenderer(new ComponentRenderer<>(cee -> new Span(cee.excludedDate().toString())));
+		formLayout.addFormItem(new HorizontalLayout(calendarEventExdateListBox, crudButtonbar), "Exdates");
 
 		binder.forField(startDateTimePicker).bind(CalendarSourceManual::startDateTime, CalendarSourceManual::startDateTime);
 		binder.forField(endDateTimePicker).bind(CalendarSourceManual::endDateTime, CalendarSourceManual::endDateTime);
