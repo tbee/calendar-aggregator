@@ -4,7 +4,6 @@ import jakarta.persistence.CascadeType;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.OneToMany;
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attribute;
@@ -13,26 +12,13 @@ import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.util.HtmlUtils;
-import org.tbee.jakarta.validator.UrlValidatorImpl;
 
-import java.io.IOException;
-import java.time.DateTimeException;
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.MonthDay;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @MappedSuperclass
 abstract public class CalendarSourceScraperBaseHTML extends CalendarSourceScraperBase {
@@ -104,38 +90,45 @@ abstract public class CalendarSourceScraperBaseHTML extends CalendarSourceScrape
 	}
 
 	protected String readScrapeUrlHTML() {
-		String html = readScrapeUrl();
+		String text = null;
+		try {
+			String html = readScrapeUrl();
 
-		// Preprocess
-		for (CalendarSourcePreprocess calendarSourcePreprocess : calendarSourcePreprocesses) {
-			html = calendarSourcePreprocess.preprocess(html);
-		}
-		//if (!calendarSourcePreprocesses.isEmpty()) logAppend("Preprocessed: " + html + "\n");
-
-		// Extract text information
-		Document doc = Jsoup.parse(html);
-		String text = doc.text();
-		logAppend("Content: " + text.length() + "\n");
-
-		// special handling for certain elements: <eventbrite-modal :events="html escaped string"
-		for (Element eventbrightModalElement : doc.selectXpath("//eventbrite-modal")) {
-			Attribute eventsAttribute = eventbrightModalElement.attribute(":events");
-			if (eventsAttribute != null) {
-				text = "{\"event\":" + HtmlUtils.htmlUnescape(eventsAttribute.getValue()) + "}";
-				logAppend("Content, added eventbrite-modal\n");
+			// Preprocess
+			for (CalendarSourcePreprocess calendarSourcePreprocess : calendarSourcePreprocesses) {
+				html = calendarSourcePreprocess.preprocess(html);
 			}
-		}
+			//if (!calendarSourcePreprocesses.isEmpty()) logAppend("Preprocessed: " + html + "\n");
 
-		// extract block
-		if (scrapeBlockStart != null && !scrapeBlockStart.isBlank()) {
-			text = text.substring(text.indexOf(scrapeBlockStart));
-			logAppend("Content after block start: " + text.length() + "\n");
+			// Extract text information
+			Document doc = Jsoup.parse(html);
+			text = doc.text();
+			logAppend("Content: " + text.length() + "\n");
+
+			// special handling for certain elements: <eventbrite-modal :events="html escaped string"
+			for (Element eventbrightModalElement : doc.selectXpath("//eventbrite-modal")) {
+				Attribute eventsAttribute = eventbrightModalElement.attribute(":events");
+				if (eventsAttribute != null) {
+					text = "{\"event\":" + HtmlUtils.htmlUnescape(eventsAttribute.getValue()) + "}";
+					logAppend("Content, added eventbrite-modal\n");
+				}
+			}
+
+			// extract block
+			if (scrapeBlockStart != null && !scrapeBlockStart.isBlank()) {
+				text = text.substring(text.indexOf(scrapeBlockStart));
+				logAppend("Content after block start: " + text.length() + "\n");
+			}
+			if (scrapeBlockEnd != null && !scrapeBlockEnd.isBlank()) {
+				text = text.substring(0, text.indexOf(scrapeBlockEnd));
+				logAppend("Content after block end: " + text.length() + "\n");
+			}
+			return text;
 		}
-		if (scrapeBlockEnd != null && !scrapeBlockEnd.isBlank()) {
-			text = text.substring(0, text.indexOf(scrapeBlockEnd));
-			logAppend("Content after block end: " + text.length() + "\n");
+		catch (RuntimeException e) {
+			if (text != null) logAppend(text + "\n");
+			throw e;
 		}
-		return text;
 	}
 
 	protected String sanatizeContent(String content) {
