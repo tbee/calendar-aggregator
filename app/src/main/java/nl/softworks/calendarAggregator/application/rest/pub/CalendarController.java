@@ -217,7 +217,6 @@ public class CalendarController {
     }
 
     static boolean filterEventOnDistance(CalendarEvent ce, Double lat, Double lon, Integer d) {
-        System.out.println(lat + " / " + lon + " / " + d);
         return lat == null || lon == null || d == null || d == 0
             || d > (int) calculateDistance(lat, lon, ce.calendarSource().calendarLocation().lat(), ce.calendarSource().calendarLocation().lon());
     }

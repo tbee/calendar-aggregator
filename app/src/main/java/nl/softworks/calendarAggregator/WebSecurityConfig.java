@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpSessionListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -38,25 +39,17 @@ public class WebSecurityConfig extends VaadinWebSecurity {
     }
 
     @Bean(name = "VaadinSecurityFilterChainBean")
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
-        http.authorizeHttpRequests().requestMatchers("/app/**").authenticated()
-            .and()
-            .authorizeHttpRequests().requestMatchers("/**").permitAll()
-            .and() //
-            .headers().frameOptions().sameOrigin() // needed for iframe
-            .and()
-            .formLogin().defaultSuccessUrl("/app/", true) //
-            .and()
-            .httpBasic()
-            .and() //
-            .csrf().disable() // needed for vaadin https://tutorialmeta.com/question/server-connection-lost-after-successful-login-with-spring-security
-            .logout() // enable the logout url https://www.baeldung.com/spring-security-logout
-            .invalidateHttpSession(true)
-            .deleteCookies("JSESSIONID")
-        ;
-        super.configure(http);
-        return http.build();
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity
+                .authorizeHttpRequests(authorize -> authorize.requestMatchers("/app/**").authenticated())
+                .authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll())
+                .headers(headers -> headers.frameOptions(config -> config.sameOrigin()))
+                .formLogin(config -> config.defaultSuccessUrl("/app", true))
+                .httpBasic(Customizer.withDefaults())
+                .csrf(config -> config.disable())
+                .logout(config -> config.invalidateHttpSession(true).deleteCookies("JSESSIONID"));
+        super.configure(httpSecurity);
+        return httpSecurity.build();
     }
 
 
