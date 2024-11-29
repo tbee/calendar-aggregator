@@ -147,7 +147,7 @@ public class CalendarSourcesTest {
                 .starttimeXpath("../../startsat")
                 .endtimeXpath("../../endsat")
                 .subjectXpath(".")
-                .jsonToXml(true)
+                .format(CalendarSourceXmlScraper.Format.JSON)
                 .datePattern("yyyy-MM-dd'T'HH:mm:ss.nX")
                 .timePattern("yyyy-MM-dd'T'HH:mm:ss.nX")
                 .dateTimeLocale("NL")

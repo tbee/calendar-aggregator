@@ -255,6 +255,26 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 				.collect(Collectors.toSet());
 	}
 
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.EAGER)
+	protected final List<CalendarSourcePreprocess> calendarSourcePreprocesses = new ArrayList<>();
+	public List<CalendarSourcePreprocess> calendarSourcePreprocesses() {
+		return Collections.unmodifiableList(calendarSourcePreprocesses);
+	}
+	public void calendarSourcePreprocesses(Collection<CalendarSourcePreprocess> v) {
+		// TODO this can be done more efficient
+		calendarSourcePreprocesses.forEach(la -> la.calendarSource = null); // delete
+		calendarSourcePreprocesses.clear();
+		v.forEach(la -> la.calendarSource = this);
+		calendarSourcePreprocesses.addAll(v);
+	}
+	public void addPreprocess(CalendarSourcePreprocess v) {
+		calendarSourcePreprocesses.add(v);
+	}
+	public void removePreprocess(CalendarSourcePreprocess v) {
+		calendarSourcePreprocesses.remove(v);
+	}
+
+
 	/**
 	 * Using MVEL2 http://mvel.documentnode.com/
 	 *
@@ -311,7 +331,15 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 					.header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
 					.build();
 			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-			return response.body();
+			String content = response.body();
+
+			// Preprocess
+			for (CalendarSourcePreprocess calendarSourcePreprocess : calendarSourcePreprocesses) {
+				content = calendarSourcePreprocess.preprocess(content);
+			}
+			//if (!calendarSourcePreprocesses.isEmpty()) logAppend("Preprocessed: " + html + "\n");
+
+			return content;
 		}
 		catch (URISyntaxException e) {
 			throw new IOException(e);

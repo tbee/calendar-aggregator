@@ -1,5 +1,6 @@
 package nl.softworks.calendarAggregator.domain.entity;
 
+import jakarta.persistence.Convert;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +11,9 @@ import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
 import net.sf.saxon.trans.XPathException;
+import nl.softworks.calendarAggregator.application.jpa.FormatConverter;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPathExpressionException;
@@ -34,15 +38,18 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
     }
 
     @NotNull
-    private boolean jsonToXml = false;
-    static public final String JSONTOXML = "jsonToXml";
-    public boolean jsonToXml() {
-        return jsonToXml;
+    @Convert(converter = FormatConverter.class)
+    private Format format = Format.XML;
+    static public final String FORMAT = "format";
+    public Format format() {
+        return format;
     }
-    public CalendarSourceXmlScraper jsonToXml(boolean v) {
-        this.jsonToXml = v;
+    public CalendarSourceXmlScraper format(Format format) {
+        this.format = format;
         return this;
     }
+    public enum Format {XML, JSON, HTML}
+
 
     @NotNull
     private String xpath = "";
@@ -207,9 +214,15 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
             }
 
             // Json to XML conversion?
-            if (jsonToXml) {
+            if (format.equals(Format.JSON)) {
                 content = JsonToXml.ofUnformatted().convert(content);
-                logAppend("XML " + content + "\n");
+                logAppend("========\nJSON->XML\n " + content + "\n");
+            }
+            else if (format.equals(Format.HTML)) {
+                Document document = Jsoup.parse(content);
+                document.outputSettings().syntax(Document.OutputSettings.Syntax.xml);
+                content = document.html();
+                logAppend("========\nHTML->XML\n " + content + "\n");
             }
 
             // Apply xpath (using saxon api because Java's API defaults to XPath 1.0)
@@ -318,6 +331,7 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
     }
 
     private LocalTime parseLocalTime(String timeString, DateTimeFormatter timeFormatter) {
+        timeString = timeString.trim();
         logAppend("Parsing '" + timeString + "' with '" + timePattern + "'\n");
         LocalTime localTime = LocalTime.parse(timeString, timeFormatter);
         logAppend("Parsed as " + localTime + "\n");
@@ -325,6 +339,7 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
     }
 
     private LocalDate parseLocalDate(String dateString, DateTimeFormatter dateFormatter) {
+        dateString = dateString.trim();
         LocalDate localDate;
         if (nearestYear) {
             MonthDay monthDay = MonthDay.parse(dateString, dateFormatter);

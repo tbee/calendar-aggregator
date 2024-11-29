@@ -1,23 +1,20 @@
 package nl.softworks.calendarAggregator.application.vdn.form;
 
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.Unit;
-import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
-import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.theme.lumo.LumoIcon;
+import nl.softworks.calendarAggregator.application.vdn.component.AnchorIcon;
+import nl.softworks.calendarAggregator.application.vdn.component.CrudIconButtonbar;
 import nl.softworks.calendarAggregator.application.vdn.component.EditingGrid;
 import nl.softworks.calendarAggregator.application.vdn.component.Harmonica;
 import nl.softworks.calendarAggregator.application.vdn.component.IconButton;
@@ -27,6 +24,7 @@ import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceLabelAssignment;
+import nl.softworks.calendarAggregator.domain.entity.CalendarSourcePreprocess;
 import nl.softworks.calendarAggregator.domain.entity.Label;
 import nl.softworks.calendarAggregator.domain.entity.Timezone;
 import org.slf4j.Logger;
@@ -50,6 +48,7 @@ abstract public class CalendarSourceForm extends Harmonica {
 	private final EditingGrid<LabelAssignmentGridRow> labelAssignGrid = new EditingGrid<>(LabelAssignmentGridRow.class, false);
 	private final Checkbox hiddenCheckbox = new Checkbox("Hidden");
 	private final ComboBox<Timezone> timezoneComboBox = new ComboBox<>("Timezone");
+	private final EditingGrid<CalendarSourcePreprocess> preprocessGrid = new EditingGrid<>(CalendarSourcePreprocess.class, false);
 
 	private CalendarSource calendarSource;
 
@@ -88,6 +87,33 @@ abstract public class CalendarSourceForm extends Harmonica {
 		binder.forField(hiddenCheckbox).bind(CalendarSource::hidden, CalendarSource::hidden);
 		binder.forField(timezoneComboBox).bind(CalendarSource::timezone, CalendarSource::timezone);
 		labelAssignGrid.setItems(R.label().findAllByOrderBySeqnrAsc().stream().map(LabelAssignmentGridRow::new).toList());
+
+		CrudIconButtonbar preprocessCrudIconButtonbar = new CrudIconButtonbar()
+				.onInsert(() -> preprocessGrid.addItems(new CalendarSourcePreprocess()));
+		FormLayout preprocessFormLayout = addAsFormlayoutInAccordion("Preprocess", true, preprocessCrudIconButtonbar, preprocessGrid);
+		preprocessFormLayout.setColspan(preprocessGrid, 2);
+
+		// Setup preprocessGrid
+		preprocessGrid.addStringColumn(CalendarSourcePreprocess::oldValue, CalendarSourcePreprocess::oldValue).setHeader("Regexp");
+		preprocessGrid.addStringColumn(CalendarSourcePreprocess::newValue, CalendarSourcePreprocess::newValue).setHeader("Replacement");
+		preprocessGrid.addCrudIconButtonbarColumn();
+		preprocessGrid.addComponentColumn((ValueProvider<CalendarSourcePreprocess, Component>) bean -> AnchorIcon.jumpOut("https://www.baeldung.com/string/replace-all")).setWidth("20px");
+
+		preprocessGrid.onEdit(item -> {
+			CalendarSourcePreprocessForm form = new CalendarSourcePreprocessForm().populateWith(item);
+			new OkCancelDialog("Preprocess", form)
+					.width(50, Unit.PERCENTAGE)
+					.okLabel("Accept")
+					.onOk(() -> {
+						try {
+							form.writeTo(item);
+							preprocessGrid.refresh();
+						} catch (Exception e) {
+							throw new RuntimeException(e);
+						}
+					})
+					.open();
+		});
 	}
 
 	public CalendarSourceForm populateWith(CalendarSource calendarSource) {
@@ -102,6 +128,7 @@ abstract public class CalendarSourceForm extends Harmonica {
 				la.populateWith(assignedLabels.get(la.label));
 			}
 		});
+		preprocessGrid.setItems(calendarSource.calendarSourcePreprocesses());
 		return this;
 	}
 
@@ -112,6 +139,7 @@ abstract public class CalendarSourceForm extends Harmonica {
 				.map(la -> la.assign)
 				.toList();
 		calendarSource.labelAssignments(selectedLabelAssignments);
+		calendarSource.calendarSourcePreprocesses(preprocessGrid.getItems());
 		return this;
 	}
 

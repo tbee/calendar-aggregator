@@ -2,6 +2,7 @@ package nl.softworks.calendarAggregator.application.vdn.form;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
@@ -18,7 +19,7 @@ public class CalendarSourceXmlScraperForm extends CalendarSourceScraperBaseForm 
 
 	private final Binder<CalendarSourceXmlScraper> binder = new Binder<>();
 
-	private final Checkbox jsonToXmlCheckbox = new Checkbox("JSON");
+	private final ComboBox<CalendarSourceXmlScraper.Format> formatComboBox = new ComboBox<>("Format");
 	private final TextField xpathTextField = new TextField("Base XPath");
 	private final TextField subjectXpatjField = new TextField("Subject XPath");
 	private final TextField startDateXpathField = new TextField("Start date XPath");
@@ -35,10 +36,11 @@ public class CalendarSourceXmlScraperForm extends CalendarSourceScraperBaseForm 
 
 
 	public CalendarSourceXmlScraperForm() {
+		formatComboBox.setItems(CalendarSourceXmlScraper.Format.values());
 
 		Button testButton = new Button("Test", evt -> test());
 
-		FormLayout formLayout = addAsFormlayoutInAccordion("XML", xpathTextField, testButton, subjectXpatjField, datePatternTextField, startDateXpathField, endDateXpathField, shortMonthNotationTextField, nearestYearCheckbox, dateTimeLocaleTextField, timePatternTextField, startTimeXpathField, endTimeXpathField, startTimeDefaultTextField, endTimeDefaultTextField);
+		FormLayout formLayout = addAsFormlayoutInAccordion("XML", xpathTextField, formatComboBox, testButton, subjectXpatjField, datePatternTextField, startDateXpathField, endDateXpathField, shortMonthNotationTextField, nearestYearCheckbox, dateTimeLocaleTextField, timePatternTextField, startTimeXpathField, endTimeXpathField, startTimeDefaultTextField, endTimeDefaultTextField);
 		formLayout.setColspan(xpathTextField, 2);
 		formLayout.setColspan(testButton, 2);
 
@@ -55,7 +57,7 @@ public class CalendarSourceXmlScraperForm extends CalendarSourceScraperBaseForm 
 		binder.forField(endTimeDefaultTextField).bind(CalendarSourceXmlScraper::endTimeDefault, CalendarSourceXmlScraper::endTimeDefault);
 		binder.forField(timePatternTextField).bind(CalendarSourceXmlScraper::timePattern, CalendarSourceXmlScraper::timePattern);
 		binder.forField(dateTimeLocaleTextField).bind(CalendarSourceXmlScraper::dateTimeLocale, CalendarSourceXmlScraper::dateTimeLocale);
-		binder.forField(jsonToXmlCheckbox).bind(CalendarSourceXmlScraper::jsonToXml, CalendarSourceXmlScraper::jsonToXml);
+		binder.forField(formatComboBox).bind(CalendarSourceXmlScraper::format, CalendarSourceXmlScraper::format);
 	}
 
 	private void test() {

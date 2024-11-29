@@ -1,9 +1,6 @@
 package nl.softworks.calendarAggregator.domain.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attribute;
@@ -14,10 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.util.HtmlUtils;
 
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 @MappedSuperclass
@@ -70,35 +63,10 @@ abstract public class CalendarSourceScraperBaseHTML extends CalendarSourceScrape
 		return this;
 	}
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.EAGER)
-	protected final List<CalendarSourcePreprocess> calendarSourcePreprocesses = new ArrayList<>();
-	public List<CalendarSourcePreprocess> calendarSourcePreprocesses() {
-		return Collections.unmodifiableList(calendarSourcePreprocesses);
-	}
-	public void calendarSourcePreprocesses(Collection<CalendarSourcePreprocess> v) {
-		// TODO this can be done more efficient
-		calendarSourcePreprocesses.forEach(la -> la.calendarSource = null); // delete
-		calendarSourcePreprocesses.clear();
-		v.forEach(la -> la.calendarSource = this);
-		calendarSourcePreprocesses.addAll(v);
-	}
-	public void addLabelAssignment(CalendarSourcePreprocess v) {
-		calendarSourcePreprocesses.add(v);
-	}
-	public void removeLabelAssignment(CalendarSourcePreprocess v) {
-		calendarSourcePreprocesses.remove(v);
-	}
-
 	protected String readScrapeUrlHTML() {
 		String text = null;
 		try {
 			String html = readScrapeUrl();
-
-			// Preprocess
-			for (CalendarSourcePreprocess calendarSourcePreprocess : calendarSourcePreprocesses) {
-				html = calendarSourcePreprocess.preprocess(html);
-			}
-			//if (!calendarSourcePreprocesses.isEmpty()) logAppend("Preprocessed: " + html + "\n");
 
 			// Extract text information
 			Document doc = Jsoup.parse(html);

@@ -13,5 +13,6 @@ public class ResultDialog extends CancelDialog {
         textArea.setWidthFull();
         textArea.setHeight(95, Unit.PERCENTAGE);
         add(textArea);
+        textArea.scrollToEnd(); // does not work
     }
 }
