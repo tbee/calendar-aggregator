@@ -9,7 +9,7 @@
 
     <changeSet id="20241129a" author="tom">
         <addColumn tableName="calendar_source" >
-            <column name="format" type="varchar(10)" defaultValue="XML">
+            <column name="format" type="varchar(10)">
                 <constraints nullable="true"/>
             </column>
         </addColumn>
@@ -17,5 +17,12 @@
             <column name="format" value="JSON"/>
             <where>json_to_xml = true</where>
         </update>
+        <update tableName="calendar_source">
+            <column name="format" value="XML"/>
+            <where>json_to_xml = false</where>
+        </update>
+        <dropColumn tableName="calendar_source">
+            <column name="json_to_xml"/>
+        </dropColumn>
     </changeSet>
 </databaseChangeLog>
