@@ -9,9 +9,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.JavaScript;
 import com.vaadin.flow.component.dependency.StyleSheet;
-import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.NativeLabel;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -28,6 +26,7 @@ import nl.softworks.calendarAggregator.application.vdn.component.AnchorIcon;
 import nl.softworks.calendarAggregator.application.vdn.component.CancelDialog;
 import nl.softworks.calendarAggregator.application.vdn.component.CrudButtonbar;
 import nl.softworks.calendarAggregator.application.vdn.component.CrudIconButtonbar;
+import nl.softworks.calendarAggregator.application.vdn.component.IconButton;
 import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.application.vdn.component.ResultDialog;
 import nl.softworks.calendarAggregator.application.vdn.component.VButton;
@@ -52,6 +51,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,6 +62,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Route("/")
 @StyleSheet("context://../vaadin.css")
@@ -448,9 +450,14 @@ implements AfterNavigationObserver
 
 		@Override
 		public Component crudButtons() {
-			return new CrudIconButtonbar()
+			CrudIconButtonbar crudIconButtonbar = new CrudIconButtonbar()
 					.onEdit(this::edit)
 					.onDelete(this::delete);
+
+			// Add generate button
+			crudIconButtonbar.add(new IconButton(LumoIcon.PLAY.create(), e -> generateAndShowTrace(TreeNodeCalendarSource.this.calendarSource)));
+
+			return crudIconButtonbar;
 		}
 
 		private void delete() {
@@ -633,5 +640,23 @@ implements AfterNavigationObserver
 					reloadTreeGrid();
 				})
 				.open();
+	}
+
+	private void generateAndShowTrace(CalendarSource calendarSource) {
+		try {
+			List<CalendarEvent> calendarEvents = calendarSource.generateEvents();
+
+			String calendarEventsString = calendarEvents.stream().map(s -> s + "\n").collect(Collectors.joining());
+			calendarSource.logAppend("\n\n" + calendarEventsString);
+		}
+		catch (RuntimeException e) {
+			StringWriter stringWriter = new StringWriter();
+			e.printStackTrace(new PrintWriter(stringWriter));
+			calendarSource.logAppend(stringWriter.toString());
+		}
+		R.calendarSource().save(calendarSource);
+		reloadTreeGrid();
+
+		new ResultDialog(calendarSource.log()).open();
 	}
 }
