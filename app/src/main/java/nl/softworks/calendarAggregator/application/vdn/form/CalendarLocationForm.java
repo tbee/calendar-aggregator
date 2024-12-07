@@ -30,7 +30,7 @@ public class CalendarLocationForm extends FormLayout {
 	private final Binder<CalendarLocation> binder = new Binder<>();
 
 	private final TextField nameTextField = new TextField("Name");
-	private final TextField urlTextField = new TextField("Url");
+	private final TextField urlTextField = new TextField("URL");
 	private final TextField locationTextField = new TextField("Location");
 	private final NumberField latNumberField = new NumberField("LAT");
 	private final NumberField lonNumberField = new NumberField("LON");

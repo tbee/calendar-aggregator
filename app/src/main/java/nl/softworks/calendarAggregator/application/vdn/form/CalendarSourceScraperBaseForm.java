@@ -19,6 +19,8 @@ public class CalendarSourceScraperBaseForm extends CalendarSourceForm {
 	protected final FormLayout scrapeFormLayout;
 
 	public CalendarSourceScraperBaseForm() {
+		scrapeURLTextField.setTooltipText("Use `=@{now.plusYears(1).format(yyyy_MM_dd)}` to insert code.");
+
 		scrapeFormLayout = addAsFormlayoutInAccordion("Scrape", scrapeURLTextField);
 		scrapeFormLayout.setColspan(scrapeURLTextField, 2);
 

@@ -55,7 +55,7 @@ abstract public class CalendarSourceForm extends Harmonica {
 	public CalendarSourceForm() {
 		setWidthFull();
 
-		urlTextField.setTooltipText("If more-info URL differs from the one in location");
+		urlTextField.setTooltipText("If more-info URL differs from the one in location. Use `=@{now.plusYears(1).format(yyyy_MM_dd)}` to insert code.");
 		timezoneComboBox.setItemLabelGenerator(timezone -> timezone == null ? "-" : timezone.name());
 		timezoneComboBox.setRenderer(new ComponentRenderer<>(timezone -> {
 			Span nameSpan = new Span(timezone == null ? "-" : timezone.name());

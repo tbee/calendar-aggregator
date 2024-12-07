@@ -20,6 +20,7 @@ public class CalendarSourceICalForm extends CalendarSourceForm {
 	private final TextField regexTextField = new TextField("Regex");
 
 	public CalendarSourceICalForm() {
+		icalUrlTextfield.setTooltipText("Use `=@{now.plusYears(1).format(yyyy_MM_dd)}` to insert code.");
 
 		Button testButton = new Button("Test", evt -> test());
 

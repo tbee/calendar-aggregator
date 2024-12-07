@@ -277,7 +277,7 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 
 	/**
 	 * Using MVEL2 http://mvel.documentnode.com/
-	 *
+	 * Example: ...&filter[from]=@{now.minusMonths(1).format(yyyy_MM_dd)}&filter[until]=@{now.plusYears(1).format(yyyy_MM_dd)}
 	 * @param url
 	 * @return
 	 */
