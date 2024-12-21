@@ -84,7 +84,7 @@ abstract public class CalendarSourceScraperBaseHTML extends CalendarSourceScrape
 
 			// extract block
 			if (scrapeBlockStart != null && !scrapeBlockStart.isBlank()) {
-				text = text.substring(text.indexOf(scrapeBlockStart));
+				text = text.substring(text.indexOf(scrapeBlockStart) + scrapeBlockStart.length());
 				logAppend("Content after block start: " + text.length() + "\n");
 			}
 			if (scrapeBlockEnd != null && !scrapeBlockEnd.isBlank()) {
