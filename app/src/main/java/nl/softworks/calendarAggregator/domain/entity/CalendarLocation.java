@@ -12,6 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tbee.jakarta.validator.UrlValidator;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -159,8 +162,14 @@ public class CalendarLocation extends EntityBase<CalendarLocation> {
 	}
 
 	public String determineGoogleMapURL() {
-		return String.format(Locale.ENGLISH, "https://www.google.com/maps/search/?api=1&query=%f,%f", lat, lon);
-	}
+//		return String.format(Locale.ENGLISH, "https://www.google.com/maps/search/?api=1&query=%f,%f", lat, lon);
+        try {
+            return String.format(Locale.ENGLISH, "https://www.google.com/maps/search/?api=1&query=%s", URLEncoder.encode(location, StandardCharsets.UTF_8.toString()));
+        }
+        catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 	public String toString() {
 		return super.toString() //

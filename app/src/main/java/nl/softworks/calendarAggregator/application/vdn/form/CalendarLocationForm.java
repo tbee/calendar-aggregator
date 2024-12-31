@@ -1,6 +1,6 @@
 package nl.softworks.calendarAggregator.application.vdn.form;
 
-import com.vaadin.flow.component.AbstractField;
+import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -46,6 +46,7 @@ public class CalendarLocationForm extends FormLayout {
 	public CalendarLocationForm() {
 		latNumberField.setId("lat");
 		lonNumberField.setId("lon");
+		locationTextField.setId("location");
 
 		timezoneComboBox.setItemLabelGenerator(timezone -> timezone.name());
 		timezoneComboBox.setRenderer(new ComponentRenderer<>(timezone -> {
@@ -67,9 +68,9 @@ public class CalendarLocationForm extends FormLayout {
 		binder.forField(enabledCheckbox).bind(CalendarLocation::enabled, CalendarLocation::enabled);
 		binder.forField(timezoneComboBox).bind(CalendarLocation::timezone, CalendarLocation::timezone);
 		binder.addValueChangeListener(event ->  {
-			if (event instanceof AbstractField.ComponentValueChangeEvent componentValueChangeEvent) {
+			if (event instanceof ComponentValueChangeEvent componentValueChangeEvent) {
 				String id = componentValueChangeEvent.getSource().getId().orElse(null);
-				if ("lat".equals(id) || "lon".equals(id)) {
+				if ("location".equals(id) || "lat".equals(id) || "lon".equals(id)) {
                     try {
 						CalendarLocation cl = new CalendarLocation();
                         binder.writeBean(cl);
