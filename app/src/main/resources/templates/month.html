@@ -85,7 +85,10 @@
                                     </span>
                                     <span class="icon" style="width:14px; height:14px;">
                                         <a th:href="${event.calendarSource().determineUrl()}" target="_blank"><i class="fas fa-arrow-up-right-from-square fa-sm"></i></a>
-                                   </span>
+                                    </span>
+                                    <span class="icon" style="width:10px; height:14px;">
+                                        <a th:href="${event.calendarSource().calendarLocation().determineGoogleMapURL()}" target="_blank"><i class="fas fa-map-pin fa-sm"></i></a>
+                                    </span>
                                 </li>
                             </ul>
                         </div>

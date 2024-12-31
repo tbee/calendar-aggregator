@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 @Entity
 public class CalendarLocation extends EntityBase<CalendarLocation> {
@@ -155,6 +156,10 @@ public class CalendarLocation extends EntityBase<CalendarLocation> {
 			calendarEvents.addAll(calendarSource.generateEvents());
 		}
 		return calendarEvents;
+	}
+
+	public String determineGoogleMapURL() {
+		return String.format(Locale.ENGLISH, "https://www.google.com/maps/search/?api=1&query=%f,%f", lat, lon);
 	}
 
 	public String toString() {

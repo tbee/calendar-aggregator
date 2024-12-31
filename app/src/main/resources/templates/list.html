@@ -13,19 +13,19 @@
 </head>
 <body>
     <div id="legenda">
-            <span class="icon" th:each="labelGroup : ${labelGroups}" th:style="${'width:' + (labelGroup.name.length() * 10) + 'px; margin-right:5px;'}">
-                <div>
-                    <i class="css-icon" th:style="${'color:' + labelGroup.color() + '; background:' + labelGroup.background() + ';width:' + (labelGroup.name.length() * 10) + 'px;'}"><span th:text="${labelGroup.name()}">...</span></i>
-                </div>
-            </span>
+        <span class="icon" th:each="labelGroup : ${labelGroups}" th:style="${'width:' + (labelGroup.name.length() * 10) + 'px; margin-right:5px;'}">
+            <div>
+                <i class="css-icon" th:style="${'color:' + labelGroup.color() + '; background:' + labelGroup.background() + ';width:' + (labelGroup.name.length() * 10) + 'px;'}"><span th:text="${labelGroup.name()}">...</span></i>
+            </div>
+        </span>
     </div>
     <table class="table is-hoverable">
         <thead>
-        <tr>
-            <td>When</td>
-            <td>What</td>
-            <td>Check here</td>
-        </tr>
+            <tr>
+                <th>When</th>
+                <th>What</th>
+                <th>Where</th>
+            </tr>
         </thead>
         <tbody>
         <th:block th:each="startDate : ${#lists.sort(dateToEvents.keySet())}">
@@ -43,6 +43,9 @@
                 <td th:classappend="${dateIterStat.index == 0} ? datechange">
                     <span class="icon">
                         <a th:href="${event.calendarSource().calendarLocation().url()}" target="_blank"><i class="fas fa-arrow-up-right-from-square"></i></a>
+                    </span>
+                    <span class="icon" style="width:10px; height:14px;">
+                        <a th:href="${event.calendarSource().calendarLocation().determineGoogleMapURL()}" target="_blank"><i class="fas fa-map-pin fa-sm"></i></a>
                     </span>
                 </td>
             </tr>
