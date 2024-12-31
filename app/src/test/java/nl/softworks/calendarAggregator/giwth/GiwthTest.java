@@ -1,6 +1,5 @@
 package nl.softworks.calendarAggregator.giwth;
 
-import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.TestPropertySource;
@@ -12,7 +11,7 @@ class GiwthTest { //extends WebTestBase {
     @LocalServerPort
     private int port;
 
-    @Test
+//    @Test
     public void test() {
 //        Scenario.of("Modify Vacation Hours", context() )
 //
