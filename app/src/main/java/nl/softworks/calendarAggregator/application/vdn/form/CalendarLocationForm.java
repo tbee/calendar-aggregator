@@ -1,16 +1,20 @@
 package nl.softworks.calendarAggregator.application.vdn.form;
 
+import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import nl.softworks.calendarAggregator.application.vdn.component.AnchorIcon;
 import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.application.vdn.component.ResultDialog;
 import nl.softworks.calendarAggregator.domain.boundary.R;
@@ -36,16 +40,20 @@ public class CalendarLocationForm extends FormLayout {
 	private final NumberField lonNumberField = new NumberField("LON");
 	private final Checkbox enabledCheckbox = new Checkbox("Enabled");
 	private final ComboBox<Timezone> timezoneComboBox = new ComboBox<>("Timezone");
+	private final Anchor mapPinAnchor = AnchorIcon.mapPin("?");
 
 	private CalendarLocation calendarLocation;
 	public CalendarLocationForm() {
+		latNumberField.setId("lat");
+		lonNumberField.setId("lon");
+
 		timezoneComboBox.setItemLabelGenerator(timezone -> timezone.name());
 		timezoneComboBox.setRenderer(new ComponentRenderer<>(timezone -> {
 			Span nameSpan = new Span(timezone.name());
 			return nameSpan;
 		}));
 		setColspan(urlTextField, 2);
-		add(nameTextField, enabledCheckbox, urlTextField, locationTextField, timezoneComboBox, latNumberField, lonNumberField);
+		add(nameTextField, new HorizontalLayout(enabledCheckbox, mapPinAnchor), urlTextField, locationTextField, timezoneComboBox, latNumberField, lonNumberField);
 
 		Button generateButton = new Button("Generate", evt -> generate());
 		setColspan(generateButton, 2);
@@ -58,11 +66,27 @@ public class CalendarLocationForm extends FormLayout {
 		binder.forField(lonNumberField).bind(CalendarLocation::lon, CalendarLocation::lon);
 		binder.forField(enabledCheckbox).bind(CalendarLocation::enabled, CalendarLocation::enabled);
 		binder.forField(timezoneComboBox).bind(CalendarLocation::timezone, CalendarLocation::timezone);
+		binder.addValueChangeListener(event ->  {
+			if (event instanceof AbstractField.ComponentValueChangeEvent componentValueChangeEvent) {
+				String id = componentValueChangeEvent.getSource().getId().orElse(null);
+				if ("lat".equals(id) || "lon".equals(id)) {
+                    try {
+						CalendarLocation cl = new CalendarLocation();
+                        binder.writeBean(cl);
+						mapPinAnchor.setHref(cl.determineGoogleMapURL());
+                    }
+                    catch (ValidationException e) {
+                        throw new RuntimeException(e);
+                    }
+				}
+			}
+		});
 	}
 
 	public CalendarLocationForm populateWith(CalendarLocation calendarLocation) {
 		timezoneComboBox.setItems(R.timezone().findAll());
 		binder.readBean(calendarLocation);
+		mapPinAnchor.setHref(calendarLocation.determineGoogleMapURL());
 		this.calendarLocation = calendarLocation;
 		return this;
 	}

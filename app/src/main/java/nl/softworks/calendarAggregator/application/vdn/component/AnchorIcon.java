@@ -5,20 +5,37 @@ import com.vaadin.flow.component.html.Span;
 
 public class AnchorIcon {
 
-    static public Anchor jumpOut(String href) {
-        if (href == null) {
-            return null;
-        }
+    private final Anchor anchor;
 
+    public AnchorIcon(String href, String... classNames) {
         Span spanIcon = new Span();
-        spanIcon.addClassName("fas");
-        spanIcon.addClassName("fa-arrow-up-right-from-square");
+        for (String className : classNames) {
+            spanIcon.addClassName(className);
+        }
 
         Span spanWrapper = new Span(spanIcon);
         spanWrapper.addClassName("icon");
 
-        Anchor anchor = new Anchor(href, spanWrapper);
+        anchor = new Anchor(href, spanWrapper);
         anchor.setTarget("_blank");
-        return anchor;
+    }
+
+    public AnchorIcon href(String v) {
+        anchor.setHref(v);
+        return this;
+    }
+
+    static public Anchor jumpOut(String href) {
+        if (href == null) {
+            return null;
+        }
+        return new AnchorIcon(href, "fas", "fa-arrow-up-right-from-square").anchor;
+    }
+
+    static public Anchor mapPin(String href) {
+        if (href == null) {
+            return null;
+        }
+        return new AnchorIcon(href, "fas", "fa-map-pin").anchor;
     }
 }
