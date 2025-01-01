@@ -151,17 +151,7 @@ implements AfterNavigationObserver
 		TreeNode selectedTreeNode = getSelectedTreeNode();
 
 		// Sorting: not ok statuses should always come first
-		Comparator<CalendarLocation> compareByStatus = (cl1, cl2) -> {
-			boolean cl1ok = cl1.statusIsOk();
-			boolean cl2ok = cl2.statusIsOk();
-			if ((cl1ok && cl2ok) || (!cl1ok && !cl2ok)) {
-				return 0;
-			}
-			if (!cl1ok) {
-				return -1;
-			}
-			return 1;
-		};
+		Comparator<CalendarLocation> compareByStatus = Comparator.comparing(CalendarLocation::statusIsOk);
 		Comparator<CalendarLocation> compareByName = Comparator.comparing(CalendarLocation::name, String.CASE_INSENSITIVE_ORDER);
 
 		// Load data
