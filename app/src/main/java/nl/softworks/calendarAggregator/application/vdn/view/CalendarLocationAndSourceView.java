@@ -14,6 +14,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.shared.Tooltip;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.AfterNavigationEvent;
@@ -75,6 +76,7 @@ implements AfterNavigationObserver
 	public static final VaadinIcon ENABLED_ICON = VaadinIcon.CHECK;
 	public static final LumoIcon DISABLED_ICON = LumoIcon.CROSS;
 
+	private final TextField filterTextField = new TextField("Filter");
 	private final TreeGrid<TreeNode> treeGrid = new TreeGrid<>();
 
 	@Autowired
@@ -84,7 +86,11 @@ implements AfterNavigationObserver
 		super("Overview");
 		tabs.setSelectedTab(overviewTab);
 
-		// calendarSourceAndEventTreeGrid
+		filterTextField.setClearButtonVisible(true);
+		filterTextField.setPrefixComponent(VaadinIcon.FILTER.create());
+		filterTextField.addValueChangeListener(e -> reloadTreeGrid());
+		// Tried to implement this with a background task (using getUI().ifPresent(ui -> ui.access(() -> {}))), but the screen was not refreshed
+
 		treeGrid.addHierarchyColumn(TreeNode::text).setHeader("Name").setFlexGrow(100);
 		treeGrid.addComponentColumn(TreeNode::crudButtons).setHeader("").setFlexGrow(30);
 		treeGrid.addComponentColumn(TreeNode::enabled).setHeader("Enabled").setFlexGrow(5);
@@ -96,14 +102,13 @@ implements AfterNavigationObserver
 		treeGrid.addColumn(TreeNode::childrenCount).setHeader("Children").setFlexGrow(10);
 		treeGrid.addItemDoubleClickListener(e -> edit());
 
-		// buttonbar
 		CrudButtonbar crudButtonbar = new CrudButtonbar()
 				.onReload(this::reloadTreeGrid)
 				.onInsert(this::insert);
 		crudButtonbar.add(new Button("Generate", (ComponentEventListener<ClickEvent<Button>>) buttonClickEvent -> generate()));
 
-		// content
-		VerticalLayout verticalLayout = new VerticalLayout(crudButtonbar, treeGrid);
+		filterTextField.setWidthFull();
+		VerticalLayout verticalLayout = new VerticalLayout(crudButtonbar, filterTextField, treeGrid);
 		verticalLayout.setSizeFull();
 		setContent(verticalLayout);
 	}
@@ -145,22 +150,28 @@ implements AfterNavigationObserver
 		// Remember selection
 		TreeNode selectedTreeNode = getSelectedTreeNode();
 
-		// Refresh data
-		List<CalendarLocation> calendarLocations = R.calendarLocation().findAll();
-		// not ok statusses should always come first
+		// Sorting: not ok statuses should always come first
 		Comparator<CalendarLocation> compareByStatus = (cl1, cl2) -> {
-			boolean cs1ok = cl1.statusIsOk();
-			boolean cs2ok = cl2.statusIsOk();
-			if ((cs1ok && cs2ok) || (!cs1ok && !cs2ok)) {
+			boolean cl1ok = cl1.statusIsOk();
+			boolean cl2ok = cl2.statusIsOk();
+			if ((cl1ok && cl2ok) || (!cl1ok && !cl2ok)) {
 				return 0;
 			}
-			if (!cs1ok) {
+			if (!cl1ok) {
 				return -1;
 			}
 			return 1;
 		};
 		Comparator<CalendarLocation> compareByName = Comparator.comparing(CalendarLocation::name, String.CASE_INSENSITIVE_ORDER);
-		calendarLocations.sort(compareByStatus.thenComparing(compareByName));
+
+		// Load data
+		String filter = filterTextField.getValue().toLowerCase();
+		List<CalendarLocation> calendarLocations = R.calendarLocation().findAll().stream()
+				.filter(cl -> filter.isBlank() || cl.name().toLowerCase().contains(filter))
+				.sorted(compareByStatus.thenComparing(compareByName))
+				.toList();
+
+		// Create treenodes
 		List<TreeNode> treeNodes = treeNodes(calendarLocations, TreeNodeCalendarLocation::new);
 		treeGrid.setItems(treeNodes, TreeNode::getChildren);
 
