@@ -1,6 +1,7 @@
 package nl.softworks.calendarAggregator.application.vdn.form;
 
 import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
@@ -44,9 +45,6 @@ public class CalendarLocationForm extends FormLayout {
 
 	private CalendarLocation calendarLocation;
 	public CalendarLocationForm() {
-		latNumberField.setId("lat");
-		lonNumberField.setId("lon");
-		locationTextField.setId("location");
 
 		timezoneComboBox.setItemLabelGenerator(timezone -> timezone.name());
 		timezoneComboBox.setRenderer(new ComponentRenderer<>(timezone -> {
@@ -61,27 +59,31 @@ public class CalendarLocationForm extends FormLayout {
 		add(generateButton);
 
 		binder.forField(nameTextField).bind(CalendarLocation::name, CalendarLocation::name);
-		binder.forField(urlTextField).withValidator(s -> UrlValidatorImpl.isValid(s), "Illegal URL").bind(CalendarLocation::url, CalendarLocation::url);
+		binder.forField(urlTextField).withValidator(UrlValidatorImpl::isValid, "Illegal URL").bind(CalendarLocation::url, CalendarLocation::url);
 		binder.forField(locationTextField).bind(CalendarLocation::location, CalendarLocation::location);
 		binder.forField(latNumberField).bind(CalendarLocation::lat, CalendarLocation::lat);
 		binder.forField(lonNumberField).bind(CalendarLocation::lon, CalendarLocation::lon);
 		binder.forField(enabledCheckbox).bind(CalendarLocation::enabled, CalendarLocation::enabled);
 		binder.forField(timezoneComboBox).bind(CalendarLocation::timezone, CalendarLocation::timezone);
 		binder.addValueChangeListener(event ->  {
-			if (event instanceof ComponentValueChangeEvent componentValueChangeEvent) {
-				String id = componentValueChangeEvent.getSource().getId().orElse(null);
-				if ("location".equals(id) || "lat".equals(id) || "lon".equals(id)) {
-                    try {
-						CalendarLocation cl = new CalendarLocation();
-                        binder.writeBean(cl);
-						mapPinAnchor.setHref(cl.determineGoogleMapURL());
-                    }
-                    catch (ValidationException e) {
-                        throw new RuntimeException(e);
-                    }
+			if (event instanceof ComponentValueChangeEvent<?,?> componentValueChangeEvent) {
+				Component source = componentValueChangeEvent.getSource();
+				if (source == locationTextField || source == latNumberField || source == lonNumberField) {
+					setMapPinAnchorHrefFromFormFields();
 				}
 			}
 		});
+	}
+
+	private void setMapPinAnchorHrefFromFormFields() {
+		try {
+			CalendarLocation cl = new CalendarLocation();
+			binder.writeBean(cl);
+			mapPinAnchor.setHref(cl.determineGoogleMapURL());
+		}
+		catch (ValidationException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	public CalendarLocationForm populateWith(CalendarLocation calendarLocation) {
