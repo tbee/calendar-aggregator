@@ -27,14 +27,12 @@ public class GenerateEventsService {
 
     private final ThreadFactory virtualThreadFactory = Thread.ofVirtual().name("virtual-thread-", 0).factory(); // needed to name virtual threads
     private ExecutorService executorService = null;
-//    private static final ExecutorService executorService = Executors.newThreadPerTaskExecutor(virtualThreadFactory);
-//    private static final ExecutorService executorService = Executors.newFixedThreadPool(10 - 1, virtualThreadFactory); // 10 equals the Hikari poolsize
 
     @PostConstruct
     public void postConstruct() {
-        int executorSize = hikariMaximumPoolSize / 2;
+        int executorSize = hikariMaximumPoolSize / 2;  // less threads than connections: leave some connections available for a.o. the UI to update
         if (LOGGER.isInfoEnabled())  LOGGER.info("GenerateEventsService executorSize=" + executorSize);
-        executorService = Executors.newFixedThreadPool(executorSize, virtualThreadFactory); // leave some connections available for a.o. the UI to update
+        executorService = Executors.newFixedThreadPool(executorSize, virtualThreadFactory);
     }
 
     @PreDestroy
