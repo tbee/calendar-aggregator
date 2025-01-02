@@ -46,7 +46,7 @@ public class CalendarSourcePreprocess extends EntityBase<CalendarSourcePreproces
 	}
 
 	public String preprocess(String html) {
-		if (LOGGER.isInfoEnabled()) LOGGER.info("Preprocess: " + oldValue + " -> " + newValue);
+		if (LOGGER.isDebugEnabled()) LOGGER.debug("Preprocess: " + oldValue + " -> " + newValue);
 		return html.replaceAll(oldValue, newValue);
 	}
 }

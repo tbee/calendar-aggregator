@@ -1,9 +1,12 @@
 package nl.softworks.calendarAggregator.domain.service;
 
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.PrintWriter;
@@ -19,27 +22,35 @@ import java.util.concurrent.TimeUnit;
 public class GenerateEventsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEventsService.class);
 
-    private static final ThreadFactory virtualThreadFactory = Thread.ofVirtual().name("virtual-thread-", 0).factory(); // needed to name virtual threads
-    private static final ExecutorService executorService = Executors.newThreadPerTaskExecutor(virtualThreadFactory);
+    @Value("${spring.datasource.hikari.maximumPoolSize}")
+    private int hikariMaximumPoolSize;
 
-    static {
-        // Handle clean shutdown
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            if (LOGGER.isInfoEnabled())  LOGGER.info("GenerateEventsService shutting down");
-            executorService.shutdown();
-            try {
-                if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
-                    executorService.shutdownNow();
-                    if (!executorService.awaitTermination(5, TimeUnit.SECONDS)) {
-                        throw new IllegalStateException("GenerateEventsService did not terminate");
-                    }
+    private final ThreadFactory virtualThreadFactory = Thread.ofVirtual().name("virtual-thread-", 0).factory(); // needed to name virtual threads
+    private ExecutorService executorService = null;
+//    private static final ExecutorService executorService = Executors.newThreadPerTaskExecutor(virtualThreadFactory);
+//    private static final ExecutorService executorService = Executors.newFixedThreadPool(10 - 1, virtualThreadFactory); // 10 equals the Hikari poolsize
+
+    @PostConstruct
+    public void postConstruct() {
+        executorService = Executors.newFixedThreadPool(hikariMaximumPoolSize - 1, virtualThreadFactory); // leave one available for the UI to update
+    }
+
+    @PreDestroy
+    public void preDestroy() {
+        if (LOGGER.isInfoEnabled())  LOGGER.info("GenerateEventsService shutting down");
+        executorService.shutdown();
+        try {
+            if (!executorService.awaitTermination(10, TimeUnit.SECONDS)) {
+                executorService.shutdownNow();
+                if (!executorService.awaitTermination(5, TimeUnit.SECONDS)) {
+                    throw new IllegalStateException("GenerateEventsService did not terminate");
                 }
-                if (LOGGER.isInfoEnabled())  LOGGER.info("GenerateEventsService shutdown");
             }
-            catch (InterruptedException e) {
-                if (LOGGER.isInfoEnabled())  LOGGER.info("GenerateEventsService shutdown failure", e);
-            }
-        }));
+            if (LOGGER.isInfoEnabled())  LOGGER.info("GenerateEventsService shutdown");
+        }
+        catch (InterruptedException e) {
+            if (LOGGER.isInfoEnabled())  LOGGER.info("GenerateEventsService shutdown failure", e);
+        }
     }
 
     public void generateEvents() {
