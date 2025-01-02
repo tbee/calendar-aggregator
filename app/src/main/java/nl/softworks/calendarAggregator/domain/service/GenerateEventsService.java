@@ -32,7 +32,9 @@ public class GenerateEventsService {
 
     @PostConstruct
     public void postConstruct() {
-        executorService = Executors.newFixedThreadPool(hikariMaximumPoolSize - 1, virtualThreadFactory); // leave one available for the UI to update
+        int executorSize = hikariMaximumPoolSize / 2;
+        if (LOGGER.isInfoEnabled())  LOGGER.info("GenerateEventsService executorSize=" + executorSize);
+        executorService = Executors.newFixedThreadPool(executorSize, virtualThreadFactory); // leave some connections available for a.o. the UI to update
     }
 
     @PreDestroy
