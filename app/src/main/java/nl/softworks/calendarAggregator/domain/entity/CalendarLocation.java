@@ -164,7 +164,7 @@ public class CalendarLocation extends EntityBase<CalendarLocation> {
 	public String determineGoogleMapURL() {
 //		return String.format(Locale.ENGLISH, "https://www.google.com/maps/search/?api=1&query=%f,%f", lat, lon);
         try {
-            return String.format(Locale.ENGLISH, "https://www.google.com/maps/search/?api=1&query=%s", URLEncoder.encode(location, StandardCharsets.UTF_8.toString()));
+            return String.format(Locale.ENGLISH, "https://www.google.com/maps/search/?api=1&query=%s", location == null ? "" : URLEncoder.encode(location, StandardCharsets.UTF_8.toString()));
         }
         catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
