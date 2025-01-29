@@ -1,4 +1,4 @@
-package nl.softworks.calendarAggregator.application.rest.pub;
+package nl.softworks.calendarAggregator.application.http;
 
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;

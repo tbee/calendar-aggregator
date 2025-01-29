@@ -2,9 +2,20 @@
 <html lang="en" th:replace="~{template :: template(~{::head},~{::body})}">
 <head>
     <style>
-        .today {
-            background: #c0c0c0!important;
+        body {
+            background-color: Canvas;
+            color: CanvasText;
+            color-scheme: light dark;
         }
+
+        .weekend {
+            background: color-mix(in srgb, Canvas, CanvasText 15.0%)!important;
+        }
+
+        .today {
+            background: color-mix(in srgb, Canvas, Highlight 25.0%)!important;
+        }
+
         .pagewidth {
             width:100%;
         }
@@ -68,7 +79,7 @@
             </thead>
             <tbody>
                 <tr th:each="dates : ${weekOfDates}">
-                    <td th:each="date,dateIterStat : ${dates}" th:classappend="${(dateIsOutsideMonth.get(date) ? 'outside-month' : 'inside-month') + ' ' + (today.equals(date) ? 'today': '')}">
+                    <td th:each="date,dateIterStat : ${dates}" th:classappend="${(dateIsOutsideMonth.get(date) ? 'outside-month' : 'inside-month') + ' ' + (date.getDayOfWeek().getValue() == 6 || date.getDayOfWeek().getValue() == 7 ? 'weekend' : '') + ' ' + (today.equals(date) ? 'today': '')}">
                         <h5 class="title is-5" th:text="${#temporals.format(date,'d')}">...</h5>
                         <div class="">
                             <ul>

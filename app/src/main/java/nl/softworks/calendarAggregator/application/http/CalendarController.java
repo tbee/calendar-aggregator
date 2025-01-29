@@ -1,4 +1,4 @@
-package nl.softworks.calendarAggregator.application.rest.pub;
+package nl.softworks.calendarAggregator.application.http;
 
 import com.google.common.collect.Lists;
 import jakarta.servlet.http.HttpServletRequest;
