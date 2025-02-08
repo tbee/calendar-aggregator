@@ -36,27 +36,11 @@
             margin-bottom: 0!important;
         }
         .outside-month > h5 {
-            color: lightgray!important;
+            xxxcolor: lightgray!important;
         }
     </style>
 </head>
 <body>
-    <div class="columns is-gapless">
-        <div class="column alignright">
-            <span class="icon">
-                <a th:href="${settings.websiteBaseurl() + '/?year=' + prevyear + '&month=' + prevmonth + '&' + filterQueryString}"><i class="fas fa-arrow-left fa-2xl"></i></a>
-            </span>
-        </div>
-        <div class="column is-one-fifth">
-            <h3 class="title is-4 centered" th:text="${yyyy.format(monthStart)}"></h3>
-            <h3 class="subtitle is-4 centered" th:text="${mmm.format(monthStart)}"></h3>
-        </div>
-        <div class="column">
-            <span class="icon">
-                <a th:href="${settings.websiteBaseurl() + '/?year=' + nextyear + '&month=' + nextmonth + '&' + filterQueryString}"><i class="fas fa-arrow-right fa-2xl"></i></a>
-            </span>
-        </div>
-    </div>
     <div id="legenda">
         <span class="icon" th:each="labelGroup : ${labelGroups}" th:style="${'width:' + (labelGroup.name.length() * 10) + 'px; margin-right:5px;'}">
             <div>
@@ -79,8 +63,8 @@
             </thead>
             <tbody>
                 <tr th:each="dates : ${weekOfDates}">
-                    <td th:each="date,dateIterStat : ${dates}" th:classappend="${(dateIsOutsideMonth.get(date) ? 'outside-month' : 'inside-month') + ' ' + (date.getDayOfWeek().getValue() == 6 || date.getDayOfWeek().getValue() == 7 ? 'weekend' : '') + ' ' + (today.equals(date) ? 'today': '')}">
-                        <h5 class="title is-5" th:text="${#temporals.format(date,'d')}">...</h5>
+                    <td th:each="date,dateIterStat : ${dates}" th:classappend="${(date.getDayOfWeek().getValue() == 6 || date.getDayOfWeek().getValue() == 7 ? 'weekend' : '') + ' ' + (today.equals(date) ? 'today': '')}">
+                        <h5 class="title is-5" th:text="${#temporals.format(date,'MMM dd')}">...</h5>
                         <div class="">
                             <ul>
                                 <li th:each="event : ${#lists.sort(dateToEvents.get(date), eventStartDateTimeComparator)}">
@@ -107,6 +91,12 @@
                 </tr>
             </tbody>
         </table>
+        <div class="centered" style="width: 100%;">
+            <span class="icon" style="width:50px;">
+                <a th:href="${settings.websiteBaseurl() + '/?moreWeeks=' + nextBlock}"><i class="fas fa-caret-down fa-xl"></i><i class="fas fa-caret-down fa-xl"></i><i class="fas fa-caret-down fa-xl"></i></a>
+            </span>
+        </div>
+
     </div>
 </body>
 </html>
