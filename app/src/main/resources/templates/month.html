@@ -92,11 +92,12 @@
             </tbody>
         </table>
         <div class="centered" style="width: 100%;">
-            <span class="icon" style="width:50px;">
-                <a th:href="${settings.websiteBaseurl() + '/?moreWeeks=' + nextBlock}"><i class="fas fa-caret-down fa-xl"></i><i class="fas fa-caret-down fa-xl"></i><i class="fas fa-caret-down fa-xl"></i></a>
+            <span id="showMore" class="icon" style="width:50px; margin-bottom: 10px;">
+                <a th:hx-get="${settings.websiteBaseurl() + '/?moreWeeks=' + nextBlock}" hx-select="#calendarwrapper" hx-target="#calendarwrapper" hx-swap="outerHTML">
+                    <i class="fas fa-caret-down fa-xl"></i><i class="fas fa-caret-down fa-xl"></i><i class="fas fa-caret-down fa-xl"></i>
+                </a>
             </span>
         </div>
-
     </div>
 </body>
 </html>

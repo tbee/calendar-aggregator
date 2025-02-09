@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" th:fragment="template(header,body)">
 <head>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+    <script src="https://unpkg.com/idiomorph@0.3.0/dist/idiomorph-ext.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
     <script src="https://kit.fontawesome.com/501b8808a2.js" crossorigin="anonymous"></script>
     <!-- https://github.com/justboil/bulma-checkbox?tab=readme-ov-file -->
@@ -105,7 +107,7 @@
     </style>
     <th:block th:replace="${header}" />
 </head>
-<body>
+<body hx-ext="morph">
 <section class="section">
     <h1 class="title" th:text="${settings.title()}">...</h1>
     <h2 class="subtitle" th:text="${settings.subtitle()}">...</h2>
