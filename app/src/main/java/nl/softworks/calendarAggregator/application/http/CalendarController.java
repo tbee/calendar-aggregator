@@ -147,10 +147,11 @@ public class CalendarController {
             moreWeeks = 6;
         }
         model.addAttribute("nextBlock", moreWeeks + 4);
-        model.addAttribute("today", LocalDate.now());
 
         // start at monday
         LocalDate now = LocalDate.now();
+        model.addAttribute("today", now);
+        model.addAttribute("startOfMonth", now.withDayOfMonth(1));
         LocalDate renderStart = now.minusDays(now.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
         LocalDate renderEnd = renderStart.plusDays(moreWeeks * 7L);
 
@@ -176,13 +177,6 @@ public class CalendarController {
                 .map(date -> Pair.of(date, dateToEventsWithPossibleEmptyDates.get(date) == null ? new ArrayList<CalendarEvent>() : dateToEventsWithPossibleEmptyDates.get(date)))
                 .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
         model.addAttribute("dateToEvents", dateToEvents);
-
-        // Is a date inside or outside the month
-        // ${(dateIsOutsideMonth.get(date) ? 'outside-month' : 'inside-month') + ' ' +
-//        Map<LocalDate, Boolean> dateIsOutsideMonth = toBeRenderedDates.stream()
-//                .map(date -> Pair.of(date, date.isBefore(monthStart) || date.isAfter(monthEnd)))
-//                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
-//        model.addAttribute("dateIsOutsideMonth", dateIsOutsideMonth);
 
         // The text of an event
         Map<CalendarEvent, String> eventToText = events.stream()

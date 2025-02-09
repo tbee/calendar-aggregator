@@ -8,11 +8,11 @@
             color-scheme: light dark;
         }
 
-        .weekend {
+        .day.weekend {
             background: color-mix(in srgb, Canvas, CanvasText 15.0%)!important;
         }
 
-        .today {
+        .day.today {
             background: color-mix(in srgb, Canvas, Highlight 25.0%)!important;
         }
 
@@ -35,8 +35,14 @@
         tbody h5 {
             margin-bottom: 0!important;
         }
-        .outside-month > h5 {
-            xxxcolor: lightgray!important;
+        .even-month {
+        }
+        .odd-month {
+            background: color-mix(in srgb, Canvas, CanvasText 5.0%)!important;
+        }
+
+        circle {
+            fill: CanvasText;
         }
     </style>
 </head>
@@ -63,7 +69,7 @@
             </thead>
             <tbody>
                 <tr th:each="dates : ${weekOfDates}">
-                    <td th:each="date,dateIterStat : ${dates}" th:classappend="${(date.getDayOfWeek().getValue() == 6 || date.getDayOfWeek().getValue() == 7 ? 'weekend' : '') + ' ' + (today.equals(date) ? 'today': '')}">
+                    <td th:each="date,dateIterStat : ${dates}" class="day" th:classappend="${(T(java.time.Period).between(startOfMonth, date).months % 2 == 0 ? 'even-month' : 'odd-month') + ' ' + (date.getDayOfWeek().getValue() == 6 || date.getDayOfWeek().getValue() == 7 ? 'weekend' : '') + ' ' + (today.equals(date) ? 'today': '')}">
                         <h5 class="title is-5" th:text="${#temporals.format(date,'MMM dd')}">...</h5>
                         <div class="">
                             <ul>
@@ -94,7 +100,11 @@
         <div class="centered" style="width: 100%;">
             <span id="showMore" class="icon" style="width:50px; margin-bottom: 10px;">
                 <a th:hx-get="${settings.websiteBaseurl() + '/?moreWeeks=' + nextBlock}" hx-select="#calendarwrapper" hx-target="#calendarwrapper" hx-swap="outerHTML">
-                    <i class="fas fa-caret-down fa-xl"></i><i class="fas fa-caret-down fa-xl"></i><i class="fas fa-caret-down fa-xl"></i>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 20" id="More-1-Fill--Streamline-Mingcute-Fill" width="100" height="30">
+                        <circle cx="10" cy="10" r="4" />
+                        <circle cx="20" cy="10" r="4" />
+                        <circle cx="30" cy="10" r="4" />
+                    </svg>
                 </a>
             </span>
         </div>
