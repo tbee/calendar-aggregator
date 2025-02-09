@@ -38,8 +38,7 @@ public class CalendarController {
     private void prepareTemplate(Model model, HttpServletRequest request,
                                  Double lat, Double lon, Integer distance,
                                  List<Label> labelInclude, List<Label> labelExclude,
-                                 Boolean showHidden,
-                                 Integer year, Integer month) {
+                                 Boolean showHidden) {
         model.addAttribute("settings", Settings.get());
         model.addAttribute("request", request);
         model.addAttribute("lat", lat);
@@ -48,18 +47,12 @@ public class CalendarController {
         model.addAttribute("labels", R.label().findAllByOrderBySeqnrAsc());
         model.addAttribute("labelsInclude", labelInclude);
         model.addAttribute("labelsExclude", labelExclude);
-        model.addAttribute("year", year == null ? "" : year.toString());
-        model.addAttribute("month", month == null ? "" : month.toString());
 
         String filterQueryString = "lat=" + nullToEmpty(lat) + "&lon=" + nullToEmpty(lon) + "&distance=" + nullToEmpty(distance)
                 + labelInclude.stream().map(l -> "&labelInclude=" + URLEncoder.encode(l.name(), StandardCharsets.UTF_8)).collect(Collectors.joining())
                 + labelExclude.stream().map(l -> "&labelExclude=" + URLEncoder.encode(l.name(), StandardCharsets.UTF_8)).collect(Collectors.joining())
                 + (showHidden == null ? "" : "&showHidden=" + showHidden);
-        String ymQueryString = "year=" + (year == null ? "" : year.toString()) + "&month=" + (month == null ? "" : month.toString());
-        String filterPlusYMQueryString = filterQueryString + "&" + ymQueryString;
         model.addAttribute("filterQueryString", filterQueryString);
-        model.addAttribute("ymQueryString", ymQueryString);
-        model.addAttribute("filterPlusYMQueryString", filterPlusYMQueryString);
     }
 
     // example http://localhost:8080/list
@@ -74,7 +67,7 @@ public class CalendarController {
 
         List<Label> labelsInclude = labelsNameToEntities(labelNamesInclude);
         List<Label> labelsExclude = labelsNameToEntities(labelNamesExclude);
-        prepareTemplate(model, request, lat, lon, distance, labelsInclude, labelsExclude, showHidden, null, null);
+        prepareTemplate(model, request, lat, lon, distance, labelsInclude, labelsExclude, showHidden);
 
         // Collect events
         LocalDateTime threshold = LocalDateTime.now();
@@ -131,7 +124,7 @@ public class CalendarController {
 
         List<Label> labelsInclude = labelsNameToEntities(labelNamesInclude);
         List<Label> labelsExclude = labelsNameToEntities(labelNamesExclude);
-        prepareTemplate(model, request, lat, lon, distance, labelsInclude, labelsExclude, showHidden, LocalDate.now().getYear(), LocalDate.now().getMonthValue());
+        prepareTemplate(model, request, lat, lon, distance, labelsInclude, labelsExclude, showHidden);
         DateTimeFormatter yyyymmdd = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
         DateTimeFormatter yyyy = DateTimeFormatter.ofPattern("yyyy", Locale.ENGLISH);
         DateTimeFormatter mmm = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH);

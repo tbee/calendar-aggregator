@@ -218,10 +218,8 @@
                 <div class="field-body">
                     <div class="field">
                         <p class="control">
-                            <input name="year" type="hidden" th:value="${year}"/>
-                            <input name="month" type="hidden" th:value="${month}"/>
                             <input class="button is-primary" type="submit" value="Go!"/>
-                            <a th:href="${settings.websiteBaseurl() + request.requestURI + '?' + ymQueryString}" class="button">Clear all</a>
+                            <a th:href="${settings.websiteBaseurl() + request.requestURI}" class="button">Clear all</a>
                         </p>
                     </div>
                 </div>
