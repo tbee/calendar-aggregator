@@ -134,14 +134,14 @@ public class CalendarController {
         if (numberOfWeeks == null || numberOfWeeks == 0) {
             numberOfWeeks = 6;
         }
-        model.addAttribute("nextBlock", numberOfWeeks + 4);
+        model.addAttribute("numberOfWeeks", numberOfWeeks);
 
         // start at monday
         LocalDate now = LocalDate.now();
         model.addAttribute("today", now);
         model.addAttribute("startOfMonth", now.withDayOfMonth(1));
         LocalDate renderStart = now.minusDays(now.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
-        LocalDate renderEnd = renderStart.plusDays(numberOfWeeks * 7L);
+        LocalDate renderEnd = renderStart.plusDays((numberOfWeeks * 7L) - 1L);
 
         // Split into weeks
         List<LocalDate> toBeRenderedDates = renderStart.datesUntil(renderEnd.plusDays(1)).toList();
