@@ -117,7 +117,7 @@ public class CalendarController {
             , @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance
             , @RequestParam(required = false) Boolean showHidden
             , @RequestParam(defaultValue = "", name = "labelInclude") List<String> labelNamesInclude, @RequestParam(defaultValue = "", name = "labelExclude") List<String> labelNamesExclude
-            , @RequestParam(defaultValue = "0") Integer moreWeeks) {
+            , @RequestParam(defaultValue = "0") Integer numberOfWeeks) {
 
         final ZoneId viewZoneId = ZoneId.of("Europe/Amsterdam"); // TODO: can the browser tell us this? Show the timezone in the page.
         model.addAttribute("viewZoneId", viewZoneId);
@@ -125,28 +125,23 @@ public class CalendarController {
         List<Label> labelsInclude = labelsNameToEntities(labelNamesInclude);
         List<Label> labelsExclude = labelsNameToEntities(labelNamesExclude);
         prepareTemplate(model, request, lat, lon, distance, labelsInclude, labelsExclude, showHidden);
-        DateTimeFormatter yyyymmdd = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
-        DateTimeFormatter yyyy = DateTimeFormatter.ofPattern("yyyy", Locale.ENGLISH);
-        DateTimeFormatter mmm = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH);
-        DateTimeFormatter dd = DateTimeFormatter.ofPattern("d", Locale.ENGLISH);
+        DateTimeFormatter mmmdd = DateTimeFormatter.ofPattern("MMM dd", Locale.ENGLISH);
         DateTimeFormatter hhmm = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH);
-        model.addAttribute("yyyymmdd", yyyymmdd);
-        model.addAttribute("yyyy", yyyy);
-        model.addAttribute("mmm", mmm);
+        model.addAttribute("mmmdd", mmmdd);
         model.addAttribute("hhmm", hhmm);
 
         // Default parameter values
-        if (moreWeeks == null || moreWeeks == 0) {
-            moreWeeks = 6;
+        if (numberOfWeeks == null || numberOfWeeks == 0) {
+            numberOfWeeks = 6;
         }
-        model.addAttribute("nextBlock", moreWeeks + 4);
+        model.addAttribute("nextBlock", numberOfWeeks + 4);
 
         // start at monday
         LocalDate now = LocalDate.now();
         model.addAttribute("today", now);
         model.addAttribute("startOfMonth", now.withDayOfMonth(1));
         LocalDate renderStart = now.minusDays(now.getDayOfWeek().getValue() - DayOfWeek.MONDAY.getValue());
-        LocalDate renderEnd = renderStart.plusDays(moreWeeks * 7L);
+        LocalDate renderEnd = renderStart.plusDays(numberOfWeeks * 7L);
 
         // Split into weeks
         List<LocalDate> toBeRenderedDates = renderStart.datesUntil(renderEnd.plusDays(1)).toList();
