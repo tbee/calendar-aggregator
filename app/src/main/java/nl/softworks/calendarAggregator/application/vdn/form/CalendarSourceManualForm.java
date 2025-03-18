@@ -13,13 +13,13 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import nl.softworks.calendarAggregator.application.vdn.component.CrudButtonbar;
-import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceManual;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceManualExdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tbee.webstack.vdn.component.CrudButtonbar;
+import org.tbee.webstack.vdn.component.OkCancelDialog;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

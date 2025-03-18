@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.event.ApplicationPreparedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.core.env.ConfigurableEnvironment;
-import org.tbee.webstack.hsqldb.HsqlEmbedded;
+import org.tbee.webstack.hsqldb.HsqlEmbeddedServer;
 
 /**
  * Must be registered in META-INF/spring.factories like so:
@@ -22,7 +22,7 @@ public class ApplicationPrepared implements ApplicationListener<ApplicationPrepa
         String password = environment.getProperty("spring.datasource.password");
 
         // Start HSQLDB
-        new HsqlEmbedded()
+        new HsqlEmbeddedServer()
                 .portFromUrl(url)
                 .username(username)
                 .password(password)

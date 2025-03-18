@@ -7,11 +7,11 @@ import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import nl.softworks.calendarAggregator.application.vdn.CalendarAggregatorAppLayout;
-import nl.softworks.calendarAggregator.application.vdn.component.CrudButtonbar;
-import nl.softworks.calendarAggregator.application.vdn.component.OkCancelDialog;
 import nl.softworks.calendarAggregator.application.vdn.form.AbstractCrudForm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tbee.webstack.vdn.component.CrudButtonbar;
+import org.tbee.webstack.vdn.component.OkCancelDialog;
 
 import java.util.List;
 import java.util.Set;
