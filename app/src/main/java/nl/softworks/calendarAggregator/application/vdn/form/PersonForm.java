@@ -11,8 +11,9 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import nl.softworks.calendarAggregator.domain.entity.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tbee.webstack.vdn.form.AbstractCrudFormLayout;
 
-public class PersonForm extends AbstractCrudForm<Person> {
+public class PersonForm extends AbstractCrudFormLayout<Person> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PersonForm.class);
 
 	private final Binder<Person> binder = new Binder<>();

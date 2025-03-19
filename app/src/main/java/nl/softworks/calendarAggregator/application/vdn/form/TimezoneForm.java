@@ -7,8 +7,9 @@ import com.vaadin.flow.data.binder.ValidationException;
 import nl.softworks.calendarAggregator.domain.entity.Timezone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tbee.webstack.vdn.form.AbstractCrudFormLayout;
 
-public class TimezoneForm extends AbstractCrudForm<Timezone> {
+public class TimezoneForm extends AbstractCrudFormLayout<Timezone> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TimezoneForm.class);
 
 	private final Binder<Timezone> binder = new Binder<>();

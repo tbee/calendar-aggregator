@@ -13,8 +13,9 @@ import nl.softworks.calendarAggregator.domain.entity.Label;
 import nl.softworks.calendarAggregator.domain.entity.LabelGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tbee.webstack.vdn.form.AbstractCrudFormLayout;
 
-public class LabelForm extends AbstractCrudForm<Label> {
+public class LabelForm extends AbstractCrudFormLayout<Label> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LabelForm.class);
 
 	private final Binder<Label> binder = new Binder<>();

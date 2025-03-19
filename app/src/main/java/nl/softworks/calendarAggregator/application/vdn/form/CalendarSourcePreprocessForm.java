@@ -6,8 +6,9 @@ import com.vaadin.flow.data.binder.ValidationException;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourcePreprocess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tbee.webstack.vdn.form.AbstractCrudFormLayout;
 
-public class CalendarSourcePreprocessForm extends AbstractCrudForm<CalendarSourcePreprocess> {
+public class CalendarSourcePreprocessForm extends AbstractCrudFormLayout<CalendarSourcePreprocess> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourcePreprocessForm.class);
 
 	private final Binder<CalendarSourcePreprocess> binder = new Binder<>();

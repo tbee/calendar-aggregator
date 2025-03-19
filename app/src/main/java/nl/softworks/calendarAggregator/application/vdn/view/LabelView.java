@@ -7,24 +7,32 @@ import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.data.provider.SortDirection;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.router.AfterNavigationEvent;
+import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.Route;
 import jakarta.annotation.security.RolesAllowed;
+import nl.softworks.calendarAggregator.application.vdn.CalendarAggregatorAppLayout;
 import nl.softworks.calendarAggregator.application.vdn.form.LabelForm;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.Label;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tbee.webstack.vdn.component.CrudComponent;
 
 import java.util.List;
 
 @Route("/label")
 @StyleSheet("context://../vaadin.css")
 @RolesAllowed("ROLE_ADMIN")
-public class LabelView extends AbstractCrudView<Label> {
+public class LabelView extends CalendarAggregatorAppLayout implements AfterNavigationObserver {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LabelView.class);
 
+	private final CrudComponent<Label> crudComponent;
+
 	public LabelView() {
-		super("Label"
+		super("Label");
+		tabs.setSelectedTab(labelGroupTab);
+		setContent(crudComponent = new CrudComponent<>(getPageTitle()
 				, Label::new
 				, p -> R.label().save(p)
 				, p -> R.label().delete(p)
@@ -47,7 +55,11 @@ public class LabelView extends AbstractCrudView<Label> {
 						return badge;
 					})).setHeader("Icon visual");
 					grid.sort(List.of(new GridSortOrder<>(seqnrColumn, SortDirection.ASCENDING)));
-				});
-		tabs.setSelectedTab(labelTab);
+				}));
+	}
+
+	@Override
+	public void afterNavigation(AfterNavigationEvent event) {
+		crudComponent.reloadGrid();
 	}
 }

@@ -6,8 +6,9 @@ import com.vaadin.flow.data.binder.ValidationException;
 import nl.softworks.calendarAggregator.domain.entity.LabelGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tbee.webstack.vdn.form.AbstractCrudFormLayout;
 
-public class LabelGroupForm extends AbstractCrudForm<LabelGroup> {
+public class LabelGroupForm extends AbstractCrudFormLayout<LabelGroup> {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LabelGroupForm.class);
 
 	private final Binder<LabelGroup> binder = new Binder<>();
