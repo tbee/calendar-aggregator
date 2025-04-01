@@ -15,6 +15,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import nl.softworks.calendarAggregator.application.vdn.component.AnchorIcon;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
@@ -22,7 +23,6 @@ import nl.softworks.calendarAggregator.domain.entity.Timezone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tbee.jakarta.validator.UrlValidatorImpl;
-import org.tbee.webstack.vdn.component.AnchorIcon;
 import org.tbee.webstack.vdn.component.OkCancelDialog;
 import org.tbee.webstack.vdn.component.ResultDialog;
 
@@ -46,7 +46,7 @@ public class CalendarLocationForm extends FormLayout {
 	private CalendarLocation calendarLocation;
 	public CalendarLocationForm() {
 
-		timezoneComboBox.setItemLabelGenerator(timezone -> timezone.name());
+		timezoneComboBox.setItemLabelGenerator(Timezone::name);
 		timezoneComboBox.setRenderer(new ComponentRenderer<>(timezone -> {
 			Span nameSpan = new Span(timezone.name());
 			return nameSpan;
