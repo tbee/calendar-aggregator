@@ -24,6 +24,7 @@ import com.vaadin.flow.theme.lumo.LumoIcon;
 import jakarta.annotation.security.RolesAllowed;
 import nl.softworks.calendarAggregator.application.vdn.CalendarAggregatorAppLayout;
 import nl.softworks.calendarAggregator.application.vdn.component.AnchorIcon;
+import nl.softworks.calendarAggregator.application.vdn.component.ResultDialog;
 import nl.softworks.calendarAggregator.application.vdn.form.CalendarLocationForm;
 import nl.softworks.calendarAggregator.application.vdn.form.CalendarSourceForm;
 import nl.softworks.calendarAggregator.application.vdn.form.CalendarSourceICalForm;
@@ -44,12 +45,10 @@ import nl.softworks.calendarAggregator.domain.service.GenerateEventsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.tbee.webstack.vdn.component.CancelDialog;
+import org.tbee.webstack.vdn.component.ConfirmationDialog;
 import org.tbee.webstack.vdn.component.CrudButtonbar;
 import org.tbee.webstack.vdn.component.CrudIconButtonbar;
 import org.tbee.webstack.vdn.component.IconButton;
-import org.tbee.webstack.vdn.component.OkCancelDialog;
-import org.tbee.webstack.vdn.component.ResultDialog;
 import org.tbee.webstack.vdn.component.VButton;
 
 import java.io.PrintWriter;
@@ -310,26 +309,26 @@ implements AfterNavigationObserver
 			treeGrid.select(this); // for reselect after reload
 
 			VerticalLayout verticalLayout = new VerticalLayout();
-			CancelDialog addSelectionDialog = new CancelDialog("Add", verticalLayout);
+			ConfirmationDialog addSelectionDialog = ConfirmationDialog.confirm("Add", verticalLayout);
 
 			verticalLayout.add(new VButton("Manual Source", e -> showInsertForm(addSelectionDialog, new CalendarSourceManual(), new CalendarSourceManualForm(), calendarSource))
-					.withIsPrimary(calendarSource != null));
+					.isPrimary(calendarSource != null));
 
 			verticalLayout.add(new VButton("Regex Source", e -> showInsertForm(addSelectionDialog, new CalendarSourceRegexScraper(), new CalendarSourceRegexScraperForm(), calendarSource))
-					.withIsPrimary(calendarSource instanceof CalendarSourceRegexScraper));
+					.isPrimary(calendarSource instanceof CalendarSourceRegexScraper));
 
 			verticalLayout.add(new VButton("Multiple days Source", e -> showInsertForm(addSelectionDialog, new CalendarSourceMultipleDaysScraper(), new CalendarSourceMultipleDaysScraperForm(), calendarSource))
-					.withIsPrimary(calendarSource instanceof CalendarSourceMultipleDaysScraper));
+					.isPrimary(calendarSource instanceof CalendarSourceMultipleDaysScraper));
 
 			verticalLayout.add(new VButton("ICal Source", e -> showInsertForm(addSelectionDialog, new CalendarSourceICal(), new CalendarSourceICalForm(), calendarSource))
-					.withIsPrimary(calendarSource instanceof CalendarSourceICal));
+					.isPrimary(calendarSource instanceof CalendarSourceICal));
 
 			verticalLayout.add(new VButton("XML/JSON Source", e -> showInsertForm(addSelectionDialog, new CalendarSourceXmlScraper(), new CalendarSourceXmlScraperForm(), calendarSource))
-					.withIsPrimary(calendarSource instanceof CalendarSourceXmlScraper));
+					.isPrimary(calendarSource instanceof CalendarSourceXmlScraper));
 
 			addSelectionDialog.open();
 		}
-		private void showInsertForm(CancelDialog addSelectionDialog, CalendarSource calendarSource, CalendarSourceForm calendarSourceForm, CalendarSource calendarSourceDefault) {
+		private void showInsertForm(ConfirmationDialog addSelectionDialog, CalendarSource calendarSource, CalendarSourceForm calendarSourceForm, CalendarSource calendarSourceDefault) {
 			addSelectionDialog.close();
 			CalendarLocationAndSourceView.this.showInsertForm(calendarLocation, calendarSource, calendarSourceForm, calendarSourceDefault);
 		}
@@ -604,9 +603,9 @@ implements AfterNavigationObserver
 	private void showInsertForm(CalendarLocation calendarLocation, CalendarSource calendarSource, CalendarSourceForm calendarSourceForm,  CalendarSource calendarSourceDefault) {
 		calendarSourceForm.populateWith(calendarSourceDefault != null ? calendarSourceDefault : calendarSource);
 
-		new OkCancelDialog("Event", calendarSourceForm)
-				.okLabel("Save")
-				.onOk(() -> {
+		ConfirmationDialog.confirmCancel("Event", calendarSourceForm)
+				.confirmText("Save")
+				.onConfirm(() -> {
 					try {
 						calendarSourceForm.writeTo(calendarSource);
 						calendarLocation.addCalendarSource(calendarSource);
@@ -620,9 +619,9 @@ implements AfterNavigationObserver
 	}
 
 	private void showEditForm(String title, Component form, Callable<Void> runnable) {
-		new OkCancelDialog(title, form)
-				.okLabel("Save")
-				.onOk(() -> {
+		ConfirmationDialog.confirmCancel(title, form)
+				.confirmText("Save")
+				.onConfirm(() -> {
 					try {
 						runnable.call();
 						reloadTreeGrid();
@@ -634,9 +633,9 @@ implements AfterNavigationObserver
 	}
 
 	private void confirmDelete(TreeNode treeNode, Runnable runnable) {
-		new OkCancelDialog("Remove " + treeNode.text(), new NativeLabel("Are you sure?"))
-				.okLabel("Yes")
-				.onOk(() -> {
+		ConfirmationDialog.confirmCancel("Remove " + treeNode.text(), new NativeLabel("Are you sure?"))
+				.confirmText("Yes")
+				.onConfirm(() -> {
 					runnable.run();
 					reloadTreeGrid();
 				})

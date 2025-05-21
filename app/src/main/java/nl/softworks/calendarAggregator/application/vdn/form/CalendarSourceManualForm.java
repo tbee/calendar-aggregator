@@ -18,8 +18,8 @@ import nl.softworks.calendarAggregator.domain.entity.CalendarSourceManual;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceManualExdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tbee.webstack.vdn.component.ConfirmationDialog;
 import org.tbee.webstack.vdn.component.CrudButtonbar;
-import org.tbee.webstack.vdn.component.OkCancelDialog;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -72,9 +72,9 @@ public class CalendarSourceManualForm extends CalendarSourceForm {
 		if (selectedItems.isEmpty()) {
 			return;
 		}
-		new OkCancelDialog("Remove", new NativeLabel("Remove " + selectedItems.size() + " date(s). Are you sure?"))
-				.okLabel("Remove")
-				.onOk(() -> {
+		ConfirmationDialog.confirmCancel("Remove", new NativeLabel("Remove " + selectedItems.size() + " date(s). Are you sure?"))
+				.confirmText("Remove")
+				.onConfirm(() -> {
 					calendarSourceManualExdates.removeAll(selectedItems);
 					calendarEventExdateListBox.setItems(calendarSourceManualExdates);
 				})
@@ -89,9 +89,9 @@ public class CalendarSourceManualForm extends CalendarSourceForm {
 		CalendarSourceManualExdate calendarSourceManualExdate = selectedItems.iterator().next();
 		DatePicker datePicker = new DatePicker(calendarSourceManualExdate.excludedDate());
 		datePicker.setI18n(datePickerIsoFormat);
-		new OkCancelDialog("Modify", datePicker)
-				.okLabel("Modify")
-				.onOk(() -> {
+		ConfirmationDialog.confirmCancel("Modify", datePicker)
+				.confirmText("Modify")
+				.onConfirm(() -> {
 					LocalDate localDate = datePicker.getValue();
 					calendarSourceManualExdate.excludedDate(localDate);
 					calendarEventExdateListBox.setItems(calendarSourceManualExdates);
@@ -102,9 +102,9 @@ public class CalendarSourceManualForm extends CalendarSourceForm {
 	private void insertExdate() {
 		DatePicker datePicker = new DatePicker();
 		datePicker.setI18n(datePickerIsoFormat);
-		new OkCancelDialog("Add", datePicker)
-				.okLabel("Add")
-				.onOk(() -> {
+		ConfirmationDialog.confirmCancel("Add", datePicker)
+				.confirmText("Add")
+				.onConfirm(() -> {
 					LocalDate localDate = datePicker.getValue();
 					calendarSourceManualExdates.add(new CalendarSourceManualExdate().excludedDate(localDate));
 					calendarEventExdateListBox.setItems(calendarSourceManualExdates);

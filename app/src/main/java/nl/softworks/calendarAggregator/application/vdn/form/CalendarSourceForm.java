@@ -14,6 +14,7 @@ import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import nl.softworks.calendarAggregator.application.vdn.component.AnchorIcon;
+import nl.softworks.calendarAggregator.application.vdn.component.ResultDialog;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
@@ -23,12 +24,11 @@ import nl.softworks.calendarAggregator.domain.entity.Label;
 import nl.softworks.calendarAggregator.domain.entity.Timezone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tbee.webstack.vdn.component.ConfirmationDialog;
 import org.tbee.webstack.vdn.component.CrudIconButtonbar;
 import org.tbee.webstack.vdn.component.EditingGrid;
 import org.tbee.webstack.vdn.component.Harmonica;
 import org.tbee.webstack.vdn.component.IconButton;
-import org.tbee.webstack.vdn.component.OkCancelDialog;
-import org.tbee.webstack.vdn.component.ResultDialog;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -101,10 +101,10 @@ abstract public class CalendarSourceForm extends Harmonica {
 
 		preprocessGrid.onEdit(item -> {
 			CalendarSourcePreprocessForm form = new CalendarSourcePreprocessForm().populateWith(item);
-			new OkCancelDialog("Preprocess", form)
+			ConfirmationDialog.confirmCancel("Preprocess", form)
 					.width(50, Unit.PERCENTAGE)
-					.okLabel("Accept")
-					.onOk(() -> {
+					.confirmText("Accept")
+					.onConfirm(() -> {
 						try {
 							form.writeTo(item);
 							preprocessGrid.refresh();
@@ -218,10 +218,10 @@ abstract public class CalendarSourceForm extends Harmonica {
 			TextField textField = new TextField();
 			textField.setWidthFull();
 			textField.setValue(assign.subjectRegexp() == null ? "" : assign.subjectRegexp());
-			new OkCancelDialog("Subject regexp", textField)
+			ConfirmationDialog.confirmCancel("Subject regexp", textField)
 					.width(50, Unit.PERCENTAGE)
-					.okLabel("Accept")
-					.onOk(() -> {
+					.confirmText("Accept")
+					.onConfirm(() -> {
 						try {
 							assign.subjectRegexp(textField.getValue());
 							LabelAssignmentGridRow.this.selectedCheckbox.setValue(true);

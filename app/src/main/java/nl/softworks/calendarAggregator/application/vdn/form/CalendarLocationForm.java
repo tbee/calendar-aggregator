@@ -16,6 +16,7 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import nl.softworks.calendarAggregator.application.vdn.component.AnchorIcon;
+import nl.softworks.calendarAggregator.application.vdn.component.ResultDialog;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
@@ -23,8 +24,7 @@ import nl.softworks.calendarAggregator.domain.entity.Timezone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tbee.jakarta.validator.UrlValidatorImpl;
-import org.tbee.webstack.vdn.component.OkCancelDialog;
-import org.tbee.webstack.vdn.component.ResultDialog;
+import org.tbee.webstack.vdn.component.ConfirmationDialog;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -124,9 +124,9 @@ public class CalendarLocationForm extends FormLayout {
 	public static void showInsertDialog(CalendarLocation selectedCalendarLocation, Runnable onInsert) {
 		CalendarLocation calendarLocation = new CalendarLocation();
 		CalendarLocationForm calendarLocationForm = new CalendarLocationForm().populateWith(selectedCalendarLocation != null ? selectedCalendarLocation : calendarLocation);
-		new OkCancelDialog("Location", calendarLocationForm)
-				.okLabel("Save")
-				.onOk(() -> {
+		ConfirmationDialog.confirmCancel("Location", calendarLocationForm)
+				.confirmText("Save")
+				.onConfirm(() -> {
 					try {
 						calendarLocationForm.writeTo(calendarLocation);
 						R.calendarLocation().save(calendarLocation);
