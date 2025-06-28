@@ -1,0 +1,380 @@
+BEGIN:VCALENDAR
+PRODID:-//Google Inc//Google Calendar 70.9054//EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:DF & Danszusjes
+X-WR-TIMEZONE:UTC
+BEGIN:VEVENT
+DTSTART:20230331T180000Z
+DTEND:20230331T213000Z
+DTSTAMP:20250628T065329Z
+UID:2dq62rnf4s4jgnmb6nuse7vj49@google.com
+CREATED:20230327T173524Z
+DESCRIPTION:Vrijdansen bij Dance Fever! <br>Kosten: <span><span>€3\,- voor
+ leden\; </span></span><span><span><span>€4\,- voor externen</span></span></
+ span>
+LAST-MODIFIED:20230327T174046Z
+LOCATION:Building "Roman Life"\, Heyendaalseweg 239\, 6525 SG Nijmegen\, Ne
+ therlands
+SEQUENCE:1
+STATUS:CONFIRMED
+SUMMARY:Vrijdansen Dance Fever
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20230602T180000Z
+DTEND:20230602T213000Z
+DTSTAMP:20250628T065329Z
+UID:4mlsl0tsjld6t4clf5it3rjk5a@google.com
+CREATED:20230403T112622Z
+DESCRIPTION:Vrijdansen bij Dance Fever!\nKom nog even nagenieten van het ET
+ DS bij Dance Fever. Doe een nog eens dansje met je blinddate partner\, of d
+ rink een drankje met je nieuwe vrienden\, het kan allemaal!\nKosten: €3\,-
+ voor leden\; €4\,- voor externen
+LAST-MODIFIED:20230403T112622Z
+LOCATION:Building "Roman Life"\, Heyendaalseweg 239\, 6525 SG Nijmegen\, Ne
+ therlands
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Vrijdansen Dance Fever - "After-ETDS party"
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20230415T180000Z
+DTEND:20230415T230000Z
+DTSTAMP:20250628T065329Z
+UID:2r3ctfl5jf0r5qbugfe2a5ljiq@google.com
+CREATED:20230327T174444Z
+DESCRIPTION:<p><span>Op 15 april is het eindelijk weer zover: het Stijldans
+ gala! De hele avond dansen\, magische outfits en een prachtige locatie… Dit
+  wordt een avond om niet te vergeten! </span></p><p><span>Je kan deze uniek
+ e avond beleven op zaterdag 15 april om 20:00 bij Danscentrum Zwijsen in Os
+ s. De tickets zijn €12\,50 voor leden en €15 voor niet-leden\, dit is inclu
+ sief twee drankjes! </span></p><p><span>We hopen jullie daar allemaal te zi
+ en!</span></p><p><span>Link naar de kaartverkoop: </span><a href="https://s
+ dvndancefever.nl/mc-events/stijldansgala-ballroomgala?mc_id=58">https://sdv
+ ndancefever.nl/mc-events/stijldansgala-ballroomgala?mc_id=58</a></p> <br><p
+ ><span>On April 15th\, it’s finally time again for a Ballroomgala! It promi
+ ses to be a memorable evening filled with magical outfits\, dancing through
+ out the night and a beautiful location. </span></p><p><span>You are welcome
+  to experience this unique evening on Saturday April 15th at 20:00 at Dance
+ centre Zwijsen in Oss. You can buy tickets for €12\,50 for members and €15
+ for non-members. This is for entrance and two drinks!</span></p><p><span>We
+  hope to see you all there!</span></p><p><span>Link to ticket sale : </span
+ ><a href="https://sdvndancefever.nl/mc-events/stijldansgala-ballroomgala?mc
+ _id=58">https://sdvndancefever.nl/mc-events/stijldansgala-ballroomgala?mc_i
+ d=58</a></p>
+LAST-MODIFIED:20230403T123859Z
+LOCATION:Danscentrum Zwijsen\, Euterpelaan 3E\, 5344 CA Oss\, Netherlands
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Dance Fever Ballroom Gala
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20230622T180000Z
+DTEND:20230622T203000Z
+DTSTAMP:20250628T065329Z
+UID:2r4d6spupu1mad74qnfc0sargc@google.com
+CREATED:20230612T145259Z
+DESCRIPTION:Er was eens... een spetterend dansoptreden. Althans\, zo zal he
+ t in de toekomst naverteld worden.  <p>22 juni 2023 vindt de jaarlijkse ein
+ dvoorstelling van SDVN Dance Fever plaats in de Stadsschouwburg van Nijmege
+ n. Ruim tweehonderd enthousiaste dansers gaan de rollen aannemen van sluwe
+ heksen\, dappere ridders\, heroïeke helden en wie weet\, misschien zal zelf
+ s menig jedi tevoorschijn komen. <br></p><p>On June 22nd Dance Fever will g
+ ive their annual end-of-year performance at the Stadsschouwburg in Nijmegen
+ . More than 200 enthousiastic dancers will portray cunning witches\, brave
+ knights\, heroic heroes and perhaps even the odd pirate or jedi in this ama
+ zing show.<br><br></p><p>Tickets: <a href="https://www.stadsschouwburgendev
+ ereeniging.nl/programma/6913/SDVN_Dance_Fever/Once_upon_a_time">https://www
+ .stadsschouwburgendevereeniging.nl/programma/6913/SDVN_Dance_Fever/Once_upo
+ n_a_time</a>     <br></p>
+LAST-MODIFIED:20230612T145524Z
+LOCATION:Stadsschouwburg Nijmegen\, Keizer Karelplein 32H\, 6511 NH Nijmege
+ n\, Nederland
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Dance Fever Show "Once Upon A Time..."
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20231110T190000Z
+DTEND:20231110T220000Z
+DTSTAMP:20250628T065329Z
+UID:2rd7f2i210qtmhnumji6qk6196@google.com
+CREATED:20230930T220251Z
+DESCRIPTION:\nVrijdansen bij Dance Fever!Kosten: €3\,- voor leden\; €4\,- v
+ oor externen. Betalen aan de deur via QR code.
+LAST-MODIFIED:20230930T220251Z
+LOCATION:Gebouw "Roomsch Leven"\, Heyendaalseweg 239\, 6525 SG Nijmegen\, N
+ ederland
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Vrijdansen Dance Fever
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20231006T180000Z
+DTEND:20231006T210000Z
+DTSTAMP:20250628T065329Z
+UID:3n1m27vv2miggaa2r862cht5tc@google.com
+CREATED:20230930T215938Z
+DESCRIPTION:Vrijdansen bij Dance Fever! Kosten: €3\,- voor leden\; €4\,- vo
+ or externen. Betalen aan de deur via QR code.
+LAST-MODIFIED:20230930T220258Z
+LOCATION:Gebouw "Roomsch Leven"\, Heyendaalseweg 239\, 6525 SG Nijmegen\, N
+ ederland
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Vrijdansen Dance Fever
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20231208T190000Z
+DTEND:20231208T220000Z
+DTSTAMP:20250628T065329Z
+UID:53rvi3mslmehpku4obmcimub66@google.com
+CREATED:20230930T220321Z
+DESCRIPTION:\nVrijdansen bij Dance Fever! Kosten: €3\,- voor leden\; €4\,-
+ voor externen. Betalen aan de deur via QR code.
+LAST-MODIFIED:20230930T220331Z
+LOCATION:Gebouw "Roomsch Leven"\, Heyendaalseweg 239\, 6525 SG Nijmegen\, N
+ ederland
+SEQUENCE:1
+STATUS:CONFIRMED
+SUMMARY:Vrijdansen Dance Fever
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240510T180000Z
+DTEND:20240510T210000Z
+DTSTAMP:20250628T065329Z
+UID:44ialtq35ai183i1neu164d30t@google.com
+CREATED:20230930T220533Z
+DESCRIPTION:\nVrijdansen bij Dance Fever! Kosten: €3\,- voor leden\; €4\,-
+ voor externen. Betalen aan de deur via QR code.
+LAST-MODIFIED:20230930T220533Z
+LOCATION:Gebouw "Roomsch Leven"\, Heyendaalseweg 239\, 6525 SG Nijmegen\, N
+ ederland
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Vrijdansen Dance Fever
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240614T180000Z
+DTEND:20240614T210000Z
+DTSTAMP:20250628T065329Z
+UID:7u3crr1rfnh5fq55n45u4s1buf@google.com
+CREATED:20230930T220552Z
+DESCRIPTION:\nVrijdansen bij Dance Fever! Kosten: €3\,- voor leden\; €4\,-
+ voor externen. Betalen aan de deur via QR code.
+LAST-MODIFIED:20230930T220739Z
+LOCATION:Gebouw "Roomsch Leven"\, Heyendaalseweg 239\, 6525 SG Nijmegen\, N
+ ederland
+SEQUENCE:1
+STATUS:CONFIRMED
+SUMMARY:Vrijdansen Dance Fever
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240322T190000Z
+DTEND:20240322T223000Z
+DTSTAMP:20250628T065329Z
+UID:7urpp5ka7377aq650e6uccu5cp@google.com
+CREATED:20231122T130310Z
+LAST-MODIFIED:20231122T130351Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Vrijdansen DanceFever
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240126T183000Z
+DTEND:20240126T220000Z
+DTSTAMP:20250628T065329Z
+UID:39s02g4v4usoiuecgnhdgl0rku@google.com
+CREATED:20230930T220359Z
+DESCRIPTION:Vrijdansen bij Dance Fever! Kosten: €3\,- voor leden\; €4\,- vo
+ or externen. Betalen aan de deur via QR code. Van 19:30 tot 20:30 is er een
+  gratis workshop voor beginners.
+LAST-MODIFIED:20231216T152120Z
+LOCATION:Gebouw "Roomsch Leven"\, Heyendaalseweg 239\, 6525 SG Nijmegen\, N
+ ederland
+SEQUENCE:1
+STATUS:CONFIRMED
+SUMMARY:Vrijdansen Dance Fever + workshop beginners
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240419T180000Z
+DTEND:20240419T223000Z
+DTSTAMP:20250628T065329Z
+UID:0cdl20jgpg2363apniplrbo0g8@google.com
+CREATED:20240223T133417Z
+DESCRIPTION:Beschrijving volgt!
+LAST-MODIFIED:20240223T133417Z
+LOCATION:Danscentrum Zwijsen\, Euterpelaan 3E\, 5344 CA Oss\, Nederland
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Stijldansgala Dance Fever
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240510T170000Z
+DTEND:20240510T180000Z
+DTSTAMP:20250628T065329Z
+UID:64idkqvfogne45s0jmmv2eqdg3@google.com
+CREATED:20240501T093607Z
+LAST-MODIFIED:20240501T093628Z
+LOCATION:Gebouw "Roomsch Leven"\, Heyendaalseweg 239\, 6525 SG Nijmegen\, N
+ ederland
+SEQUENCE:1
+STATUS:CONFIRMED
+SUMMARY:Charlestonworkshop Dance Fever
+TRANSP:TRANSPARENT
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20240920T180000Z
+DTEND:20240920T213000Z
+DTSTAMP:20250628T065329Z
+UID:35rrq9udcc18bs9056266lpb39@google.com
+CREATED:20240703T091449Z
+LAST-MODIFIED:20240703T091449Z
+LOCATION:Gebouw "Roomsch Leven"\, Heyendaalseweg 239\, 6525 SG Nijmegen\, N
+ ederland
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Vrijdansavond Dance Fever
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20241018T180000Z
+DTEND:20241018T213000Z
+DTSTAMP:20250628T065329Z
+UID:2t7kgfo4kn23k6ar0jdq4s0bf7@google.com
+CREATED:20240703T091500Z
+LAST-MODIFIED:20240703T091500Z
+LOCATION:Gebouw "Roomsch Leven"\, Heyendaalseweg 239\, 6525 SG Nijmegen\, N
+ ederland
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Vrijdansavond Dance Fever
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20241213T190000Z
+DTEND:20241213T223000Z
+DTSTAMP:20250628T065329Z
+UID:798lgmjidolq4gvbbuceb2i7lc@google.com
+CREATED:20240703T091516Z
+LAST-MODIFIED:20240703T091516Z
+LOCATION:Gebouw "Roomsch Leven"\, Heyendaalseweg 239\, 6525 SG Nijmegen\, N
+ ederland
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Vrijdansavond Dance Fever
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20250314T190000Z
+DTEND:20250314T223000Z
+DTSTAMP:20250628T065329Z
+UID:6fa9iqcsa3ci0k0ogke00f9cro@google.com
+CREATED:20240703T091650Z
+LAST-MODIFIED:20240703T091650Z
+LOCATION:Gebouw "Roomsch Leven"\, Heyendaalseweg 239\, 6525 SG Nijmegen\, N
+ ederland
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Vrijdansavond Dance Fever
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20250411T180000Z
+DTEND:20250411T213000Z
+DTSTAMP:20250628T065329Z
+UID:4k7tnmbvv9p46hdgi5krp92f86@google.com
+CREATED:20240703T091704Z
+LAST-MODIFIED:20240703T091704Z
+LOCATION:Gebouw "Roomsch Leven"\, Heyendaalseweg 239\, 6525 SG Nijmegen\, N
+ ederland
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Vrijdansavond Dance Fever
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20250509T180000Z
+DTEND:20250509T213000Z
+DTSTAMP:20250628T065329Z
+UID:1mh5843g9ecikqioe9ss7ru30c@google.com
+CREATED:20240703T091722Z
+LAST-MODIFIED:20240703T091722Z
+LOCATION:Gebouw "Roomsch Leven"\, Heyendaalseweg 239\, 6525 SG Nijmegen\, N
+ ederland
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Vrijdansavond Dance Fever
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20250214T190000Z
+DTEND:20250214T223000Z
+DTSTAMP:20250628T065329Z
+UID:7sdj03emniaipapg0gk8imfupu@google.com
+CREATED:20240703T091528Z
+LAST-MODIFIED:20241024T183847Z
+LOCATION:Gebouw "Roomsch Leven"\, Heyendaalseweg 239\, 6525 SG Nijmegen\, N
+ ederland
+SEQUENCE:1
+STATUS:CONFIRMED
+SUMMARY:Vrijdansavond Dance Fever
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20250315T183000Z
+DTEND:20250315T233000Z
+DTSTAMP:20250628T065329Z
+UID:7tspfntjklmckh0htnh2konl80@google.com
+CREATED:20250210T220210Z
+DESCRIPTION:For more information\, see <a href="https://www.dancingdinos.nl
+ /news/2025-01-06-Party.html">https://www.dancingdinos.nl/news/2025-01-06-Pa
+ rty.html</a>
+LAST-MODIFIED:20250210T220406Z
+LOCATION:Cultuur- & Vergadercentrum H.F. Witte\, Henri Dunantplein 4\, 3731
+  CL De Bilt\, Nederland
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Dancing Dinos
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20250530T180000Z
+DTEND:20250530T230000Z
+DTSTAMP:20250628T065329Z
+UID:277urpue7h0biruh9lclsogic6@google.com
+CREATED:20250204T173143Z
+LAST-MODIFIED:20250210T220443Z
+SEQUENCE:0
+STATUS:CONFIRMED
+SUMMARY:Save the date: Dance Fever stijldansgala
+TRANSP:OPAQUE
+END:VEVENT
+BEGIN:VEVENT
+DTSTART:20250627T180000Z
+DTEND:20250627T213000Z
+DTSTAMP:20250628T065329Z
+UID:36n5c1l4oj95nkia8stuc203kg@google.com
+CREATED:20240703T091742Z
+LAST-MODIFIED:20250417T200800Z
+LOCATION:Gebouw "Roomsch Leven"\, Heyendaalseweg 239\, 6525 SG Nijmegen\, N
+ ederland
+SEQUENCE:2
+STATUS:CONFIRMED
+SUMMARY:Vrijdansavond Dance Fever
+TRANSP:OPAQUE
+END:VEVENT
+END:VCALENDAR

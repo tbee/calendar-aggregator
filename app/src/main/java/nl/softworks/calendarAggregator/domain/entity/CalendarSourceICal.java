@@ -3,13 +3,16 @@ package nl.softworks.calendarAggregator.domain.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotNull;
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.Parameter;
 import net.fortuna.ical4j.model.component.CalendarComponent;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.parameter.TzId;
 import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.DateProperty;
 import net.fortuna.ical4j.model.property.DtEnd;
@@ -22,8 +25,11 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.Temporal;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -58,6 +64,9 @@ public class CalendarSourceICal extends CalendarSource {
 		return this;
 	}
 
+	@Transient
+	private String assumedTimezone = null;
+
 	@Override
 	public List<CalendarEvent> generateEvents() {
 		try {
@@ -69,7 +78,25 @@ public class CalendarSourceICal extends CalendarSource {
 			// Get ical as string
 			String url = resolveUrl(icalUrl);
 			logAppend("url = " + url);
-			String icalContent = S.icalService().sanatize(getUrl(url));
+			String icalContent = getUrl(url);
+			icalContent = S.icalService().sanatize(icalContent);
+
+			// This is a patch for Dance Fever, but maybe we can generate this more generally
+			if (icalContent.contains("X-WR-TIMEZONE:UTC") && !icalContent.contains("TZID:UTC")) {
+				icalContent = icalContent.replace("X-WR-TIMEZONE:UTC\r\n", """
+						BEGIN:VTIMEZONE\r
+						TZID:UTC\r
+						BEGIN:STANDARD\r
+						TZNAME:UTC\r
+						TZOFFSETFROM:+0000\r
+						TZOFFSETTO:+0000\r
+						DTSTART:16010101T000000\r
+						END:STANDARD\r
+						END:VTIMEZONE\r
+						""");
+				assumedTimezone = "UTC";
+			}
+
 			String logContent = (icalContent.length() > 10000 ? icalContent.substring(0, 10000) + "\n...\n" : icalContent);
 			logAppend(logContent + "\n");
 			if (icalContent.isBlank()) {
@@ -113,7 +140,7 @@ public class CalendarSourceICal extends CalendarSource {
 				LocalDateTime endLocalDateTime = toLocalDateTime(endDate);
 
 				// Validate summary
-				String summary = vEvent.getSummary().orElseThrow().getValue();
+				String summary = vEvent.getSummary().getValue();
 				logAppend("summary = " + summary + "\n");
 				if (pattern != null) {
 					Matcher matcher = pattern.matcher(summary);
@@ -162,10 +189,22 @@ public class CalendarSourceICal extends CalendarSource {
 	}
 
 	private LocalDateTime toLocalDateTime(DateProperty<?> dateProperty) {
-		if ("DATE".equals(dateProperty.getParameter("VALUE").orElse(new Value("")).getValue())) {
-			return LocalDate.from(dateProperty.getDate()).atStartOfDay();
+		// Set a timezone if we assume one
+		Optional<TzId> tzId = dateProperty.getParameter(Parameter.TZID);
+		if (tzId.isEmpty() && assumedTimezone != null) {
+			dateProperty.add(new TzId(assumedTimezone));
 		}
-		return LocalDateTime.from(dateProperty.getDate());
+
+		Temporal date = dateProperty.getDate();
+		// Convert to the zone of the calendarLocation
+		if (date instanceof ZonedDateTime zonedDateTime) {
+			date = zonedDateTime.withZoneSameInstant(ZoneId.of(calendarLocation.timezone.name()));
+		}
+		// Convert Date or DateTime to LocalDateTime
+		if ("DATE".equals(dateProperty.getParameter("VALUE").orElse(new Value("")).getValue())) {
+			return LocalDate.from(date).atStartOfDay();
+		}
+		return LocalDateTime.from(date);
 	}
 
 	public String toString() {
