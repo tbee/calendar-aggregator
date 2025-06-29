@@ -81,20 +81,11 @@ public class CalendarSourceICal extends CalendarSource {
 			String icalContent = getUrl(url);
 			icalContent = S.icalService().sanatize(icalContent);
 
-			// This is a patch for Dance Fever, but maybe we can generate this more generally
-			if (icalContent.contains("X-WR-TIMEZONE:UTC") && !icalContent.contains("TZID:UTC")) {
-				icalContent = icalContent.replace("X-WR-TIMEZONE:UTC\r\n", """
-						BEGIN:VTIMEZONE\r
-						TZID:UTC\r
-						BEGIN:STANDARD\r
-						TZNAME:UTC\r
-						TZOFFSETFROM:+0000\r
-						TZOFFSETTO:+0000\r
-						DTSTART:16010101T000000\r
-						END:STANDARD\r
-						END:VTIMEZONE\r
-						""");
-				assumedTimezone = "UTC";
+			// Get the timezone from the informational header
+			Pattern timezonePattern = Pattern.compile("X-WR-TIMEZONE:([^[\\r|\\n]]*)", Pattern.CASE_INSENSITIVE);
+			Matcher timezoneMatcher = timezonePattern.matcher(icalContent);
+			if (timezoneMatcher.find()) { // find first match
+				assumedTimezone = timezoneMatcher.group(1);
 			}
 
 			String logContent = (icalContent.length() > 10000 ? icalContent.substring(0, 10000) + "\n...\n" : icalContent);
