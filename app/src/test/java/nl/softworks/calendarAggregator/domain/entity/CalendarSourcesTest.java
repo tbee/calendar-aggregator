@@ -166,7 +166,6 @@ public class CalendarSourcesTest {
         assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 22, 15, 0, 0), calendarEvents.get(0).endDateTime());
     }
 
-
     @Test
     public void dancefever_20250628() {
         SMock.populate();
@@ -186,6 +185,27 @@ public class CalendarSourcesTest {
         Assertions.assertEquals("Vrijdansavond Dance Fever", calendarEvents.get(0).subject());
         assertLocalDateTimeNearestYear(LocalDateTime.of(2025, 6, 27, 20, 0, 0), calendarEvents.get(0).startDateTime());
         assertLocalDateTimeNearestYear(LocalDateTime.of(2025, 6, 27, 23, 30, 0), calendarEvents.get(0).endDateTime());
+    }
+
+    @Test
+    public void vidazevenaar_20250629a() {
+        SMock.populate();
+
+        CalendarSourceICal calendarSource = new CalendarSourceICal()
+                .regex(".*(oudjaarsavond|Nieuwjaarsbal|Dansavond|Danscaf|Dansmiddag|Openingsavond|Workshop|Techniek).*")
+                .icalUrl(this.getClass().getResource("/webSnapshots/vidazevenaar_20250629a.ical").toExternalForm());
+        calendarSource.localDateTimeNowSupplier = () -> LocalDateTime.of(2025, 06, 21, 12, 34, 56);
+        new CalendarLocation()
+                .timezone(new Timezone().name(ZoneId.of("Europe/Amsterdam").getId()))
+                .addCalendarSource(calendarSource);
+        List<CalendarEvent> calendarEvents = calendarSource.generateEvents();
+        System.out.println(calendarSource.log());
+        System.out.println(calendarEvents);
+
+        Assertions.assertEquals(11, calendarEvents.size());
+        Assertions.assertEquals("Dansavond Zaterdag 9 augustus", calendarEvents.get(0).subject());
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2025, 8, 9, 21, 0, 0), calendarEvents.get(0).startDateTime());
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2025, 8, 9, 23, 30, 0), calendarEvents.get(0).endDateTime());
     }
 
     private void assertLocalDateTimeNearestYear(LocalDateTime expectedLocalDateTime, LocalDateTime actualLocalDateTime) {

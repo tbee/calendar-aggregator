@@ -1,0 +1,159 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Vida Studio&#039;s - ECPv6.3.6//NONSGML v1.0//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:Vida Studio&#039;s
+X-ORIGINAL-URL:https://vidazevenaar.nl/v2
+X-WR-CALDESC:Evenementen voor Vida Studio&#039;s
+REFRESH-INTERVAL;VALUE=DURATION:PT1H
+X-Robots-Tag:noindex
+X-PUBLISHED-TTL:PT1H
+BEGIN:VTIMEZONE
+TZID:Europe/Amsterdam
+BEGIN:DAYLIGHT
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+DTSTART:20250330T010000
+END:DAYLIGHT
+BEGIN:STANDARD
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+DTSTART:20251026T010000
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Amsterdam:20250809T210000
+DTEND;TZID=Europe/Amsterdam:20250809T233000
+DTSTAMP:20250629T080410
+CREATED:20250605T113913Z
+LAST-MODIFIED:20250605T114144Z
+UID:9295-1754773200-1754782200@vidazevenaar.nl
+SUMMARY:Dansavond Zaterdag 9 augustus
+DESCRIPTION:Danst u bij ons\, of bij een andere dansschool\, of heeft u in het verleden gedanst?\nU bent van harte welkom!!! \nZaal open 20.30 uur  Aanvang 21.00 uur\nEinde Ca. 23.30 uur
+URL:https://vidazevenaar.nl/v2/evenementen/dansavond-zaterdag-9-augustus/
+LOCATION:Vida Studio’s\, Raadhuisplein 17\, Zevenaar\, Gelderland\, 6901 GP\, Nederland
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Amsterdam:20250816T210000
+DTEND;TZID=Europe/Amsterdam:20250816T233000
+DTSTAMP:20250629T080410
+CREATED:20250605T114106Z
+LAST-MODIFIED:20250605T114106Z
+UID:9297-1755378000-1755387000@vidazevenaar.nl
+SUMMARY:Dansavond Zaterdag 16 augustus
+DESCRIPTION:Zaal open 20.30 uur Aanvang 21.00 uur\, Einde  Ca. 23.30 uur
+URL:https://vidazevenaar.nl/v2/evenementen/dansavond-zaterdag-16-augustus/
+LOCATION:Vida Studio’s\, Raadhuisplein 17\, Zevenaar\, Gelderland\, 6901 GP\, Nederland
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Amsterdam:20250823T200000
+DTEND;TZID=Europe/Amsterdam:20250823T233000
+DTSTAMP:20250629T080410
+CREATED:20250605T114233Z
+LAST-MODIFIED:20250608T101900Z
+UID:9299-1755979200-1755991800@vidazevenaar.nl
+SUMMARY:Danscafe Weense Wals en Dansavond Zaterdag 23 augustus
+DESCRIPTION:Na het succes van 7 juni\, danscafe weense wals. Gaan we vandaag links om walsen behandelen. \nWeense Wals links om 20.00 uur – 21.00 uur \nDansavond 21.00 uur – 23.30 uur
+URL:https://vidazevenaar.nl/v2/evenementen/dansavond-zaterdag-23-augustus/
+LOCATION:Vida Studio’s\, Raadhuisplein 17\, Zevenaar\, Gelderland\, 6901 GP\, Nederland
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Amsterdam:20250828T193000
+DTEND;TZID=Europe/Amsterdam:20250828T210000
+DTSTAMP:20250629T080410
+CREATED:20250605T115058Z
+LAST-MODIFIED:20250605T115058Z
+UID:9302-1756409400-1756414800@vidazevenaar.nl
+SUMMARY:Doordansavond Donderdag 28 augustus
+DESCRIPTION:Na de zomerstop het dansprogramma’s weer ophalen?\nWij helpen graag\, en we gaan wat danstechnische puntjes met u doornemen. \nAanvang 19.30 uur – 21.00 uur
+URL:https://vidazevenaar.nl/v2/evenementen/doordansavond-donderdag-28-augustus/
+LOCATION:Vida Studio’s\, Raadhuisplein 17\, Zevenaar\, Gelderland\, 6901 GP\, Nederland
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Amsterdam:20250829T193000
+DTEND;TZID=Europe/Amsterdam:20250829T210000
+DTSTAMP:20250629T080410
+CREATED:20250605T115212Z
+LAST-MODIFIED:20250605T115212Z
+UID:9304-1756495800-1756501200@vidazevenaar.nl
+SUMMARY:Doordansavond Vrijdag 29 augustus
+DESCRIPTION:Aanvang 19.30 uur – 21.00 uur
+URL:https://vidazevenaar.nl/v2/evenementen/doordansavond-vrijdag-29-augustus/
+LOCATION:Vida Studio’s\, Raadhuisplein 17\, Zevenaar\, Gelderland\, 6901 GP\, Nederland
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Amsterdam:20250903T193000
+DTEND;TZID=Europe/Amsterdam:20250903T210000
+DTSTAMP:20250629T080410
+CREATED:20250605T115301Z
+LAST-MODIFIED:20250605T115301Z
+UID:9306-1756927800-1756933200@vidazevenaar.nl
+SUMMARY:Doordansavond Woensdag 3 september
+DESCRIPTION:Na de zomerstop het dansprogramma’s weer ophalen?\nWij helpen graag\, en we gaan wat danstechnische puntjes met u doornemen. \nAanvang 19.30 uur – 21.00 uur
+URL:https://vidazevenaar.nl/v2/evenementen/doordansavond-woensdag-3-september/
+LOCATION:Vida Studio’s\, Raadhuisplein 17\, Zevenaar\, Gelderland\, 6901 GP\, Nederland
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Amsterdam:20250907T193000
+DTEND;TZID=Europe/Amsterdam:20250907T210000
+DTSTAMP:20250629T080410
+CREATED:20250605T115401Z
+LAST-MODIFIED:20250605T115401Z
+UID:9308-1757273400-1757278800@vidazevenaar.nl
+SUMMARY:Doordansavond Zondag 7 september
+DESCRIPTION:Aanvang 19.30 uur – 21.oo uur
+URL:https://vidazevenaar.nl/v2/evenementen/doordansavond-zondag-7-september/
+LOCATION:Vida Studio’s\, Raadhuisplein 17\, Zevenaar\, Gelderland\, 6901 GP\, Nederland
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Amsterdam:20250910T193000
+DTEND;TZID=Europe/Amsterdam:20250910T210000
+DTSTAMP:20250629T080410
+CREATED:20250605T115505Z
+LAST-MODIFIED:20250605T115505Z
+UID:9310-1757532600-1757538000@vidazevenaar.nl
+SUMMARY:Doordansavond Woensdag 10 september
+DESCRIPTION:Aanvang 19.30 uur – 21.00 uur
+URL:https://vidazevenaar.nl/v2/evenementen/doordansavond-woensdag-10-september/
+LOCATION:Vida Studio’s\, Raadhuisplein 17\, Zevenaar\, Gelderland\, 6901 GP\, Nederland
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Amsterdam:20250913T210000
+DTEND;TZID=Europe/Amsterdam:20250913T233000
+DTSTAMP:20250629T080410
+CREATED:20250605T115647Z
+LAST-MODIFIED:20250605T115647Z
+UID:9312-1757797200-1757806200@vidazevenaar.nl
+SUMMARY:Dansavond Zaterdag 13 september
+DESCRIPTION:Zaal open 20.30 uur\, Aanvang 21.00 uur.\nEinde Ca 23.30 uur
+URL:https://vidazevenaar.nl/v2/evenementen/dansavond-zaterdag-13-september/
+LOCATION:Vida Studio’s\, Raadhuisplein 17\, Zevenaar\, Gelderland\, 6901 GP\, Nederland
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Amsterdam:20250914T193000
+DTEND;TZID=Europe/Amsterdam:20250914T210000
+DTSTAMP:20250629T080410
+CREATED:20250605T115749Z
+LAST-MODIFIED:20250605T115749Z
+UID:9314-1757878200-1757883600@vidazevenaar.nl
+SUMMARY:Doordansavond Zondag 14 september
+DESCRIPTION:Na de zomerstop het dansprogramma’s weer ophalen?\nWij helpen graag\, en we gaan wat danstechnische puntjes met u doornemen. \nAanvang 19.30 uur – 21.00 uur
+URL:https://vidazevenaar.nl/v2/evenementen/doordansavond-zondag-14-september/
+LOCATION:Vida Studio’s\, Raadhuisplein 17\, Zevenaar\, Gelderland\, 6901 GP\, Nederland
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/Amsterdam:20250920T203000
+DTEND;TZID=Europe/Amsterdam:20250920T235900
+DTSTAMP:20250629T080410
+CREATED:20250605T120116Z
+LAST-MODIFIED:20250605T120116Z
+UID:9316-1758400200-1758412740@vidazevenaar.nl
+SUMMARY:Openingsavond Zaterdag 20 september
+DESCRIPTION:We luiden het nieuwe dansseizoen in met onze openingsavond!!\nNiet zomaar een avond\, maar we vieren ons jubileum!!\n40 jaar Vida in Zevenaar\nZaal open 20.00 uur Aanvang Ca. 20.30 uur
+URL:https://vidazevenaar.nl/v2/evenementen/openingsavond-zaterdag-20-september/
+LOCATION:Vida Studio’s\, Raadhuisplein 17\, Zevenaar\, Gelderland\, 6901 GP\, Nederland
+END:VEVENT
+END:VCALENDAR
