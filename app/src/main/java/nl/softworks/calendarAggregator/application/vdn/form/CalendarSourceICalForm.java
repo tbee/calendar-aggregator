@@ -8,6 +8,7 @@ import com.vaadin.flow.data.binder.ValidationException;
 import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceICal;
+import nl.softworks.calendarAggregator.domain.entity.Timezone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,8 @@ public class CalendarSourceICalForm extends CalendarSourceForm {
 
 	private final TextField icalUrlTextfield = new TextField("ICal URL");
 	private final TextField regexTextField = new TextField("Regex");
+
+	private Timezone timezoneForTest;
 
 	public CalendarSourceICalForm() {
 		icalUrlTextfield.setTooltipText("Use `=@{now.plusYears(1).format(yyyy_MM_dd)}` to insert code.");
@@ -35,7 +38,7 @@ public class CalendarSourceICalForm extends CalendarSourceForm {
 
 	private void test() {
 		CalendarSourceICal calendarSource = new CalendarSourceICal();
-		new CalendarLocation().enabled(true).addCalendarSource(calendarSource);
+		new CalendarLocation().enabled(true).timezone(timezoneForTest).addCalendarSource(calendarSource);
 		generateAndShowTrace(calendarSource);
 	}
 
@@ -45,6 +48,7 @@ public class CalendarSourceICalForm extends CalendarSourceForm {
 		if (calendarSource instanceof CalendarSourceICal calendarSourceICal) {
 			binder.readBean(calendarSourceICal);
 		}
+		timezoneForTest = calendarSource.determineTimezone();
 		return this;
 	}
 
