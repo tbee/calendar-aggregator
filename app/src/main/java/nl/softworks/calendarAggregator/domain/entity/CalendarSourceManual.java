@@ -134,7 +134,7 @@ public class CalendarSourceManual extends CalendarSource {
 			// Extra events
 			calendarEvents.addAll(calendarSourceExtraEvents.stream()
 					.map(csmi -> new CalendarEvent(CalendarSourceManual.this)
-						.subject(csmi.subject() == null ? subject : csmi.subject())
+						.subject(csmi.subject() == null || csmi.subject().isBlank() ? subject : csmi.subject())
 						.startDateTime(csmi.startDateTime())
 						.endDateTime(csmi.endDateTime()))
 					.toList());
