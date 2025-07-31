@@ -9,7 +9,6 @@ import com.vaadin.flow.component.html.NativeLabel;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.listbox.MultiSelectListBox;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
@@ -24,7 +23,6 @@ import org.tbee.webstack.vdn.component.ConfirmationDialog;
 import org.tbee.webstack.vdn.component.CrudButtonbar;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -152,19 +150,20 @@ public class CalendarSourceManualForm extends CalendarSourceForm {
 	}
 
 	private void extraEventPopup(String actionName, CalendarSourceExtraEvent calendarSourceExtraEvent) {
-		DateTimePicker startDateTimePicker = new DateTimePicker(calendarSourceExtraEvent == null ? LocalDateTime.now() : calendarSourceExtraEvent.startDateTime());
-		DateTimePicker endDateTimePicker = new DateTimePicker(calendarSourceExtraEvent == null ? LocalDateTime.now() : calendarSourceExtraEvent.endDateTime());
-		TextField subjectTextField = new TextField(calendarSourceExtraEvent == null ? "" : calendarSourceExtraEvent.subject());
-		ConfirmationDialog.confirmCancel(actionName, new VerticalLayout(startDateTimePicker, endDateTimePicker, subjectTextField))
+		CalendarSourceExtraEventSubform calendarSourceExtraEventSubform = new CalendarSourceExtraEventSubform();
+		calendarSourceExtraEventSubform.populateWith(calendarSourceExtraEvent);
+		ConfirmationDialog.confirmCancel(actionName, calendarSourceExtraEventSubform)
 				.confirmText(actionName)
 				.onConfirm(() -> {
-					calendarSourceExtraEvent.startDateTime(startDateTimePicker.getValue());
-					calendarSourceExtraEvent.endDateTime(endDateTimePicker.getValue());
-					calendarSourceExtraEvent.subject(subjectTextField.getValue());
+					try {
+						calendarSourceExtraEventSubform.writeTo(calendarSourceExtraEvent);
 
-					calendarSourceExtraEvents.remove(calendarSourceExtraEvent);
-					calendarSourceExtraEvents.add(calendarSourceExtraEvent);
-					calendarSourceExtraEventListBox.setItems(calendarSourceExtraEvents);
+						calendarSourceExtraEvents.remove(calendarSourceExtraEvent);
+						calendarSourceExtraEvents.add(calendarSourceExtraEvent);
+						calendarSourceExtraEventListBox.setItems(calendarSourceExtraEvents);
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
 				})
 				.open();
 	}
