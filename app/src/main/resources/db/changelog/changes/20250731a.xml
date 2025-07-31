@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!-- https://xenovation.com/blog/development/java/java-professional-developer/liquibase-related-sql-java-types -->
+
+    <changeSet id="20250731a" author="tom">
+        <createTable tableName="calendar_source_extra_event">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lazylock" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="calendar_source_id" type="bigint">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date_time" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date_time" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="subject" type="varchar(255)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint  constraintName="calendar_source_extra_event__calendar_source"
+                                  baseTableName="calendar_source_extra_event"
+                                  baseColumnNames="calendar_source_id"
+                                  referencedTableName="calendar_source"
+                                  referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

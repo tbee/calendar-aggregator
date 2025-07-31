@@ -92,9 +92,21 @@ public class CalendarSourceManual extends CalendarSource {
 		this.calendarSourceManualExdates.addAll(calendarEventExdates);
 		return this;
 	}
-	public void addExdate(CalendarSourceManualExdate rosterDate) {
-		calendarSourceManualExdates.add(rosterDate);
-		rosterDate.calendarSource = this;
+	public void addExdate(CalendarSourceManualExdate v) {
+		calendarSourceManualExdates.add(v);
+		v.calendarSource = this;
+	}
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.EAGER)
+	protected final List<CalendarSourceExtraEvent> calendarSourceExtraEvents = new ArrayList<>();
+	public List<CalendarSourceExtraEvent> extraEvents() {
+		return Collections.unmodifiableList(calendarSourceExtraEvents);
+	}
+	public CalendarSourceManual extraEvents(List<CalendarSourceExtraEvent> v) {
+		this.calendarSourceExtraEvents.clear();
+		v.forEach(cee -> cee.calendarSource = this);
+		this.calendarSourceExtraEvents.addAll(v);
+		return this;
 	}
 
 	@Override
@@ -118,6 +130,14 @@ public class CalendarSourceManual extends CalendarSource {
 				calendarEvents.addAll(applyRRule(now));
 				logAppend("Applied RRule: " + calendarEvents.size() + " events created\n");
 			}
+
+			// Extra events
+			calendarEvents.addAll(calendarSourceExtraEvents.stream()
+					.map(csmi -> new CalendarEvent(CalendarSourceManual.this)
+						.subject(csmi.subject() == null ? subject : csmi.subject())
+						.startDateTime(csmi.startDateTime())
+						.endDateTime(csmi.endDateTime()))
+					.toList());
 
 			// Nothing in the distant past
 			dropExpiredEvents();
