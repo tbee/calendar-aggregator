@@ -21,6 +21,12 @@ public class ApplicationPrepared implements ApplicationListener<ApplicationPrepa
         String username = environment.getProperty("spring.datasource.username");
         String password = environment.getProperty("spring.datasource.password");
 
+        boolean hsqlStart = Boolean.parseBoolean(environment.getProperty("consilio.hsql.start", "true"));
+        if (!hsqlStart) {
+            if (LOGGER.isInfoEnabled()) LOGGER.info("HSQLDB is not started, as configured in consilio.hsql.start");
+            return;
+        }
+
         // Start HSQLDB
         new HsqlEmbeddedServer()
                 .portFromUrl(url)
