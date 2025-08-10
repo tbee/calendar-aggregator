@@ -4,7 +4,7 @@ import org.hsqldb.persist.HsqlProperties;
 
 public class Application {
     public static void main(String[] args) {
-        System.out.println("HsqlDbFunctions.encodeBase64: " + org.jumpmind.symmetric.db.hsqldb.HsqlDbFunctions.encodeBase64("test".getBytes()));
+//        System.out.println("HsqlDbFunctions.encodeBase64: " + org.jumpmind.symmetric.db.hsqldb.HsqlDbFunctions.encodeBase64("test".getBytes()));
 
         HsqlProperties hsqlProperties = new HsqlProperties();
         hsqlProperties.setProperty("server.port", 9147);
