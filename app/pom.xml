@@ -172,13 +172,19 @@
 			<scope>test</scope>
 		</dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>org.jumpmind.symmetric</groupId>-->
-<!--            <artifactId>symmetric-client</artifactId>-->
-<!--            <version>3.16.5</version>-->
-<!--            <scope>system</scope>-->
-<!--            <systemPath>C:/Users/tom/Applications/symmetric-server-3.16.5/web/WEB-INF/lib/symmetric-client-3.16.5.jar</systemPath>-->
-<!--        </dependency>-->
+        <dependency>
+            <groupId>org.jumpmind.symmetric</groupId>
+            <artifactId>symmetric-client</artifactId>
+            <version>3.16.5</version>
+            <scope>system</scope>
+            <systemPath>C:/Users/tom/Applications/symmetric-server-3.16.5/web/WEB-INF/lib/symmetric-client-3.16.5.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.7</version>
+        </dependency>
 	</dependencies>
 
     <repositories>

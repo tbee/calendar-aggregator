@@ -24,6 +24,7 @@ public class CalendarAggregateApplication {
 	public static void main(String[] args) {
 		Locale.setDefault(new Locale("NL"));
 		System.setProperty("liquibase.secureParsing", "false");
+        System.setProperty("hsqldb.method_class_names", "org.jumpmind.symmetric.db.hsqldb.HsqlDbFunctions.*"); // for SymmetricDS
 		SpringApplication.run(CalendarAggregateApplication.class, args);
 	}
 
