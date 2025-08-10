@@ -171,6 +171,14 @@
 			<version>1.41.1</version>
 			<scope>test</scope>
 		</dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>org.jumpmind.symmetric</groupId>-->
+<!--            <artifactId>symmetric-client</artifactId>-->
+<!--            <version>3.16.5</version>-->
+<!--            <scope>system</scope>-->
+<!--            <systemPath>C:/Users/tom/Applications/symmetric-server-3.16.5/web/WEB-INF/lib/symmetric-client-3.16.5.jar</systemPath>-->
+<!--        </dependency>-->
 	</dependencies>
 
     <repositories>
@@ -223,7 +231,8 @@
 					<layout>ZIP</layout> <!-- required to be able to use -Dloader.main -->
 					<attach>false</attach>
 					<excludeDevtools>true</excludeDevtools>
-				</configuration>
+<!--                    <includeSystemScope>true</includeSystemScope>-->
+                </configuration>
 				<executions>
 					<execution>
 						<goals>
