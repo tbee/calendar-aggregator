@@ -22,7 +22,7 @@ public class CalendarAggregateApplication {
 	private static final AtomicBoolean hsqldbStarted = new AtomicBoolean(false);
 
 	public static void main(String[] args) {
-		Locale.setDefault(new Locale("NL"));
+		Locale.setDefault(Locale.of("NL"));
 		System.setProperty("liquibase.secureParsing", "false");
         System.setProperty("hsqldb.method_class_names", "org.jumpmind.symmetric.db.hsqldb.HsqlDbFunctions.*"); // for SymmetricDS
 		SpringApplication.run(CalendarAggregateApplication.class, args);
