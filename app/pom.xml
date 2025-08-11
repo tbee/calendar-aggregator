@@ -237,7 +237,7 @@
 					<layout>ZIP</layout> <!-- required to be able to use -Dloader.main -->
 					<attach>false</attach>
 					<excludeDevtools>true</excludeDevtools>
-<!--                    <includeSystemScope>true</includeSystemScope>-->
+                    <includeSystemScope>true</includeSystemScope>
                 </configuration>
 				<executions>
 					<execution>

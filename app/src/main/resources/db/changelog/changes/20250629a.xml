@@ -8,6 +8,7 @@
     <!-- https://xenovation.com/blog/development/java/java-professional-developer/liquibase-related-sql-java-types -->
 
     <changeSet id="20250629a" author="tom">
+        <validCheckSum>ANY</validCheckSum>
         <sql dbms="hsqldb" splitStatements="true" stripComments="true">
             SET DATABASE TRANSACTION CONTROL MVCC;
         </sql>
