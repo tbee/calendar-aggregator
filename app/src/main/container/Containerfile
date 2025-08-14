@@ -1,0 +1,5 @@
+FROM azul/zulu-openjdk:23-latest
+COPY ../../../target/*-boot.jar app.jar
+COPY ../../../target/application-default.properties application-default.properties
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "/app.jar"]

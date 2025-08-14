@@ -7,7 +7,7 @@ call mvnw versions:set -DgenerateBackupPoms=false -DprocessAllModules=true -Dgro
 
 cd app
 call ..\mvnw -version
-call ..\mvnw clean package -DskipTests -Pproduction
+call ..\mvnw clean package -DskipTests -Pproduction %*
 pause 
 
-# run with: java -jar target\calendarAggregator-*.jar
+rem run with: java -jar target\calendarAggregator-*.jar

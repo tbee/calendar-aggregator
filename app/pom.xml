@@ -229,6 +229,22 @@
 					</compilerArgs>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>com.vaadin</groupId>
+                <artifactId>vaadin-maven-plugin</artifactId>
+                <version>${vaadin.version}</version>
+                <executions>
+                    <execution>
+                        <id>frontend</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>prepare-frontend</goal>
+                        </goals>
+                        <configuration>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
@@ -264,6 +280,19 @@
 	<profiles>
 		<profile>
 			<id>production</id>
+            <dependencies>
+                <dependency>
+                    <!-- Exclude development dependencies from production -->
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-core</artifactId>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>com.vaadin</groupId>
+                            <artifactId>vaadin-dev</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+            </dependencies>
 			<build>
 				<plugins>
 					<plugin>
@@ -275,7 +304,6 @@
 								<id>frontend</id>
 								<phase>compile</phase>
 								<goals>
-									<goal>prepare-frontend</goal>
 									<goal>build-frontend</goal>
 								</goals>
 								<configuration>
@@ -286,6 +314,83 @@
 				</plugins>
 			</build>
 		</profile>
+
+        <profile>
+            <id>container</id>
+            <build>
+                <plugins>
+<!--                    <plugin>-->
+<!--                        <groupId>com.vaadin</groupId>-->
+<!--                        <artifactId>vaadin-maven-plugin</artifactId>-->
+<!--                        <version>${vaadin.version}</version>-->
+<!--                        <executions>-->
+<!--                            <execution>-->
+<!--                                <id>frontend</id>-->
+<!--                                <phase>compile</phase>-->
+<!--                                <goals>-->
+<!--                                    <goal>build-frontend</goal>-->
+<!--                                </goals>-->
+<!--                                <configuration>-->
+<!--                                </configuration>-->
+<!--                            </execution>-->
+<!--                        </executions>-->
+<!--                    </plugin>-->
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <executions>
+                            <execution>
+                                <id>copy-resource-one</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <outputDirectory>target</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>..</directory>
+                                            <includes>
+                                                <include>application-default.properties</include>
+                                            </includes>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.tbee</groupId>
+                        <artifactId>podman-maven-plugin</artifactId>
+                        <version>main</version>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>imageId</goal>
+                                    <goal>build</goal>
+                                    <goal>push</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <verbose>true</verbose>
+                            <containerFile>src/main/container/Containerfile</containerFile>
+                            <tags>
+                                <tag>${containerImageId}:${project.version}</tag>
+                                <tag>${containerImageId}:latest</tag>
+                            </tags>
+                            <registry>
+                                <hostname>docker.io</hostname>
+                                <url>https://docker.io/library</url>
+                                <user>${dockerio.user}</user>
+                                <password>${dockerio.password}</password>
+                            </registry>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
 	</profiles>
 
 </project>

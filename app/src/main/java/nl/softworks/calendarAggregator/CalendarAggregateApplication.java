@@ -24,6 +24,7 @@ public class CalendarAggregateApplication {
 	public static void main(String[] args) {
 		Locale.setDefault(Locale.of("NL"));
 		System.setProperty("liquibase.secureParsing", "false");
+        System.setProperty("liquibase.duplicateFileMode", "WARN"); // springboot includes the db scripts twice
         System.setProperty("hsqldb.method_class_names", "org.jumpmind.symmetric.db.hsqldb.HsqlDbFunctions.*"); // for SymmetricDS
 		SpringApplication.run(CalendarAggregateApplication.class, args);
 	}
