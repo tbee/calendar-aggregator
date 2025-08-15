@@ -2,6 +2,7 @@ if exist javaHome.cmd (
     call javaHome.cmd
 )
 
+rem one directory up for the application-default.properties
 cd ..
 for %%f in (app\target\calendarAggregator-*.jar) do (
     echo %%f

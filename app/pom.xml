@@ -282,7 +282,6 @@
 			<id>production</id>
             <dependencies>
                 <dependency>
-                    <!-- Exclude development dependencies from production -->
                     <groupId>com.vaadin</groupId>
                     <artifactId>vaadin-core</artifactId>
                     <exclusions>
@@ -307,7 +306,8 @@
 									<goal>build-frontend</goal>
 								</goals>
 								<configuration>
-								</configuration>
+                                    <forceProductionBuild>true</forceProductionBuild>
+                                </configuration>
 							</execution>
 						</executions>
 					</plugin>
