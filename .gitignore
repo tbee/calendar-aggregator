@@ -37,3 +37,4 @@ app/javaHome.cmd
 app/dependency-reduced-pom.xml
 application-default.properties
 app/containerId.txt
+app/podman_containerId.txt
