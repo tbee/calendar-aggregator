@@ -1,0 +1,17 @@
+# Save the output of this file and use kubectl create -f to import it into Kubernetes.
+#
+# Created with podman-5.5.2
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: "2025-08-17T05:20:46Z"
+  labels:
+    app: dancemoments-pod
+  name: dancemoments-pod
+spec:
+  containers:
+  - image: localhost/org.tbee.calendaraggregator:latest
+    name: dancemoments
+    ports:
+    - containerPort: 8080
+      hostPort: 8080
