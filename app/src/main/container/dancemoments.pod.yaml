@@ -10,6 +10,7 @@ metadata:
   name: dancemoments-pod
 spec:
   containers:
+  # When the :latest tag is present, that causes podman to Always attempt to pull the image from the remote repository, as described here - https://kubernetes.io/docs/concepts/containers/images/
   - image: localhost/org.tbee.calendaraggregator:latest
     name: dancemoments
     ports:
