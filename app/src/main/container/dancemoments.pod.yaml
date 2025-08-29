@@ -11,8 +11,8 @@ metadata:
 spec:
   containers:
   # When the :latest tag is present, that causes podman to Always attempt to pull the image from the remote repository, as described here - https://kubernetes.io/docs/concepts/containers/images/
-  - image: localhost/org.tbee.calendaraggregator:latest
-    imagePullPolicy: Never  # This prevents pulling from remote registries
+  - image: localhost:5000/org.tbee.calendaraggregator:latest
+    #imagePullPolicy: Never  # This prevents pulling from remote registries
     name: dancemoments
     ports:
     - containerPort: 8080
