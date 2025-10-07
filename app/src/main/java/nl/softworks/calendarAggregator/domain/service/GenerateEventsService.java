@@ -1,12 +1,10 @@
 package nl.softworks.calendarAggregator.domain.service;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.PrintWriter;
@@ -15,25 +13,26 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 @Service
 public class GenerateEventsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEventsService.class);
 
-    @Value("${spring.datasource.hikari.maximumPoolSize}")
-    private int hikariMaximumPoolSize;
-
-    private final ThreadFactory virtualThreadFactory = Thread.ofVirtual().name("virtual-thread-", 0).factory(); // needed to name virtual threads
-    private ExecutorService executorService = null;
-
-    @PostConstruct
-    public void postConstruct() {
-        int executorSize = hikariMaximumPoolSize / 2;  // less threads than connections: leave some connections available for a.o. the UI to update
-        if (LOGGER.isInfoEnabled())  LOGGER.info("GenerateEventsService executorSize=" + executorSize);
-        executorService = Executors.newFixedThreadPool(executorSize, virtualThreadFactory);
-    }
+//    @Value("${spring.datasource.hikari.maximumPoolSize}")
+//    private int hikariMaximumPoolSize;
+//
+//    private final ThreadFactory virtualThreadFactory = Thread.ofVirtual().name("virtual-thread-", 0).factory(); // needed to name virtual threads
+//    private ExecutorService executorService = null;
+//
+//    @PostConstruct
+//    public void postConstruct() {
+//        int executorSize = hikariMaximumPoolSize / 2;  // fewer threads than connections: leave some connections available for a.o. the UI to update
+//        if (LOGGER.isInfoEnabled())  LOGGER.info("GenerateEventsService executorSize=" + executorSize);
+//        executorService = Executors.newFixedThreadPool(executorSize, virtualThreadFactory);
+//    }
+// We're using a normal pool to see if that increases stability
+    private final ExecutorService executorService = Executors.newFixedThreadPool(3);
 
     @PreDestroy
     public void preDestroy() {
@@ -63,7 +62,7 @@ public class GenerateEventsService {
             R.calendarLocation().findAll().stream()
                     .flatMap(cl -> cl.calendarSources().stream())
                     .forEach(cs -> {
-                        if (LOGGER.isInfoEnabled()) LOGGER.info("Scheduled " + cs.calendarLocation().name());
+                        if (LOGGER.isInfoEnabled()) LOGGER.info("Scheduled {}", cs.calendarLocation().name());
                         cs.status("Scheduled");
                         R.calendarSource().saveAndFlush(cs);
                         executorService.submit(() -> generateEvents(cs.id()));
@@ -84,11 +83,11 @@ public class GenerateEventsService {
         try {
             CalendarSource calendarSource = R.calendarSource().findById(calendarSourceId).orElseThrow();
             try {
-                if (LOGGER.isInfoEnabled()) LOGGER.info("Generating events for " + calendarSource.calendarLocation().name() + " in " + Thread.currentThread().getName());
+                if (LOGGER.isInfoEnabled()) LOGGER.info("Generating events for {} in {}", calendarSource.calendarLocation().name(), Thread.currentThread().getName());
                 calendarSource.generateEvents();
-                if (LOGGER.isInfoEnabled()) LOGGER.info("Generating events for " + calendarSource.calendarLocation().name() + " in " + Thread.currentThread().getName() + " finished");
+                if (LOGGER.isInfoEnabled()) LOGGER.info("Generating events for {} in {} finished", calendarSource.calendarLocation().name(), Thread.currentThread().getName());
             } catch (RuntimeException e) {
-                LOGGER.error("Problem generating events for " + calendarSourceId + " " + calendarSource.calendarLocation().name(), e);
+                LOGGER.error("Problem generating events for {} {}", calendarSourceId, calendarSource.calendarLocation().name(), e);
                 calendarSource = R.calendarSource().findById(calendarSource.id()).orElseThrow(); // fresh does not work
                 calendarSource.log(exceptionToString(e));
                 calendarSource.status("Exception: " + e.getMessage());
