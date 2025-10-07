@@ -1,17 +1,17 @@
-# Save the output of this file and use kubectl create -f to import it into Kubernetes.
-#
-# Created with podman-5.5.2
 apiVersion: v1
 kind: Pod
 metadata:
-  creationTimestamp: "2025-08-17T05:20:46Z"
   labels:
     app: dancemoments-pod
   name: dancemoments-pod
 spec:
+  imagePullSecrets:
+  - name: regcred
   containers:
   # When the :latest tag is present, that causes podman to Always attempt to pull the image from the remote repository, as described here - https://kubernetes.io/docs/concepts/containers/images/
-  - image: localhost:5000/org.tbee.calendaraggregator:latest
+  #- image: nexus.softworks.nl/docker-private/org.tbee.calendaraggregator:latest
+  - image: nyota.softworks.nl:5080/org.tbee.calendaraggregator
+  #- image: localhost:5000/org.tbee.calendaraggregator:latest
     #imagePullPolicy: Never  # This prevents pulling from remote registries
     name: dancemoments
     ports:
