@@ -117,7 +117,7 @@ public class CalendarSourceManual extends CalendarSource {
 				return calendarEvents;
 			}
 
-			LocalDateTime now = LocalDateTime.now();
+			LocalDateTime now = localDateTimeNowSupplier.get();
 			if (rrule.isBlank()) {
 				logAppend("No RRule, creating single event\n");
 				calendarEvents.add(new CalendarEvent(CalendarSourceManual.this)

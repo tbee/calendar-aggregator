@@ -303,7 +303,7 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 
 		// Evaluate the expression
 		Map<String, Object> vars = new HashMap<>(functionMap);
-		vars.put("now", LocalDateTime.now());
+		vars.put("now", localDateTimeNowSupplier.get());
 		vars.put("yyyy_MM_dd", DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 		String newUrl = (String) TemplateRuntime.execute(compiledExpression, vars);
 		logAppend("URL after: " + newUrl + "\n");

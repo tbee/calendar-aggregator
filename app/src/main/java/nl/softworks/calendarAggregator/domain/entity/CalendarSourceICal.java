@@ -96,9 +96,9 @@ public class CalendarSourceICal extends CalendarSource {
 			}
 
 			// Parse ical
-			LocalDateTime pastThreshold = LocalDateTime.now().minusMonths(1);
+			LocalDateTime pastThreshold = localDateTimeNowSupplier.get().minusMonths(1);
 			logAppend("pastThreshold = " + pastThreshold);
-			LocalDateTime futureThreshold = LocalDateTime.now().plusMonths(6);
+			LocalDateTime futureThreshold = localDateTimeNowSupplier.get().plusMonths(6);
 			logAppend("futureThreshold = " + futureThreshold);
 			CalendarBuilder builder = new CalendarBuilder();
 			Calendar calendar = builder.build(new StringReader(icalContent));
