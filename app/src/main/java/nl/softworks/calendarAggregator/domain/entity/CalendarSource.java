@@ -13,6 +13,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.io.IOUtils;
+import org.htmlunit.WebClient;
+import org.htmlunit.html.HtmlPage;
 import org.mvel2.MVEL;
 import org.mvel2.ParserConfiguration;
 import org.mvel2.ParserContext;
@@ -29,7 +31,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -217,7 +218,29 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 //		return hidden();
 //	}
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.EAGER)
+    @NotNull
+    protected boolean emulateBrowser = false;
+    static public final String EMULATEBROWSER = "emulateBrowser";
+    public boolean emulateBrowser() {
+        return emulateBrowser;
+    }
+    public CalendarSource emulateBrowser(boolean v) {
+        this.emulateBrowser = v;
+        return this;
+    }
+
+    @NotNull
+    protected boolean caseInsensitive = true;
+    static public final String CASEINSENSITIVE = "caseInsensitive";
+    public boolean caseInsensitive() {
+        return caseInsensitive;
+    }
+    public CalendarSource caseInsensitive(boolean v) {
+        this.caseInsensitive = v;
+        return this;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.EAGER)
     protected final List<CalendarEvent> calendarEvents = new ArrayList<>();
 	public List<CalendarEvent> calendarEvents() {
 		return Collections.unmodifiableList(calendarEvents);
@@ -310,43 +333,57 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 		return newUrl;
 	}
 
-	protected String getUrl(String urlString) throws IOException, InterruptedException {
+    protected String getUrl(String urlString) throws IOException, InterruptedException {
+        try {
+            // For unit tests
+            if (urlString.startsWith("file:")) {
+                return IOUtils.toString(new URI(urlString), StandardCharsets.UTF_8);
+            }
 
-		// For unit tests
-		if (urlString.startsWith("file:")) {
-			return IOUtils.toString(new URL(urlString), StandardCharsets.UTF_8);
-		}
+            String content = (emulateBrowser ? getUrlHtmlUnit(urlString) : getUrlHttpClient(urlString));
 
-		try {
-			HttpClient client = HttpClient.newBuilder()
-					.version(HttpClient.Version.HTTP_1_1)
-					.followRedirects(HttpClient.Redirect.NORMAL)
-					.connectTimeout(Duration.ofMinutes(10))
-					.build();
-			HttpRequest request = HttpRequest.newBuilder()
-					.GET()
-					.uri(new URI(urlString.trim()))
-					.header("Accept", "*/*")
-					//.header("Accept-Encoding", "gzip, deflate, br, zstd")
-					.header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
-					.build();
-			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-			String content = response.body();
+            // Preprocess
+            //if (!calendarSourcePreprocesses.isEmpty()) logAppend("Preprocessed: " + html + "\n");
+            for (CalendarSourcePreprocess calendarSourcePreprocess : calendarSourcePreprocesses) {
+                content = calendarSourcePreprocess.preprocess(content);
+            }
 
-			// Preprocess
-			for (CalendarSourcePreprocess calendarSourcePreprocess : calendarSourcePreprocesses) {
-				content = calendarSourcePreprocess.preprocess(content);
-			}
-			//if (!calendarSourcePreprocesses.isEmpty()) logAppend("Preprocessed: " + html + "\n");
+            return content;
+        }
+        catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
+    }
 
-			return content;
-		}
-		catch (URISyntaxException e) {
-			throw new IOException(e);
+	private String getUrlHtmlUnit(String urlString) throws IOException, InterruptedException {
+
+        try (WebClient webClient = new WebClient()) {
+            webClient.getOptions().setDownloadImages(false);
+            webClient.getOptions().setThrowExceptionOnScriptError(false);
+
+            final HtmlPage page = webClient.getPage(urlString);
+			return page.asXml();
 		}
 	}
 
-	public List<CalendarEvent> generateEvents() {
+    private String getUrlHttpClient(String urlString) throws IOException, InterruptedException, URISyntaxException {
+        HttpClient client = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .followRedirects(HttpClient.Redirect.NORMAL)
+                .connectTimeout(Duration.ofMinutes(10))
+                .build();
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(new URI(urlString.trim()))
+                .header("Accept", "*/*")
+                //.header("Accept-Encoding", "gzip, deflate, br, zstd")
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36")
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        return response.body();
+    }
+
+    public List<CalendarEvent> generateEvents() {
 		log("");
 		status(OK);
 		calendarEvents.clear();

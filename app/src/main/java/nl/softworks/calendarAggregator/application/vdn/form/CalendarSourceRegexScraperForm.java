@@ -1,6 +1,5 @@
 package nl.softworks.calendarAggregator.application.vdn.form;
 
-import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -33,6 +32,7 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseHTM
 	private final TextField endTimeDefaultTextField = new TextField("End time default");
 	private final TextField timePatternTextField = new TextField("Time pattern");
 	private final TextField dateTimeLocaleTextField = new TextField("Date Time Locale");
+    private final Checkbox caseInsensitiveCheckbox = new Checkbox("Case Insensitive");
 
 
 	public CalendarSourceRegexScraperForm() {
@@ -40,7 +40,7 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseHTM
 
 		Button testButton = new Button("Test", evt -> test());
 
-		FormLayout formLayout = addAsFormlayoutInAccordion("Regex", regexTextField, testButton, subjectGroupIdxIntegerField, datePatternTextField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, shortMonthNotationTextField, nearestYearCheckbox, dateTimeLocaleTextField, timePatternTextField, startTimeGroupIdxIntegerField, endTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeDefaultTextField);
+		FormLayout formLayout = addAsFormlayoutInAccordion("Regex", regexTextField, testButton, subjectGroupIdxIntegerField, datePatternTextField, startDateGroupIdxIntegerField, endDateGroupIdxIntegerField, shortMonthNotationTextField, nearestYearCheckbox, dateTimeLocaleTextField, timePatternTextField, startTimeGroupIdxIntegerField, endTimeGroupIdxIntegerField, startTimeDefaultTextField, endTimeDefaultTextField, caseInsensitiveCheckbox);
 		formLayout.setColspan(regexTextField, 2);
 		formLayout.setColspan(testButton, 2);
 
@@ -57,6 +57,7 @@ public class CalendarSourceRegexScraperForm extends CalendarSourceScraperBaseHTM
 		binder.forField(endTimeDefaultTextField).bind(CalendarSourceRegexScraper::endTimeDefault, CalendarSourceRegexScraper::endTimeDefault);
 		binder.forField(timePatternTextField).bind(CalendarSourceRegexScraper::timePattern, CalendarSourceRegexScraper::timePattern);
 		binder.forField(dateTimeLocaleTextField).bind(CalendarSourceRegexScraper::dateTimeLocale, CalendarSourceRegexScraper::dateTimeLocale);
+        binder.forField(caseInsensitiveCheckbox).bind(CalendarSource::caseInsensitive, CalendarSource::caseInsensitive);
 	}
 
 	private void test() {

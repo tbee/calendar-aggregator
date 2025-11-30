@@ -174,7 +174,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBaseHTML {
             }
 
             // Create formatters
-            Locale locale = new Locale(dateTimeLocale);
+            Locale locale = Locale.of(dateTimeLocale);
             logAppend("Locale " + locale + "\n");
             DateTimeFormatter dateFormatter = createDateFormatter(datePattern, shortMonthNotation, locale);
             DateTimeFormatter timeFormatter = createTimeFormatter(timePattern, locale);
@@ -189,7 +189,8 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBaseHTML {
 
             // Apply regex
             logAppend(regex + "\n");
-            Matcher matcher = Pattern.compile(regex, Pattern.CASE_INSENSITIVE).matcher(content);
+            Pattern pattern = (caseInsensitive ? Pattern.compile(regex, Pattern.CASE_INSENSITIVE) : Pattern.compile(regex));
+            Matcher matcher = pattern.matcher(content);
             String previousSubject = "";
             while (matcher.find()) {
                 logMatcher(matcher, content);
