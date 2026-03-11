@@ -182,8 +182,13 @@ public class CalendarSourceICal extends CalendarSource {
 	private LocalDateTime toLocalDateTime(DateProperty<?> dateProperty) {
 		// Set a timezone if we assume one
 		Optional<TzId> tzId = dateProperty.getParameter(Parameter.TZID);
-		if (tzId.isEmpty() && assumedTimezone != null) {
-			dateProperty.add(new TzId(assumedTimezone));
+		if (tzId.isEmpty()) {
+			if (assumedTimezone != null) {
+				dateProperty.add(new TzId(assumedTimezone));
+			}
+			else if (dateProperty.getValue().endsWith("Z")) {
+				dateProperty.add(new TzId("UTC"));
+			}
 		}
 
 		Temporal date = dateProperty.getDate();
