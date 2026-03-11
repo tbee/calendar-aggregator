@@ -79,8 +79,8 @@ public class CalendarSourcesTest {
 
         Assertions.assertEquals(13, calendarEvents.size());
         Assertions.assertEquals("", calendarEvents.getFirst().subject());
-        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 1, 6, 20, 30, 0), calendarEvents.getFirst().startDateTime(), calendarSource.localDateTimeNowSupplier);
-        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 1, 6, 23, 59, 0), calendarEvents.getFirst().endDateTime(), calendarSource.localDateTimeNowSupplier);
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 1, 6, 20, 30, 0), calendarEvents.getFirst().startDateTime(), LocalDateTime::now);
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 1, 6, 23, 59, 0), calendarEvents.getFirst().endDateTime(), LocalDateTime::now);
     }
 
     @Test
@@ -136,8 +136,8 @@ public class CalendarSourcesTest {
 
         Assertions.assertEquals(6, calendarEvents.size());
         Assertions.assertEquals("Vrije Dansavond", calendarEvents.getFirst().subject());
-        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 28, 20, 30, 0), calendarEvents.getFirst().startDateTime(), calendarSource.localDateTimeNowSupplier);
-        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 28, 23, 59, 0), calendarEvents.getFirst().endDateTime(), calendarSource.localDateTimeNowSupplier);
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 28, 20, 30, 0), calendarEvents.getFirst().startDateTime(), LocalDateTime::now);
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 28, 23, 59, 0), calendarEvents.getFirst().endDateTime(), LocalDateTime::now);
     }
 
     @Test
