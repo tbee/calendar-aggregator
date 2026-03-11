@@ -201,7 +201,10 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 		if (timezone != null) {
 			return timezone;
 		}
-		return calendarLocation.timezone();
+		if (calendarLocation != null) {
+			return calendarLocation.timezone();
+		}
+		return null;
 	}
 
 	@NotNull

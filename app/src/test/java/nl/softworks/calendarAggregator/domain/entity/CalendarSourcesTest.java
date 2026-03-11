@@ -4,10 +4,10 @@ import nl.softworks.calendarAggregator.domain.boundary.SMock;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.function.Supplier;
 
 public class CalendarSourcesTest {
 
@@ -28,9 +28,9 @@ public class CalendarSourcesTest {
         new CalendarLocation().addCalendarSource(calendarSource);
         List<CalendarEvent> calendarEvents = calendarSource.generateEvents();
         Assertions.assertEquals(1, calendarEvents.size());
-        Assertions.assertEquals("Kerstgala", calendarEvents.get(0).subject());
-        Assertions.assertEquals(LocalDateTime.of(2023, 12, 16, 20, 30, 0), calendarEvents.get(0).startDateTime());
-        Assertions.assertEquals(LocalDateTime.of(2023, 12, 16, 23, 59, 0), calendarEvents.get(0).endDateTime());
+        Assertions.assertEquals("Kerstgala", calendarEvents.getFirst().subject());
+        Assertions.assertEquals(LocalDateTime.of(2023, 12, 16, 20, 30, 0), calendarEvents.getFirst().startDateTime());
+        Assertions.assertEquals(LocalDateTime.of(2023, 12, 16, 23, 59, 0), calendarEvents.getFirst().endDateTime());
     }
 
     @Test
@@ -53,9 +53,9 @@ public class CalendarSourcesTest {
         List<CalendarEvent> calendarEvents = calendarSource.generateEvents();
 
         Assertions.assertEquals(13, calendarEvents.size());
-        Assertions.assertEquals("", calendarEvents.get(0).subject());
-        Assertions.assertEquals(LocalDateTime.of(2023, 10, 28, 14, 30, 0), calendarEvents.get(0).startDateTime());
-        Assertions.assertEquals(LocalDateTime.of(2023, 10, 28, 18, 00, 0), calendarEvents.get(0).endDateTime());
+        Assertions.assertEquals("", calendarEvents.getFirst().subject());
+        Assertions.assertEquals(LocalDateTime.of(2023, 10, 28, 14, 30, 0), calendarEvents.getFirst().startDateTime());
+        Assertions.assertEquals(LocalDateTime.of(2023, 10, 28, 18, 00, 0), calendarEvents.getFirst().endDateTime());
     }
 
     @Test
@@ -78,9 +78,9 @@ public class CalendarSourcesTest {
         List<CalendarEvent> calendarEvents = calendarSource.generateEvents();
 
         Assertions.assertEquals(13, calendarEvents.size());
-        Assertions.assertEquals("", calendarEvents.get(0).subject());
-        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 1, 6, 20, 30, 0), calendarEvents.get(0).startDateTime());
-        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 1, 6, 23, 59, 0), calendarEvents.get(0).endDateTime());
+        Assertions.assertEquals("", calendarEvents.getFirst().subject());
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 1, 6, 20, 30, 0), calendarEvents.getFirst().startDateTime(), calendarSource.localDateTimeNowSupplier);
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 1, 6, 23, 59, 0), calendarEvents.getFirst().endDateTime(), calendarSource.localDateTimeNowSupplier);
     }
 
     @Test
@@ -104,8 +104,8 @@ public class CalendarSourcesTest {
         calendarEvents.forEach(e -> System.out.println(e));
 
         Assertions.assertEquals(14, calendarEvents.size());
-        Assertions.assertEquals("Vrijdansen en Workshop West Coast Swing 31 mei 2024 HF Witte Colenbergh 1", calendarEvents.get(0).subject().trim());
-        Assertions.assertEquals(LocalDateTime.of(2024, 5, 31, 19, 0, 0), calendarEvents.get(0).startDateTime());
+        Assertions.assertEquals("Vrijdansen en Workshop West Coast Swing 31 mei 2024 HF Witte Colenbergh 1", calendarEvents.getFirst().subject().trim());
+        Assertions.assertEquals(LocalDateTime.of(2024, 5, 31, 19, 0, 0), calendarEvents.getFirst().startDateTime());
         Assertions.assertEquals("Vrijdansen Maandagavond Zomer 2024 Gymzaal Duurstedelaan A", calendarEvents.get(13).subject().trim());
         Assertions.assertEquals(LocalDateTime.of(2024, 8, 26, 19, 30, 0), calendarEvents.get(13).startDateTime());
     }
@@ -135,9 +135,9 @@ public class CalendarSourcesTest {
         System.out.println(calendarEvents);
 
         Assertions.assertEquals(6, calendarEvents.size());
-        Assertions.assertEquals("Vrije Dansavond", calendarEvents.get(0).subject());
-        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 28, 20, 30, 0), calendarEvents.get(0).startDateTime());
-        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 28, 23, 59, 0), calendarEvents.get(0).endDateTime());
+        Assertions.assertEquals("Vrije Dansavond", calendarEvents.getFirst().subject());
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 28, 20, 30, 0), calendarEvents.getFirst().startDateTime(), calendarSource.localDateTimeNowSupplier);
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 28, 23, 59, 0), calendarEvents.getFirst().endDateTime(), calendarSource.localDateTimeNowSupplier);
     }
 
     @Test
@@ -161,9 +161,9 @@ public class CalendarSourcesTest {
         System.out.println(calendarEvents);
 
         Assertions.assertEquals(7, calendarEvents.size());
-        Assertions.assertEquals("Danscafe Ginger", calendarEvents.get(0).subject());
-        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 22, 12, 0, 0), calendarEvents.get(0).startDateTime());
-        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 22, 15, 0, 0), calendarEvents.get(0).endDateTime());
+        Assertions.assertEquals("Danscafe Ginger", calendarEvents.getFirst().subject());
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 22, 12, 0, 0), calendarEvents.getFirst().startDateTime(), calendarSource.localDateTimeNowSupplier);
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 22, 15, 0, 0), calendarEvents.getFirst().endDateTime(), calendarSource.localDateTimeNowSupplier);
     }
 
     @Test
@@ -182,9 +182,9 @@ public class CalendarSourcesTest {
         System.out.println(calendarEvents);
 
         Assertions.assertEquals(1, calendarEvents.size());
-        Assertions.assertEquals("Vrijdansavond Dance Fever", calendarEvents.get(0).subject());
-        assertLocalDateTimeNearestYear(LocalDateTime.of(2025, 6, 27, 20, 0, 0), calendarEvents.get(0).startDateTime());
-        assertLocalDateTimeNearestYear(LocalDateTime.of(2025, 6, 27, 23, 30, 0), calendarEvents.get(0).endDateTime());
+        Assertions.assertEquals("Vrijdansavond Dance Fever", calendarEvents.getFirst().subject());
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2025, 6, 27, 20, 0, 0), calendarEvents.getFirst().startDateTime(), calendarSource.localDateTimeNowSupplier);
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2025, 6, 27, 23, 30, 0), calendarEvents.getFirst().endDateTime(), calendarSource.localDateTimeNowSupplier);
     }
 
     @Test
@@ -203,18 +203,18 @@ public class CalendarSourcesTest {
         System.out.println(calendarEvents);
 
         Assertions.assertEquals(11, calendarEvents.size());
-        Assertions.assertEquals("Dansavond Zaterdag 9 augustus", calendarEvents.get(0).subject());
-        assertLocalDateTimeNearestYear(LocalDateTime.of(2025, 8, 9, 21, 0, 0), calendarEvents.get(0).startDateTime());
-        assertLocalDateTimeNearestYear(LocalDateTime.of(2025, 8, 9, 23, 30, 0), calendarEvents.get(0).endDateTime());
+        Assertions.assertEquals("Dansavond Zaterdag 9 augustus", calendarEvents.getFirst().subject());
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2025, 8, 9, 21, 0, 0), calendarEvents.getFirst().startDateTime(), calendarSource.localDateTimeNowSupplier);
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2025, 8, 9, 23, 30, 0), calendarEvents.getFirst().endDateTime(),calendarSource.localDateTimeNowSupplier);
     }
 
-    private void assertLocalDateTimeNearestYear(LocalDateTime expectedLocalDateTime, LocalDateTime actualLocalDateTime) {
+    private void assertLocalDateTimeNearestYear(LocalDateTime expectedLocalDateTime, LocalDateTime actualLocalDateTime, Supplier<LocalDateTime> localDateTimeNowSupplier) {
         int actualYear = actualLocalDateTime.getYear();
 
         LocalDateTime expectedLocalDateTimeIgnoreYear = expectedLocalDateTime.withYear(actualYear);
         Assertions.assertEquals(expectedLocalDateTimeIgnoreYear, actualLocalDateTime);
 
-        int nowYear = LocalDate.now().getYear();
+        int nowYear = localDateTimeNowSupplier.get().getYear();
         Assertions.assertTrue(actualYear == nowYear - 1 || actualYear == nowYear || actualYear == nowYear + 1);
     }
 }
