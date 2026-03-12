@@ -1,5 +1,40 @@
-FROM azul/zulu-openjdk:23-latest
-COPY ../../../target/*-boot.jar app.jar
-COPY ../../../src/main/container/application-default.properties application-default.properties
+FROM eclipse-temurin:21-jre-alpine
+
+# Create non-root user (UID/GID 1000) - recommended for security
+RUN addgroup -g 1000 appgroup && \
+    adduser -D -u 1000 -G appgroup appuser
+
+# Create directories
+RUN mkdir -p /app /data && \
+    chown -R appuser:appgroup /app /data
+
+# Install rclone (static binary) + certificates
+RUN apk add --no-cache ca-certificates curl tar zip && \
+    apk add --no-cache --virtual .build-deps unzip && \
+    curl -L --silent -o /tmp/rclone.zip https://downloads.rclone.org/rclone-current-linux-amd64.zip && \
+    unzip /tmp/rclone.zip -d /tmp && \
+    mv /tmp/rclone-*/rclone /usr/local/bin/rclone && \
+    chmod +x /usr/local/bin/rclone && \
+    rm -rf /tmp/* && \
+    apk del .build-deps
+
+# Copy and prepare backup.sh
+COPY backup.sh /app/backup.sh
+RUN chmod +x /app/backup.sh && \
+    chown appuser:appgroup /app/backup.sh
+
+# Copy the Spring Boot executable JAR
+COPY ../../../target/*-boot.jar /app/app.jar
+COPY ../../../src/main/container/application-default.properties /data/application-default.properties
+
+WORKDIR /data
+USER appuser
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+
+# The /data volume will be backed by Longhorn PVC
+VOLUME ["/data"]
+
+# Default command = run the Spring Boot app
+# In Kubernetes Deployment/StatefulSet this stays as-is.
+# In CronJob override with: command: ["/app/backup.sh"]
+CMD ["java", "-jar", "app.jar"]
