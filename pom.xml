@@ -8,9 +8,42 @@
 	<name>Calendar Aggregator top</name>
 	<packaging>pom</packaging>
 
+	<properties>
+		<java.version>25</java.version>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.release>${java.version}</maven.compiler.release>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
 	<!-- these modules just exist for easy import in EDIs -->
 	<modules>
 		<module>app</module>
 		<module>testing</module>
 	</modules>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.mvnsearch</groupId>
+				<artifactId>toolchains-maven-plugin</artifactId>
+				<version>4.5.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>toolchain</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<toolchains>
+						<jdk>
+							<version>${maven.compiler.target}</version>
+						</jdk>
+					</toolchains>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
