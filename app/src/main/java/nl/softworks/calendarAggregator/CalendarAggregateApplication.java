@@ -1,5 +1,8 @@
 package nl.softworks.calendarAggregator;
 
+import com.vaadin.flow.component.dependency.StyleSheet;
+import com.vaadin.flow.component.page.AppShellConfigurator;
+import com.vaadin.flow.theme.aura.Aura;
 import nl.softworks.calendarAggregator.application.jpa.RepoBaseImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +20,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @SpringBootApplication
 @EnableJpaRepositories(repositoryBaseClass = RepoBaseImpl.class)
-public class CalendarAggregateApplication {
+@StyleSheet(Aura.STYLESHEET)
+public class CalendarAggregateApplication implements AppShellConfigurator {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarAggregateApplication.class);
 	private static final AtomicBoolean hsqldbStarted = new AtomicBoolean(false);
 
