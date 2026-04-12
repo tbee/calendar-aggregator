@@ -31,10 +31,10 @@ src/main/dev-bundle/
 calendarAggregator.iml
 dbdumps
 pom.xml.versionsBackup
+application-default.properties
 /app/src/main/dev-bundle
 /app/java.cmd
 /app/javaHome.cmd
 /app/dependency-reduced-pom.xml
-/application-default.properties
 /app/node_modules
 
