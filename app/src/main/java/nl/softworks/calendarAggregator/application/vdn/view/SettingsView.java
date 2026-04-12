@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Route("/settings")
-@StyleSheet("context://../vaadin.css")
+@StyleSheet("vaadin.css")
 @RolesAllowed("ROLE_ADMIN")
 public class SettingsView extends CalendarAggregatorAppLayout
 implements AfterNavigationObserver {

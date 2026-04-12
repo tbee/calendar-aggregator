@@ -354,6 +354,37 @@
 			</build>
 		</profile>
 
+		<!-- we use this profile to take advantage of the java version configured in toolchains -->
+		<profile>
+			<id>run</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>3.6.1</version>
+						<executions>
+							<execution>
+								<id>run-boot-jar</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>java</executable>
+									<arguments>
+										<argument>-jar</argument>
+										<argument>target/calendarAggregator-2.42.0-boot.jar</argument>
+										<argument>--logging.level.org.springframework.boot.context.config=TRACE</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
 		<profile>
 			<id>container</id>
 			<build>
@@ -398,44 +429,6 @@
 						<configuration>
 							<skip>true</skip>
 						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>run-container</id>
-			<properties>
-				<containerImageId>org.tbee.calendaraggregator/calendar-aggregator</containerImageId>
-			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.tbee</groupId>
-						<artifactId>podman-maven-plugin</artifactId>
-						<version>main</version>
-						<executions>
-							<execution>
-								<id>run-pod</id>
-								<goals>
-									<goal>runPod</goal>
-								</goals>
-								<configuration>
-									<verbose>true</verbose>
-									<pod>
-										<publish>5005:5005</publish><!-- java remote debugging -->
-										<publish>8080:8080</publish>
-									</pod>
-									<containers>
-										<container>
-											<image>${containerImageId}}:${project.version}</image>
-											<dns>8.8.8.8</dns>
-											<dns>1.1.1.1</dns>
-											<env>BASEURL=http://localhost:8080</env>
-										</container>
-									</containers>
-								</configuration>
-							</execution>
-						</executions>
 					</plugin>
 				</plugins>
 			</build>

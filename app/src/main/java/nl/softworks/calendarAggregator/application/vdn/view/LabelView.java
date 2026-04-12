@@ -22,7 +22,7 @@ import org.tbee.webstack.vdn.component.CrudComponent;
 import java.util.List;
 
 @Route("/label")
-@StyleSheet("context://../vaadin.css")
+@StyleSheet("vaadin.css")
 @RolesAllowed("ROLE_ADMIN")
 public class LabelView extends CalendarAggregatorAppLayout implements AfterNavigationObserver {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LabelView.class);

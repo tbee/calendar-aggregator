@@ -17,10 +17,9 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 
-	<!-- these modules just exist for easy import in EDIs -->
 	<modules>
 		<module>app</module>
-		<module>testing</module>
+<!--		<module>testing</module>-->
 	</modules>
 
 	<build>

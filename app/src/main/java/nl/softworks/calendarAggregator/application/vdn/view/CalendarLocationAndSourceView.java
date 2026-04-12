@@ -65,7 +65,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Route("/")
-@StyleSheet("context://../vaadin.css")
+@StyleSheet("vaadin.css")
 @JavaScript("https://kit.fontawesome.com/501b8808a2.js")
 @RolesAllowed({"ROLE_ADMIN", "ROLE_USER"})
 public class CalendarLocationAndSourceView extends CalendarAggregatorAppLayout

@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.tbee.webstack.vdn.component.CrudComponent;
 
 @Route("/timezone")
-@StyleSheet("context://../vaadin.css")
+@StyleSheet("vaadin.css")
 @RolesAllowed("ROLE_ADMIN")
 public class TimezoneView extends CalendarAggregatorAppLayout implements AfterNavigationObserver {
 	private static final Logger LOGGER = LoggerFactory.getLogger(TimezoneView.class);

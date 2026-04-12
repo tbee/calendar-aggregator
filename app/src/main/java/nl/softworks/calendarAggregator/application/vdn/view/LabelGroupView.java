@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.tbee.webstack.vdn.component.CrudComponent;
 
 @Route("/labelgroup")
-@StyleSheet("context://../vaadin.css")
+@StyleSheet("vaadin.css")
 @RolesAllowed("ROLE_ADMIN")
 public class LabelGroupView extends CalendarAggregatorAppLayout implements AfterNavigationObserver {
 	private static final Logger LOGGER = LoggerFactory.getLogger(LabelGroupView.class);

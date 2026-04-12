@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.tbee.webstack.vdn.component.CrudComponent;
 
 @Route("/person")
-@StyleSheet("context://../vaadin.css")
+@StyleSheet("vaadin.css")
 @RolesAllowed("ROLE_ADMIN")
 public class PersonView extends CalendarAggregatorAppLayout implements AfterNavigationObserver {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PersonView.class);
