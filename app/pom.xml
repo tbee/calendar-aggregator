@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.5.6</version>
+		<version>4.0.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>org.tbee</groupId>
@@ -15,26 +15,17 @@
 	<description>Merge all kinds of calendar sources into one calendar</description>
 	
 	<properties>
-		<java.version>21</java.version>
+		<java.version>25</java.version>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.release>${java.version}</maven.compiler.release>
 		<!-- https://vaadin.com/docs/latest/configuration/live-reload/hotswap-agent -->
-        <vaadin.version>24.9.0</vaadin.version> <!-- https://vaadin.com/releases -->
+        <vaadin.version>25.1.1</vaadin.version> <!-- https://vaadin.com/releases -->
 		<testcontainers.version>1.17.3</testcontainers.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
-            <!-- https://docs.spring.io/spring-boot/maven-plugin/using.html#using.import -->
-            <dependency>
-                <!-- Take manual control of the springboot version instead of via vaadin -->
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>3.5.6</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
 			<dependency>
 				<groupId>com.vaadin</groupId>
 				<artifactId>vaadin-bom</artifactId>
@@ -152,6 +143,11 @@
 			<version>main</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-dev</artifactId>
+			<optional>true</optional>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
@@ -360,9 +356,6 @@
 
 		<profile>
 			<id>container</id>
-			<properties>
-				<containerImageId>org.tbee.calendaraggregator/calendar-aggregator</containerImageId>
-			</properties>
 			<build>
 				<plugins>
 					<plugin>
@@ -411,35 +404,35 @@
 		</profile>
 		<profile>
 			<id>run-container</id>
+			<properties>
+				<containerImageId>org.tbee.calendaraggregator/calendar-aggregator</containerImageId>
+			</properties>
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-						<version>3.5.0</version>
+						<groupId>org.tbee</groupId>
+						<artifactId>podman-maven-plugin</artifactId>
+						<version>main</version>
 						<executions>
 							<execution>
-								<id>run</id>
-								<phase>validate</phase>
+								<id>run-pod</id>
 								<goals>
-									<goal>exec</goal>
+									<goal>runPod</goal>
 								</goals>
 								<configuration>
-									<!--
-                                    Access via: http://localhost:8080
-                                    Running the container on Windows in WSL: make sure mirrored networking is active.
-                                    -->
-									<executable>podman</executable>
-									<arguments>
-										<argument>run</argument>
-										<argument>--rm</argument>
-										<argument>-it</argument>
-										<argument>--name</argument>
-										<argument>calendaraggregator</argument>
-										<argument>-p</argument>
-										<argument>8080:8080</argument>
-										<argument>org.tbee.calendaraggregator/calendar-aggregator:${project.version}</argument>
-									</arguments>
+									<verbose>true</verbose>
+									<pod>
+										<publish>5005:5005</publish><!-- java remote debugging -->
+										<publish>8080:8080</publish>
+									</pod>
+									<containers>
+										<container>
+											<image>${containerImageId}}:${project.version}</image>
+											<dns>8.8.8.8</dns>
+											<dns>1.1.1.1</dns>
+											<env>BASEURL=http://localhost:8080</env>
+										</container>
+									</containers>
 								</configuration>
 							</execution>
 						</executions>

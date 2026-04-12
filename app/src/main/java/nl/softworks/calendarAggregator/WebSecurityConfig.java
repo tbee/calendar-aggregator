@@ -1,6 +1,6 @@
 package nl.softworks.calendarAggregator;
 
-import com.vaadin.flow.spring.security.VaadinWebSecurity;
+import com.vaadin.flow.spring.security.VaadinSecurityConfigurer;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpSessionEvent;
 import jakarta.servlet.http.HttpSessionListener;
@@ -24,7 +24,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity 
-public class WebSecurityConfig extends VaadinWebSecurity {
+public class WebSecurityConfig {
 
     @Autowired
     private DataSource dataSource;
@@ -48,7 +48,13 @@ public class WebSecurityConfig extends VaadinWebSecurity {
                 .httpBasic(Customizer.withDefaults())
                 .csrf(config -> config.disable())
                 .logout(config -> config.invalidateHttpSession(true).deleteCookies("JSESSIONID"));
-        super.configure(httpSecurity);
+
+        httpSecurity.with(VaadinSecurityConfigurer.vaadin(), configurer -> {
+//            // This is important to register your login view to the
+//            // view access checker mechanism:
+//            configurer.loginView(LoginView.class);
+        });
+
         return httpSecurity.build();
     }
 
