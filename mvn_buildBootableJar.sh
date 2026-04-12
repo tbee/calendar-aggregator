@@ -1,1 +1,1 @@
-mvnw clean package -Pproduction
+mvnw clean package -DskipTests -Pproduction

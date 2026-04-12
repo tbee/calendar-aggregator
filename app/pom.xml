@@ -3,14 +3,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.0.5</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<groupId>org.tbee</groupId>
+		<artifactId>calendarAggregator-top</artifactId>
+		<version>2.42.0</version>
+		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<groupId>org.tbee</groupId>
 	<artifactId>calendarAggregator</artifactId>
-	<version>2.42.0</version>
 	<name>Calendar Aggregator</name>
 	<description>Merge all kinds of calendar sources into one calendar</description>
 	
@@ -22,6 +20,7 @@
 		<!-- https://vaadin.com/docs/latest/configuration/live-reload/hotswap-agent -->
         <vaadin.version>25.1.1</vaadin.version> <!-- https://vaadin.com/releases -->
 		<testcontainers.version>1.17.3</testcontainers.version>
+		<springboot.version>4.0.5</springboot.version>
 	</properties>
 
 	<dependencyManagement>
@@ -30,6 +29,13 @@
 				<groupId>com.vaadin</groupId>
 				<artifactId>vaadin-bom</artifactId>
 				<version>${vaadin.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${springboot.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -287,6 +293,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${springboot.version}</version>
 				<configuration>
 					<classifier>boot</classifier>
 					<layout>ZIP</layout> <!-- required to be able to use -Dloader.main -->
