@@ -353,6 +353,7 @@
 								</goals>
 								<configuration>
                                     <forceProductionBuild>true</forceProductionBuild>
+									<optimizeBundle>false</optimizeBundle>
                                 </configuration>
 							</execution>
 						</executions>
