@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-# toolchain takes care of the correct JVM
+# clean up stopped containers
+podman compose rm
 
-mvnw clean package -DskipTests -Pcontainer $*
+# toolchain takes care of the correct JVM
+mvnw clean package -DskipTests -Pproduction -Pcontainer $*
 
