@@ -9,7 +9,7 @@ if [ -z "$(find /data -mindepth 1 -print -quit)" ]; then
 
   if [ -f /data-init/hsqldb.tar.gz ]; then
     mkdir -p /data/hsqldb
-    tar -xzf /data-init/hsqldb.tar.gz -C /data/hsqldb
+    tar -xzmf /data-init/hsqldb.tar.gz -C /data/hsqldb
     rm -f /data/hsqldb.tar.gz
   fi
 fi
