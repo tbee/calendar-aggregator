@@ -37,4 +37,5 @@ application-default.properties
 /app/javaHome.cmd
 /app/dependency-reduced-pom.xml
 /app/node_modules
+/app/src/main/container/data-volume/
 
