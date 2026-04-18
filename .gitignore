@@ -39,3 +39,4 @@ application-default.properties
 /app/node_modules
 /app/src/main/container/data-volume/
 
+app/dancemoments_pg_dump.sql
