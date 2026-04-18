@@ -189,6 +189,12 @@
 			<version>1.41.1</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>${testcontainers.version}</version>
+			<scope>test</scope>
+		</dependency>
 
 <!--        <dependency>-->
 <!--            <groupId>org.jumpmind.symmetric</groupId>-->
@@ -203,6 +209,12 @@
             <artifactId>postgresql</artifactId>
             <version>42.7.7</version>
         </dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${testcontainers.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
     <repositories>
@@ -385,6 +397,17 @@
 										<argument>target/calendarAggregator-${project.version}-boot.jar</argument>
 										<argument>--logging.level.org.springframework.boot.context.config=TRACE</argument>
 									</arguments>
+								</configuration>
+							</execution>
+							<execution>
+								<id>run-test-main</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>java</goal>
+								</goals>
+								<configuration>
+									<mainClass>nl.softworks.calendarAggregator.CalendarAggregatorApplicationPostgres</mainClass>
+									<classpathScope>test</classpathScope>
 								</configuration>
 							</execution>
 						</executions>

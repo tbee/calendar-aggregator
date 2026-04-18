@@ -40,3 +40,4 @@ application-default.properties
 /app/src/main/container/data-volume/
 
 app/dancemoments_pg_dump.sql
+app/src/test/resources/dancemoments_pg_dump.sql
