@@ -2,11 +2,9 @@ package nl.softworks.calendarAggregator;
 
 import org.testcontainers.containers.PostgreSQLContainer;
 
-import java.io.IOException;
-
 public class CalendarAggregatorApplicationPostgres {
 
-    private static PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
+    private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
             .withDatabaseName("postgres")
             .withUsername("postgres")
             .withPassword("password")
@@ -17,14 +15,15 @@ public class CalendarAggregatorApplicationPostgres {
                 }
             });
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         if (!POSTGRES.isRunning()) {
+//        if ("restartedMain".equals(Thread.currentThread().getName())) {
             startPostgres();
         }
         CalendarAggregateApplication.main(args);
     }
 
-    private static void startPostgres() throws IOException, InterruptedException {
+    private static void startPostgres() {
         // Disable HSQLDB
         System.setProperty("calendaraggregator.hsqldb.start", "false");
 
@@ -44,7 +43,6 @@ public class CalendarAggregatorApplicationPostgres {
         System.setProperty("spring.datasource.username", POSTGRES.getUsername());
         System.setProperty("spring.datasource.password", POSTGRES.getPassword());
         System.setProperty("spring.profiles.active", "dev");
-
-        // Start applicatiion
+        System.setProperty("spring.jpa.database-platform", "org.tbee.webstack.postgresql.CustomPostgreSQLDialect");
     }
 }
