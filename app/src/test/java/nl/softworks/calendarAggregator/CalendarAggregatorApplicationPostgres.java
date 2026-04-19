@@ -9,7 +9,13 @@ public class CalendarAggregatorApplicationPostgres {
     private static PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
             .withDatabaseName("postgres")
             .withUsername("postgres")
-            .withPassword("password");
+            .withPassword("password")
+            .withLogConsumer(frame -> {
+                String line = frame.getUtf8String();
+                if (line != null && !line.isEmpty()) {
+                    System.out.print("[postgres] " + line);
+                }
+            });
 
     public static void main(String[] args) throws Exception {
         if (!POSTGRES.isRunning()) {
