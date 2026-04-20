@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
 
+import static org.testcontainers.containers.wait.strategy.Wait.*;
+
 public class CalendarAggregatorApplicationPostgres {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationPrepared.class);
 
@@ -17,7 +19,8 @@ public class CalendarAggregatorApplicationPostgres {
                 if (line != null && !line.isEmpty()) {
                     LOGGER.info("{POSTGRES} " + line.replaceAll("\\r?\\n", ""));
                 }
-            });
+            })
+            .waitingFor(forListeningPort());
 
     public static void main(String[] args) {
         startPostgres();
@@ -25,9 +28,8 @@ public class CalendarAggregatorApplicationPostgres {
     }
 
     private static void startPostgres() {
-        System.out.println("TBEERBNOT " + System.getProperty("spring.datasource.url"));
         if (System.getProperty("spring.datasource.url") != null) {
-            LOGGER.info("Postgres container is already setup" + POSTGRES.getJdbcUrl());
+            LOGGER.info("Postgres container is already setup");
             return;
         }
 
