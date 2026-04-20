@@ -29,7 +29,7 @@ public class ApplicationPrepared implements ApplicationListener<ApplicationPrepa
 
         // Only start HSQLDB if the URL is for HSQLDB
         if (url == null || !url.startsWith("jdbc:hsqldb:")) {
-            if (LOGGER.isInfoEnabled()) LOGGER.info("HSQLDB is not started, as datasource URL is not HSQLDB");
+            if (LOGGER.isInfoEnabled()) LOGGER.info("HSQLDB is not started, because the datasource URL is not HSQLDB");
             return;
         }
 
