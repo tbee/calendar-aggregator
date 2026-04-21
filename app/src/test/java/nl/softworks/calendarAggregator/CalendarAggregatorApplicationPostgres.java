@@ -3,17 +3,17 @@ package nl.softworks.calendarAggregator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.wait.strategy.WaitAllStrategy;
+import org.testcontainers.utility.MountableFile;
 
-import static org.testcontainers.containers.wait.strategy.Wait.*;
+import static org.testcontainers.containers.wait.strategy.Wait.forListeningPort;
 
 public class CalendarAggregatorApplicationPostgres {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationPrepared.class);
 
     private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
-            .withDatabaseName("postgres")
-            .withUsername("postgres")
-            .withPassword("password")
+            .withDatabaseName("dancemoments")
+            .withUsername("dancemoments")
+            .withPassword("dancemoments")
             .withLogConsumer(frame -> {
                 String line = frame.getUtf8String();
                 if (line != null && !line.isEmpty()) {
@@ -22,12 +22,12 @@ public class CalendarAggregatorApplicationPostgres {
             })
             .waitingFor(forListeningPort());
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         startPostgres();
         CalendarAggregateApplication.main(args);
     }
 
-    private static void startPostgres() {
+    private static void startPostgres() throws Exception {
         if (System.getProperty("spring.datasource.url") != null) {
             LOGGER.info("Postgres container is already setup");
             return;
@@ -37,12 +37,12 @@ public class CalendarAggregatorApplicationPostgres {
         POSTGRES.start();
         LOGGER.info("Postgres container started on " + POSTGRES.getJdbcUrl());
 
-//        // restore database
-//        postgres.copyFileToContainer(
-//            MountableFile.forClasspathResource("dancemoments_pg_dump.sql"),
-//            "/tmp/dump.sql"
-//        );
-//        postgres.execInContainer("psql", "-U", "postgres", "-d", "postgres", "-f", "/tmp/dump.sql");
+        // restore database
+        POSTGRES.copyFileToContainer(
+            MountableFile.forClasspathResource("dancemoments_pg_dump.sql"),
+            "/tmp/dump.sql"
+        );
+        POSTGRES.execInContainer("psql", "-U", "dancemoments", "-d", "dancemoments", "-f", "/tmp/dump.sql");
 
         // Setup springboot
         System.setProperty("spring.datasource.url", POSTGRES.getJdbcUrl());
