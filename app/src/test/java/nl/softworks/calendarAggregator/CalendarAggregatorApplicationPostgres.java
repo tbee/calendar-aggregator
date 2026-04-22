@@ -10,18 +10,18 @@ import java.io.File;
 import java.nio.file.Path;
 
 public class CalendarAggregatorApplicationPostgres {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CalendarAggregatorApplicationPostgres.class);
 
     public static void main(String[] args) throws Exception {
         startPostgres("dancemoments", "dancemoments", "dancemoments", new File("app/dancemoments_pg_dump.sql"));
+        System.setProperty("spring.jpa.database-platform", PostgreSQLOnHsqldbCompatibilityDialect.class.getName());
         System.setProperty("spring.profiles.active", "dev");
+
         CalendarAggregateApplication.main(args);
     }
 
     // TBEERNOT: move to webstack
-    private static final Logger LOGGER = LoggerFactory.getLogger(CalendarAggregatorApplicationPostgres.class);
-
     private static void startPostgres(String databaseName, String username, String password, File dumpFile) throws Exception {
-        // This causes the container to be started twice because of the restartedMain thread: if (postgreSQLContainer.isRunning()) {
         if (System.getProperty(CalendarAggregatorApplicationPostgres.class.getName()) != null) {
             LOGGER.info("Postgres container is already running");
             return;
@@ -54,7 +54,6 @@ public class CalendarAggregatorApplicationPostgres {
         System.setProperty("spring.datasource.url", postgreSQLContainer.getJdbcUrl());
         System.setProperty("spring.datasource.username", postgreSQLContainer.getUsername());
         System.setProperty("spring.datasource.password", postgreSQLContainer.getPassword());
-        System.setProperty("spring.jpa.database-platform", PostgreSQLOnHsqldbCompatibilityDialect.class.getName());
 
         // Mark as started
         System.setProperty(CalendarAggregatorApplicationPostgres.class.getName(), "started");
