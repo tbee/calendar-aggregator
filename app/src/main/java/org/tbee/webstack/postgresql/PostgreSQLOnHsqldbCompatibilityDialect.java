@@ -10,7 +10,7 @@ import org.hibernate.type.descriptor.jdbc.spi.JdbcTypeRegistry;
 import java.sql.Types;
 
 // Map CLOB to TEXT so the @Lob annotation works correctly
-public class CustomPostgreSQLDialect extends PostgreSQLDialect {
+public class PostgreSQLOnHsqldbCompatibilityDialect extends PostgreSQLDialect {
 
     @Override
     protected String columnType(int sqlTypeCode) {
