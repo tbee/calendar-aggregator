@@ -12,7 +12,7 @@ import java.nio.file.Path;
 public class CalendarAggregatorApplicationPostgres {
 
     public static void main(String[] args) throws Exception {
-        startPostgres(new File("app/dancemoments_pg_dump.sql"));
+        startPostgres("dancemoments", "dancemoments", "dancemoments", new File("app/dancemoments_pg_dump.sql"));
         System.setProperty("spring.profiles.active", "dev");
         CalendarAggregateApplication.main(args);
     }
@@ -20,45 +20,40 @@ public class CalendarAggregatorApplicationPostgres {
     // TBEERNOT: move to webstack
     private static final Logger LOGGER = LoggerFactory.getLogger(CalendarAggregatorApplicationPostgres.class);
 
-    public static final String DATABASE_NAME = "dancemoments";
-    public static final String USERNAME = "dancemoments";
-    public static final String PASSWORD = "dancemoments";
-
-    private static final PostgreSQLContainer<?> POSTGRES = new PostgreSQLContainer<>("postgres:18")
-            .withDatabaseName(DATABASE_NAME)
-            .withUsername(USERNAME)
-            .withPassword(PASSWORD)
-            .withLogConsumer(frame -> {
-                String line = frame.getUtf8String();
-                if (line != null && !line.isEmpty()) {
-                    LOGGER.info("{POSTGRES} " + line.replaceAll("\\r?\\n", ""));
-                }
-            })
-            .waitingFor(org.testcontainers.containers.wait.strategy.Wait.forListeningPort());
-
-    private static void startPostgres(File dumpFile) throws Exception {
-        // This causes the container to be started twice because of the restartedMain thread: if (POSTGRES.isRunning()) {
+    private static void startPostgres(String databaseName, String username, String password, File dumpFile) throws Exception {
+        // This causes the container to be started twice because of the restartedMain thread: if (postgreSQLContainer.isRunning()) {
         if (System.getProperty(CalendarAggregatorApplicationPostgres.class.getName()) != null) {
             LOGGER.info("Postgres container is already running");
             return;
         }
 
         // Start postgres container
-        POSTGRES.start();
-        LOGGER.info("Postgres container started on " + POSTGRES.getJdbcUrl());
+        PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:18")
+                .withDatabaseName(databaseName)
+                .withUsername(username)
+                .withPassword(password)
+                .withLogConsumer(frame -> {
+                    String line = frame.getUtf8String();
+                    if (line != null && !line.isEmpty()) {
+                        LOGGER.info("{postgreSQLContainer} " + line.replaceAll("\\r?\\n", ""));
+                    }
+                })
+                .waitingFor(org.testcontainers.containers.wait.strategy.Wait.forListeningPort());
+        postgreSQLContainer.start();
+        LOGGER.info("Postgres container started on " + postgreSQLContainer.getJdbcUrl());
 
-        // restore database
+        // Restore a database
         if (dumpFile != null) {
             LOGGER.info("Importing " + dumpFile.getAbsolutePath());
             String containerPath = "/tmp/dump.sql";
-            POSTGRES.copyFileToContainer(MountableFile.forHostPath(Path.of(dumpFile.getAbsolutePath())), containerPath);
-            POSTGRES.execInContainer("psql", "-U", USERNAME, "-d", DATABASE_NAME, "-f", containerPath);
+            postgreSQLContainer.copyFileToContainer(MountableFile.forHostPath(Path.of(dumpFile.getAbsolutePath())), containerPath);
+            postgreSQLContainer.execInContainer("psql", "-U", username, "-d", databaseName, "-f", containerPath);
         }
 
         // Setup spring
-        System.setProperty("spring.datasource.url", POSTGRES.getJdbcUrl());
-        System.setProperty("spring.datasource.username", POSTGRES.getUsername());
-        System.setProperty("spring.datasource.password", POSTGRES.getPassword());
+        System.setProperty("spring.datasource.url", postgreSQLContainer.getJdbcUrl());
+        System.setProperty("spring.datasource.username", postgreSQLContainer.getUsername());
+        System.setProperty("spring.datasource.password", postgreSQLContainer.getPassword());
         System.setProperty("spring.jpa.database-platform", PostgreSQLOnHsqldbCompatibilityDialect.class.getName());
 
         // Mark as started
