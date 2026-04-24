@@ -1,4 +1,4 @@
-package org.tbee.webstack.postgresql;
+package org.tbee.webstack.postgres;
 
 import org.hibernate.boot.model.TypeContributions;
 import org.hibernate.dialect.PostgreSQLDialect;
