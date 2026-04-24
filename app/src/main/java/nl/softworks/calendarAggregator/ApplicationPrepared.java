@@ -20,6 +20,9 @@ public class ApplicationPrepared implements ApplicationListener<ApplicationPrepa
         String url = environment.getProperty("spring.datasource.url");
         String username = environment.getProperty("spring.datasource.username");
         String password = environment.getProperty("spring.datasource.password");
+//        String url = "jdbc:hsqldb:hsql://127.0.0.1:9148/calendarAggregator";
+//        String username = "technical";
+//        String password = "...";
 
         boolean hsqlStart = Boolean.parseBoolean(environment.getProperty("calendaraggregator.hsqldb.start", "true"));
         if (!hsqlStart) {
