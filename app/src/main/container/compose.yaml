@@ -14,3 +14,8 @@ services:
       - ./data-volume:/data
     environment:
       BASEURL: http://127.0.0.1:8080
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.hsqldb.jdbc.JDBCDriver
+      SPRING_DATASOURCE_URL: jdbc:hsqldb:hsql://127.0.0.1:9148/calendarAggregator
+      SPRING_DATASOURCE_USERNAME: technical
+      SPRING_DATASOURCE_PASSWORD: "tgb1q@W3e$$R5t"
+      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.HSQLDialect
