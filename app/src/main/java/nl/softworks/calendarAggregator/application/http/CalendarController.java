@@ -9,6 +9,9 @@ import nl.softworks.calendarAggregator.domain.entity.Settings;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,11 +38,21 @@ public class CalendarController {
 
     private static int EARTH_RADIUS = 6371;
 
+    // Environment variables have higher priority than most application files, but lower than command-line arguments or system properties (in recent versions).
+    //    Replace dots (.) with underscores (_).
+    //    Remove dashes (-).
+    //    Convert to uppercase.
+    // So:
+    // - baseUrl -> BASEURL
+    @Autowired
+    private Environment environment;
+
     private void prepareTemplate(Model model, HttpServletRequest request,
                                  Double lat, Double lon, Integer distance,
                                  List<Label> labelInclude, List<Label> labelExclude,
                                  Boolean showHidden) {
         model.addAttribute("settings", Settings.get());
+        model.addAttribute("baseUrl", baseUrl());
         model.addAttribute("request", request);
         model.addAttribute("lat", lat);
         model.addAttribute("lon", lon);
@@ -238,5 +251,12 @@ public class CalendarController {
 
     private static double haversine(double val) {
         return Math.pow(Math.sin(val / 2), 2);
+    }
+
+    @Nullable
+    private String baseUrl() {
+        String baseUrl = environment.getProperty("baseUrl");
+        if (LOGGER.isDebugEnabled()) LOGGER.debug("BaseUrl=" + baseUrl);
+        return baseUrl;
     }
 }

@@ -1,12 +1,10 @@
 package nl.softworks.calendarAggregator.domain.entity;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tbee.jakarta.validator.UrlValidator;
 
 @Entity
 public class Settings extends EntityBase<Settings> {
@@ -20,18 +18,18 @@ public class Settings extends EntityBase<Settings> {
 		return settings;
 	}
 
-	@Column(unique=true) // prevent the same name to occur
-	@NotNull
-	@UrlValidator
-	protected String websiteBaseurl;
-	static public final String WEBSITEBASEURL = "websiteBaseurl";
-	public String websiteBaseurl() {
-		return websiteBaseurl;
-	}
-	public Settings websiteBaseurl(String v) {
-		this.websiteBaseurl = v;
-		return this;
-	}
+//	@Column(unique=true) // prevent the same name to occur
+//	@NotNull
+//	@UrlValidator
+//	protected String websiteBaseurl;
+//	static public final String WEBSITEBASEURL = "websiteBaseurl";
+//	public String websiteBaseurl() {
+//		return websiteBaseurl;
+//	}
+//	public Settings websiteBaseurl(String v) {
+//		this.websiteBaseurl = v;
+//		return this;
+//	}
 
 	@NotNull
 	protected String title;
@@ -66,9 +64,9 @@ public class Settings extends EntityBase<Settings> {
 		return this;
 	}
 
-	public String toString() {
-		return super.toString() //
-		     + ",websiteBaseurl=" + websiteBaseurl
-		     ;
-	}
+//	public String toString() {
+//		return super.toString() //
+//		     + ",websiteBaseurl=" + websiteBaseurl
+//		     ;
+//	}
 }

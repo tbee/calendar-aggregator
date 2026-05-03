@@ -1,3 +1,3 @@
 call mvnw versions:set
-call mvnw clean install -DskipTests -Pcontainer
+call mvnw clean install -DskipTests -Pproduction -Pcontainer
 pause
