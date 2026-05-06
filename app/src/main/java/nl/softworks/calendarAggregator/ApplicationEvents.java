@@ -9,12 +9,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -28,8 +30,18 @@ public class ApplicationEvents {
     @Autowired
     private GenerateEventsService generateEventsService;
 
+    @Autowired
+    private Environment environment;
+
     @EventListener(ApplicationReadyEvent.class)
     public void startApp() {
+
+        // Write/reader guard
+        String appMode = environment.getProperty("calendaraggregator.app.mode", "");
+        if (appMode.toLowerCase(Locale.ROOT).contains("reader")) {
+            LOGGER.info("Not creating an administrator or scheduled task for generating events because calendaraggregator.app.mode is '{}'", appMode);
+            return;
+        }
 
         // Make sure there is an admin user
         List<Person> persons = R.person().findByRoleAndEnabled(Person.Role.ROLE_ADMIN, true);
