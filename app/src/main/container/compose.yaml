@@ -10,8 +10,8 @@ services:
     ports:
       - "5005:5005" # java debug
       - "8080:8080"
-    volumes:
-      - ./data-volume:/data
+#    volumes:
+#      - ./data-volume:/data
     environment:
       BASEURL: http://127.0.0.1:8080
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.hsqldb.jdbc.JDBCDriver

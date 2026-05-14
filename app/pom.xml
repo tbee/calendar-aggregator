@@ -62,7 +62,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
 		</dependency>
-
 		<!-- https://vaadin.com/docs/latest/components -->
 		<dependency>
 			<groupId>com.vaadin</groupId>
@@ -151,6 +150,22 @@
 			<groupId>org.tbee</groupId>
 			<artifactId>webstack</artifactId>
 			<version>main</version>
+		</dependency>
+
+		<!-- Prometheus metrics via /actuator/prometheus -->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
+		<!-- Expose actuator endpoints -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
+		<!-- OTEL bridge for metrics exemplars -->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-tracing-bridge-otel</artifactId>
 		</dependency>
 
 		<dependency>
@@ -425,8 +440,43 @@
 			<properties>
 				<containerImageId>org.tbee.calendaraggregator/calendaraggregator</containerImageId>
 			</properties>
+			<dependencies>
+				<dependency>
+					<groupId>io.opentelemetry.javaagent</groupId>
+					<artifactId>opentelemetry-javaagent</artifactId>
+					<version>2.27.0</version>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
 			<build>
 				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>3.6.1</version>
+						<executions>
+							<execution>
+								<id>copy-otel-javaagent</id>
+								<phase>package</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>io.opentelemetry.javaagent</groupId>
+											<artifactId>opentelemetry-javaagent</artifactId>
+											<version>2.27.0</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}</outputDirectory>
+											<destFileName>opentelemetry-javaagent.jar</destFileName>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
 					<plugin>
 						<groupId>org.tbee</groupId>
 						<artifactId>podman-maven-plugin</artifactId>
