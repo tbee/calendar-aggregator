@@ -23,10 +23,15 @@ EXPOSE 8080
 EXPOSE 5005
 
 # OpenTelemetry configuration
-ENV OTEL_TRACES_EXPORTER=none
-ENV OTEL_METRICS_EXPORTER=none
+ENV OTEL_SERVICE_NAME=dancemoments
+# don't try to push logs via http:4318
 ENV OTEL_LOGS_EXPORTER=none
-ENV OTEL_JAVA_LOGGING_AUTO_INSTRUMENTATION_ENABLED=true
+#ENV OTEL_TRACES_EXPORTER=none
+#ENV OTEL_METRICS_EXPORTER=none
+#ENV OTEL_JAVA_LOGGING_AUTO_INSTRUMENTATION_ENABLED=true
+#ENV OTEL_INSTRUMENTATION_LOGBACK_MDC_ENABLED=true
+#ENV OTEL_INSTRUMENTATION_LOG4J_CONTEXT_DATA_ENABLED=true
+#ENV OTEL_INSTRUMENTATION_LOGBACK_APPENDER_EXPERIMENTAL_LOG_ATTRIBUTES=true
 #ENV OTEL_JAVAAGENT_DEBUG=true
 
 ENTRYPOINT ["java", "-Dlogging.config=file:/data/logback.xml", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-javaagent:/app/opentelemetry-javaagent.jar", "-jar", "/app/app.jar"]
