@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.tbee</groupId>
 		<artifactId>calendarAggregator-top</artifactId>
-		<version>3.1.0</version>
+		<version>3.2.7</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>calendarAggregator</artifactId>
@@ -152,20 +152,33 @@
 			<version>main</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-micrometer-tracing-opentelemetry</artifactId>
+		</dependency>
 		<!-- Prometheus metrics via /actuator/prometheus -->
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>
 		</dependency>
-		<!-- Expose actuator endpoints -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
 		<!-- OTEL bridge for metrics exemplars -->
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-tracing-bridge-otel</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.opentelemetry</groupId>
+			<artifactId>opentelemetry-exporter-otlp</artifactId>
+		</dependency>
+		<!-- Needed for HTTP server span instrumentation via Micrometer -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+		<!-- Expose actuator endpoints -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 
 		<dependency>
@@ -214,14 +227,6 @@
 			<version>${testcontainers.version}</version>
 			<scope>test</scope>
 		</dependency>
-
-<!--        <dependency>-->
-<!--            <groupId>org.jumpmind.symmetric</groupId>-->
-<!--            <artifactId>symmetric-client</artifactId>-->
-<!--            <version>3.16.5</version>-->
-<!--            <scope>system</scope>-->
-<!--            <systemPath>C:/Users/tom/Applications/symmetric-server-3.16.5/web/WEB-INF/lib/symmetric-client-3.16.5.jar</systemPath>-->
-<!--        </dependency>-->
 
         <dependency>
             <groupId>org.postgresql</groupId>
