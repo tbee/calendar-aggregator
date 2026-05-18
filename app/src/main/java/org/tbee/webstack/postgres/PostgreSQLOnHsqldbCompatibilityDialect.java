@@ -9,8 +9,7 @@ import org.hibernate.type.descriptor.jdbc.spi.JdbcTypeRegistry;
 
 import java.sql.Types;
 
-// TBEERNOT: move to webstack
-
+// Compatibility with HSQLDB
 // Map CLOB to TEXT so the @Lob annotation works correctly
 public class PostgreSQLOnHsqldbCompatibilityDialect extends PostgreSQLDialect {
 

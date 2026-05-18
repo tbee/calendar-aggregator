@@ -24,10 +24,11 @@ EXPOSE 5005
 
 # OpenTelemetry configuration
 ENV OTEL_SERVICE_NAME=dancemoments
+ENV MANAGEMENT_METRICS_TAGS_APPLICATION=dancemoments
 # disable all, this is overridden in the kubernetes deployment
 ENV OTEL_LOGS_EXPORTER=none
 ENV OTEL_TRACES_EXPORTER=none
 ENV OTEL_METRICS_EXPORTER=none
 
-# "-javaagent:/app/opentelemetry-javaagent.jar", this is done by the micrometer-tracing-bridge-otel dependency
+# "-javaagent:/app/opentelemetry-javaagent.jar", this is for spring done by the micrometer-tracing-bridge-otel dependency
 ENTRYPOINT ["java", "-Dlogging.config=file:/data/logback.xml", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005", "-jar", "/app/app.jar"]
