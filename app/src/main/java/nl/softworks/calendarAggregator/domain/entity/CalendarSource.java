@@ -252,6 +252,7 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 	public void addCalendarEvent(CalendarEvent calendarEvent) {
 		calendarEvents.add(calendarEvent);
 		calendarEvent.calendarSource = this;
+		calendarEvent.seqnr(calendarEvents.size());
 	}
 	public void removeCalendarEvent(CalendarEvent calendarEvent) {
 		calendarEvents.remove(calendarEvent);

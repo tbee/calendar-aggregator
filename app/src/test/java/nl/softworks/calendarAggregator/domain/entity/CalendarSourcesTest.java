@@ -30,6 +30,9 @@ public class CalendarSourcesTest {
         new CalendarLocation().addCalendarSource(calendarSource);
         List<CalendarEvent> calendarEvents = new ArrayList<>(calendarSource.generateEvents());
         calendarEvents.sort(Comparator.comparing(CalendarEvent::startDateTime));
+        //System.out.println(calendarSource.log());
+        //calendarEvents.forEach(ce -> System.out.println(ce.startDateTime()));
+
         Assertions.assertEquals(1, calendarEvents.size());
         Assertions.assertEquals("Kerstgala", calendarEvents.getFirst().subject());
         Assertions.assertEquals(LocalDateTime.of(2023, 12, 16, 20, 30, 0), calendarEvents.getFirst().startDateTime());
@@ -55,6 +58,8 @@ public class CalendarSourcesTest {
         new CalendarLocation().addCalendarSource(calendarSource);
         List<CalendarEvent> calendarEvents = new ArrayList<>(calendarSource.generateEvents());
         calendarEvents.sort(Comparator.comparing(CalendarEvent::startDateTime));
+        //System.out.println(calendarSource.log());
+        //calendarEvents.forEach(ce -> System.out.println(ce.startDateTime()));
 
         Assertions.assertEquals(13, calendarEvents.size());
         Assertions.assertEquals("", calendarEvents.getFirst().subject());
@@ -81,6 +86,8 @@ public class CalendarSourcesTest {
         new CalendarLocation().addCalendarSource(calendarSource);
         List<CalendarEvent> calendarEvents = new ArrayList<>(calendarSource.generateEvents());
         calendarEvents.sort(Comparator.comparing(CalendarEvent::startDateTime));
+        //System.out.println(calendarSource.log());
+        //calendarEvents.forEach(ce -> System.out.println(ce.startDateTime()));
 
         Assertions.assertEquals(13, calendarEvents.size());
         Assertions.assertEquals("", calendarEvents.getFirst().subject());
@@ -106,6 +113,8 @@ public class CalendarSourcesTest {
         new CalendarLocation().addCalendarSource(calendarSource);
         List<CalendarEvent> calendarEvents = new ArrayList<>(calendarSource.generateEvents());
         calendarEvents.sort(Comparator.comparing(CalendarEvent::startDateTime));
+        //System.out.println(calendarSource.log());
+        //calendarEvents.forEach(ce -> System.out.println(ce.startDateTime()));
 
         Assertions.assertEquals(14, calendarEvents.size());
         Assertions.assertEquals("Vrijdansen en Workshop West Coast Swing 31 mei 2024 HF Witte Colenbergh 1", calendarEvents.getFirst().subject().trim());
@@ -132,16 +141,17 @@ public class CalendarSourcesTest {
                 .scrapeBlockStart("Agenda")
                 .scrapeUrl(this.getClass().getResource("/webSnapshots/wijgers_20231201a.html").toExternalForm())
                 ;
-        calendarSource.localDateTimeNowSupplier = () -> LocalDateTime.of(2023, 10, 01, 12, 34, 56);
+        calendarSource.localDateTimeNowSupplier = () -> LocalDateTime.of(2023, 10, 1, 12, 34, 56);
         new CalendarLocation().addCalendarSource(calendarSource);
         List<CalendarEvent> calendarEvents = new ArrayList<>(calendarSource.generateEvents());
-        calendarEvents.sort(Comparator.comparing(CalendarEvent::startDateTime));
+        calendarEvents.sort(Comparator.comparing(CalendarEvent::seqnr));
+        //System.out.println(calendarSource.log());
+        //calendarEvents.forEach(ce -> System.out.println(ce.startDateTime()));
 
         Assertions.assertEquals(6, calendarEvents.size());
         Assertions.assertEquals("Vrije Dansavond", calendarEvents.getFirst().subject());
-// TBEERNOT FIX!
-//        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 28, 20, 30, 0), calendarEvents.getFirst().startDateTime(), LocalDateTime::now);
-//        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 28, 23, 59, 0), calendarEvents.getFirst().endDateTime(), LocalDateTime::now);
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 28, 20, 30, 0), calendarEvents.getFirst().startDateTime(), LocalDateTime::now);
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 28, 23, 59, 0), calendarEvents.getFirst().endDateTime(), LocalDateTime::now);
     }
 
     @Test
@@ -162,6 +172,8 @@ public class CalendarSourcesTest {
         new CalendarLocation().addCalendarSource(calendarSource);
         List<CalendarEvent> calendarEvents = new ArrayList<>(calendarSource.generateEvents());
         calendarEvents.sort(Comparator.comparing(CalendarEvent::startDateTime));
+        //System.out.println(calendarSource.log());
+        //calendarEvents.forEach(ce -> System.out.println(ce.startDateTime()));
 
         Assertions.assertEquals(7, calendarEvents.size());
         Assertions.assertEquals("Danscafe Ginger", calendarEvents.getFirst().subject());
@@ -182,6 +194,8 @@ public class CalendarSourcesTest {
                 .addCalendarSource(calendarSource);
         List<CalendarEvent> calendarEvents = new ArrayList<>(calendarSource.generateEvents());
         calendarEvents.sort(Comparator.comparing(CalendarEvent::startDateTime));
+        //System.out.println(calendarSource.log());
+        //calendarEvents.forEach(ce -> System.out.println(ce.startDateTime()));
 
         Assertions.assertEquals(1, calendarEvents.size());
         Assertions.assertEquals("Vrijdansavond Dance Fever", calendarEvents.getFirst().subject());
@@ -202,6 +216,8 @@ public class CalendarSourcesTest {
                 .addCalendarSource(calendarSource);
         List<CalendarEvent> calendarEvents = new ArrayList<>(calendarSource.generateEvents());
         calendarEvents.sort(Comparator.comparing(CalendarEvent::startDateTime));
+        //System.out.println(calendarSource.log());
+        //calendarEvents.forEach(ce -> System.out.println(ce.startDateTime()));
 
         Assertions.assertEquals(11, calendarEvents.size());
         Assertions.assertEquals("Dansavond Zaterdag 9 augustus", calendarEvents.getFirst().subject());
