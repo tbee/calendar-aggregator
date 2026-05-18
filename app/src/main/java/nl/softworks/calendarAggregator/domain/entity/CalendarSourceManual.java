@@ -20,6 +20,7 @@ import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @DiscriminatorValue("manual")
@@ -81,7 +82,7 @@ public class CalendarSourceManual extends CalendarSource {
 		return !rrule.isBlank();
 	}
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.LAZY)
 	protected final List<CalendarSourceManualExdate> calendarSourceManualExdates = new ArrayList<>();
 	public List<CalendarSourceManualExdate> exdates() {
 		return Collections.unmodifiableList(calendarSourceManualExdates);
@@ -97,7 +98,7 @@ public class CalendarSourceManual extends CalendarSource {
 		v.calendarSource = this;
 	}
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.LAZY)
 	protected final List<CalendarSourceExtraEvent> calendarSourceExtraEvents = new ArrayList<>();
 	public List<CalendarSourceExtraEvent> extraEvents() {
 		return Collections.unmodifiableList(calendarSourceExtraEvents);
@@ -110,7 +111,7 @@ public class CalendarSourceManual extends CalendarSource {
 	}
 
 	@Override
-	public List<CalendarEvent> generateEvents() {
+	public Set<CalendarEvent> generateEvents() {
 		try {
 			super.generateEvents();
 			if (!isEnabled()) {

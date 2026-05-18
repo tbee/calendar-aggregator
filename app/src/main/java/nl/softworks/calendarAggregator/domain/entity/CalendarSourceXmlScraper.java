@@ -26,8 +26,8 @@ import java.time.LocalTime;
 import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 @Entity
 @DiscriminatorValue("json")
@@ -193,7 +193,7 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
     }
 
     @Override
-    public List<CalendarEvent> generateEvents() {
+    public Set<CalendarEvent> generateEvents() {
         try {
             super.generateEvents();
             if (!isEnabled()) {
@@ -210,7 +210,7 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
             String content = readScrapeUrl();
             if (content.isBlank()) {
                 status("No contents");
-                return List.of();
+                return Set.of();
             }
 
             // Json to XML conversion?
@@ -305,7 +305,7 @@ public class CalendarSourceXmlScraper extends CalendarSourceScraperBase {
             // set status
             if (calendarEvents().isEmpty()) {
                 status("No events");
-                return List.of();
+                return Set.of();
             }
 
             return calendarEvents();

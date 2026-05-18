@@ -30,6 +30,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.Temporal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,7 +69,7 @@ public class CalendarSourceICal extends CalendarSource {
 	private String assumedTimezone = null;
 
 	@Override
-	public List<CalendarEvent> generateEvents() {
+	public Set<CalendarEvent> generateEvents() {
 		try {
 			super.generateEvents();
 			if (!isEnabled()) {
@@ -92,7 +93,7 @@ public class CalendarSourceICal extends CalendarSource {
 			logAppend(logContent + "\n");
 			if (icalContent.isBlank()) {
 				status("No contents");
-				return List.of();
+				return Set.of();
 			}
 
 			// Parse ical
@@ -165,7 +166,7 @@ public class CalendarSourceICal extends CalendarSource {
 			logAppend("Done\n");
 			if (calendarEvents().isEmpty()) {
 				status("No events");
-				return List.of();
+				return Set.of();
 			}
 
 			return calendarEvents();

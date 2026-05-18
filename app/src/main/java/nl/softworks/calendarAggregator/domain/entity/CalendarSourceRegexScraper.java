@@ -13,8 +13,8 @@ import java.time.LocalTime;
 import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -166,7 +166,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBaseHTML {
     }
 
     @Override
-    public List<CalendarEvent> generateEvents() {
+    public Set<CalendarEvent> generateEvents() {
         try {
             super.generateEvents();
             if (!isEnabled()) {
@@ -183,7 +183,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBaseHTML {
             String content = readScrapeUrlHTML();
             if (content.isBlank()) {
                 status("No contents");
-                return List.of();
+                return Set.of();
             }
             content = sanatizeContent(content);
 
@@ -279,7 +279,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBaseHTML {
             // set status
             if (calendarEvents().isEmpty()) {
                 status("No events");
-                return List.of();
+                return Set.of();
             }
 
             return calendarEvents();

@@ -644,7 +644,7 @@ implements AfterNavigationObserver
 
 	private void generateAndShowTrace(CalendarSource calendarSource) {
 		try {
-			List<CalendarEvent> calendarEvents = calendarSource.generateEvents();
+			Set<CalendarEvent> calendarEvents = calendarSource.generateEvents();
 
 			String calendarEventsString = calendarEvents.stream().map(s -> s + "\n").collect(Collectors.joining());
 			calendarSource.logAppend("\n\n" + calendarEventsString);

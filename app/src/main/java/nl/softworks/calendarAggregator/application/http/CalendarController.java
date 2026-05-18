@@ -57,7 +57,7 @@ public class CalendarController {
         model.addAttribute("lat", lat);
         model.addAttribute("lon", lon);
         model.addAttribute("distance", distance);
-        model.addAttribute("labels", R.label().findAllByOrderBySeqnrAsc());
+        model.addAttribute("labels", R.label().findAllByOrderBySeqnrAscEager());
         model.addAttribute("labelsInclude", labelInclude);
         model.addAttribute("labelsExclude", labelExclude);
 
@@ -84,7 +84,7 @@ public class CalendarController {
 
         // Collect events
         LocalDateTime threshold = LocalDateTime.now();
-        List<CalendarEvent> events = R.calendarEvent().findAll().stream()
+        List<CalendarEvent> events = R.calendarEvent().findAllEager().stream()
                 .filter(ce -> ce.endDateTimeInZone(viewZoneId).isAfter(threshold))
                 .filter(ce -> showHidden != null && showHidden || !ce.calendarSource().hidden())
                 .filter(ce -> filterEventOnDistance(ce, lat, lon, distance))
@@ -163,7 +163,7 @@ public class CalendarController {
 
         // Collect events
         LocalDateTime threshold = LocalDateTime.now();
-        List<CalendarEvent> events = R.calendarEvent().findAll().stream()
+        List<CalendarEvent> events = R.calendarEvent().findAllEager().stream()
                 .filter(ce -> ce.endDateTimeInZone(viewZoneId).isAfter(threshold))
                 .filter(ce -> showHidden != null && showHidden || !ce.calendarSource().hidden())
                 .filter(ce -> filterEventOnDistance(ce, lat, lon, distance))

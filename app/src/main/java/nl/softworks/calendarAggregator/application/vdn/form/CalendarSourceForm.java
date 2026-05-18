@@ -34,6 +34,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 abstract public class CalendarSourceForm extends Harmonica {
@@ -153,7 +154,7 @@ abstract public class CalendarSourceForm extends Harmonica {
 	protected void generateAndShowTrace(CalendarSource calendarSource) {
 		try {
 			writeTo(calendarSource);
-			List<CalendarEvent> calendarEvents = calendarSource.generateEvents();
+			Set<CalendarEvent> calendarEvents = calendarSource.generateEvents();
 			populateWith(calendarSource);
 
 			String calendarEventsString = calendarEvents.stream().map(s -> s + "\n").collect(Collectors.joining());

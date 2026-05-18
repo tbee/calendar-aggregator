@@ -36,7 +36,7 @@ public class CalendarResource {
                 .collect(Collectors.joining("\n"));
 
         // Collect events
-        List<CalendarEvent> events = R.calendarEvent().findAll().stream()
+        List<CalendarEvent> events = R.calendarEvent().findAllEager().stream()
                 .filter(ce -> showHidden || !ce.calendarSource().hidden())
                 .filter(ce -> CalendarController.filterEventOnDistance(ce, lat, lon, distance))
                 .filter(ce -> CalendarController.filterEventOnLabels(ce, labelsInclude, labelsExclude))

@@ -139,7 +139,7 @@ public class CalendarLocation extends EntityBase<CalendarLocation> {
 		return this;
 	}
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarLocation", fetch = FetchType.EAGER)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarLocation", fetch = FetchType.LAZY)
     protected final List<CalendarSource> calendarSources = new ArrayList<>();
 	public List<CalendarSource> calendarSources() {
 		return Collections.unmodifiableList(calendarSources);
@@ -177,4 +177,3 @@ public class CalendarLocation extends EntityBase<CalendarLocation> {
 		     ;
 	}
 }
-

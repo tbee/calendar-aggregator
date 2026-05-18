@@ -13,6 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.io.IOUtils;
+import org.hibernate.annotations.BatchSize;
 import org.htmlunit.WebClient;
 import org.htmlunit.html.HtmlPage;
 import org.mvel2.MVEL;
@@ -38,12 +39,11 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -243,10 +243,11 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
         return this;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.EAGER)
-    protected final List<CalendarEvent> calendarEvents = new ArrayList<>();
-	public List<CalendarEvent> calendarEvents() {
-		return Collections.unmodifiableList(calendarEvents);
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.LAZY)
+	@BatchSize(size = 100) // prevent N+1 queries
+    protected final Set<CalendarEvent> calendarEvents = new HashSet<>();
+	public Set<CalendarEvent> calendarEvents() {
+		return Collections.unmodifiableSet(calendarEvents);
 	}
 	public void addCalendarEvent(CalendarEvent calendarEvent) {
 		calendarEvents.add(calendarEvent);
@@ -257,10 +258,11 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 		calendarEvent.calendarSource = null;
 	}
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.EAGER)
-	protected final List<CalendarSourceLabelAssignment> labelAssignments = new ArrayList<>();
-	public List<CalendarSourceLabelAssignment> labelAssignments() {
-		return Collections.unmodifiableList(labelAssignments);
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.LAZY)
+	@BatchSize(size = 100) // prevent N+1 queries
+	protected final Set<CalendarSourceLabelAssignment> labelAssignments = new HashSet<>();
+	public Set<CalendarSourceLabelAssignment> labelAssignments() {
+		return Collections.unmodifiableSet(labelAssignments);
 	}
 	public void labelAssignments(Collection<CalendarSourceLabelAssignment> v) {
 		// TODO this can be done more efficient
@@ -281,10 +283,11 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 				.collect(Collectors.toSet());
 	}
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.EAGER)
-	protected final List<CalendarSourcePreprocess> calendarSourcePreprocesses = new ArrayList<>();
-	public List<CalendarSourcePreprocess> calendarSourcePreprocesses() {
-		return Collections.unmodifiableList(calendarSourcePreprocesses);
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "calendarSource", fetch = FetchType.LAZY)
+	@BatchSize(size = 100) // prevent N+1 queries
+	protected final Set<CalendarSourcePreprocess> calendarSourcePreprocesses = new HashSet<>();
+	public Set<CalendarSourcePreprocess> calendarSourcePreprocesses() {
+		return Collections.unmodifiableSet(calendarSourcePreprocesses);
 	}
 	public void calendarSourcePreprocesses(Collection<CalendarSourcePreprocess> v) {
 		// TODO this can be done more efficient
@@ -386,7 +389,7 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
         return response.body();
     }
 
-    public List<CalendarEvent> generateEvents() {
+    public Set<CalendarEvent> generateEvents() {
 		log("");
 		status(OK);
 		calendarEvents.clear();

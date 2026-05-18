@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -111,7 +111,7 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
     }
 
     @Override
-    public List<CalendarEvent> generateEvents() {
+    public Set<CalendarEvent> generateEvents() {
         try {
             super.generateEvents();
             if (!isEnabled()) {
@@ -124,7 +124,7 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
             String content = readScrapeUrlHTML();
             if (content.isBlank()) {
                 status("No contents");
-                return List.of();
+                return Set.of();
             }
             content = sanatizeContent(content);
 
@@ -207,7 +207,7 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
            logAppend("Done\n");
             if (calendarEvents().isEmpty()) {
                 status("No events");
-                return List.of();
+                return Set.of();
             }
             return calendarEvents();
         }
