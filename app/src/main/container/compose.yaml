@@ -28,6 +28,7 @@ services:
       POSTGRES_USER: technical
       POSTGRES_PASSWORD: "technical"
     volumes:
+      # dancemoments role is needed it is in the pg_dump, and the restore will fail if it doesn't exist
       - ./init/00-create-roles.sql:/docker-entrypoint-initdb.d/00-create-roles.sql:ro
       - ../../../../dancemoments_pg_dump.sql:/docker-entrypoint-initdb.d/01-dancemoments_pg_dump.sql:ro
     healthcheck:
