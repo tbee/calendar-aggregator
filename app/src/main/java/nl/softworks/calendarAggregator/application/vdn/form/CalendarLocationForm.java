@@ -23,7 +23,7 @@ import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.Timezone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tbee.jakarta.validator.UrlValidatorImpl;
+import org.tbee.webstack.jakarta.validator.UrlValidatorImpl;
 import org.tbee.webstack.vdn.component.ConfirmationDialog;
 
 import java.util.List;

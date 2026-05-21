@@ -149,7 +149,7 @@
 		<dependency>
 			<groupId>org.tbee</groupId>
 			<artifactId>webstack</artifactId>
-			<version>main</version>
+			<version>2.x.x</version>
 		</dependency>
 
 		<dependency>

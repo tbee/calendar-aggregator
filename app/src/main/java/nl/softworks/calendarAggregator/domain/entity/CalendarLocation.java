@@ -10,7 +10,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tbee.jakarta.validator.UrlValidator;
+import org.tbee.webstack.jakarta.validator.UrlValidator;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
