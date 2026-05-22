@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 public class PostgresTestContainer {
 
-    private String containerName = "postgres:latest";
+    private String containerName = "postgres:18";
     private String database;
     private String username;
     private String password;
@@ -30,7 +30,7 @@ public class PostgresTestContainer {
             }
 
             // Start postgres container
-            PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:18")
+            PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>(containerName)
                     .withDatabaseName(database)
                     .withUsername(username)
                     .withPassword(password)
