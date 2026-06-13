@@ -11,6 +11,7 @@ public class CalendarAggregatorApplicationPostgres {
     private static final Logger LOGGER = LoggerFactory.getLogger(CalendarAggregatorApplicationPostgres.class);
 
     public static void main(String[] args) throws Exception {
+        // Run "podman machine start" first
         new PostgresTestContainer()
                 .database("dancemoments")
                 .username("dancemoments")
