@@ -43,3 +43,4 @@ app/dancemoments_pg_dump.sql
 app/src/test/resources/dancemoments_pg_dump.sql
 dancemoments_pg_dump.sql
 /app/src/main/bundles
+*.sql.gz
