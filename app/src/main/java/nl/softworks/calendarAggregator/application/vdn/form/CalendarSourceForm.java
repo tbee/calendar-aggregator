@@ -173,8 +173,8 @@ abstract public class CalendarSourceForm extends Harmonica {
 
 		final private Label label;
 		private CalendarSourceLabelAssignment assign;
-		private Checkbox selectedCheckbox = new Checkbox(false);
-		private IconButton editIcon = new IconButton(LumoIcon.EDIT.create(), e -> edit());
+		private final Checkbox selectedCheckbox = new Checkbox(false);
+		private final IconButton editIcon = new IconButton(LumoIcon.EDIT.create(), e -> edit());
 
 		public LabelAssignmentGridRow(Label v) {
 			this.label = v;
