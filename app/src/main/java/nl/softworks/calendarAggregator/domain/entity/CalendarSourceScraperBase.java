@@ -113,7 +113,7 @@ abstract public class CalendarSourceScraperBase extends CalendarSource {
 	}
 
 	protected LocalDate determineDateByNearestYear(MonthDay monthDay) {
-		LocalDate now = LocalDate.now();
+		LocalDate now = localDateTimeNowSupplier.get().toLocalDate();
 
 		// Calculate the three options
 		int year = now.getYear();

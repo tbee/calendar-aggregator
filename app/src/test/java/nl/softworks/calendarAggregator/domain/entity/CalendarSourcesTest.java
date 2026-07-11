@@ -82,7 +82,7 @@ public class CalendarSourcesTest {
                 .scrapeBlockEnd("Zie agenda")
                 .scrapeUrl(this.getClass().getResource("/webSnapshots/verhoeven_20231127a.html").toExternalForm())
                 ;
-        calendarSource.localDateTimeNowSupplier = () -> LocalDateTime.of(2023, 12, 01, 12, 34, 56);
+        calendarSource.localDateTimeNowSupplier = () -> LocalDateTime.of(2023, 12, 1, 12, 34, 56);
         new CalendarLocation().addCalendarSource(calendarSource);
         List<CalendarEvent> calendarEvents = new ArrayList<>(calendarSource.generateEvents());
         calendarEvents.sort(Comparator.comparing(CalendarEvent::startDateTime));
@@ -91,8 +91,8 @@ public class CalendarSourcesTest {
 
         Assertions.assertEquals(13, calendarEvents.size());
         Assertions.assertEquals("", calendarEvents.getFirst().subject());
-        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 1, 6, 20, 30, 0), calendarEvents.getFirst().startDateTime(), LocalDateTime::now);
-        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 1, 6, 23, 59, 0), calendarEvents.getFirst().endDateTime(), LocalDateTime::now);
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 1, 6, 20, 30, 0), calendarEvents.getFirst().startDateTime(), () -> calendarSource.localDateTimeNowSupplier.get());
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 1, 6, 23, 59, 0), calendarEvents.getFirst().endDateTime(), () -> calendarSource.localDateTimeNowSupplier.get());
     }
 
     @Test
@@ -150,8 +150,8 @@ public class CalendarSourcesTest {
 
         Assertions.assertEquals(6, calendarEvents.size());
         Assertions.assertEquals("Vrije Dansavond", calendarEvents.getFirst().subject());
-        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 28, 20, 30, 0), calendarEvents.getFirst().startDateTime(), LocalDateTime::now);
-        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 28, 23, 59, 0), calendarEvents.getFirst().endDateTime(), LocalDateTime::now);
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 28, 20, 30, 0), calendarEvents.getFirst().startDateTime(), () -> calendarSource.localDateTimeNowSupplier.get());
+        assertLocalDateTimeNearestYear(LocalDateTime.of(2024, 10, 28, 23, 59, 0), calendarEvents.getFirst().endDateTime(), () -> calendarSource.localDateTimeNowSupplier.get());
     }
 
     @Test
