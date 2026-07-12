@@ -3,6 +3,7 @@ package nl.softworks.calendarAggregator.domain.boundary;
 import jakarta.annotation.PostConstruct;
 import nl.softworks.calendarAggregator.domain.service.GenerateEventsService;
 import nl.softworks.calendarAggregator.domain.service.ICalService;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
@@ -31,5 +32,11 @@ public class S {
     GenerateEventsService generateEventsService;
     static public GenerateEventsService generateEventsService() {
         return S.singleton.generateEventsService;
+    }
+
+    @Autowired
+    ChatModel chatModel;
+    static public ChatModel chatModel() {
+        return S.singleton.chatModel;
     }
 }
