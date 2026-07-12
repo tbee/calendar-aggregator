@@ -5,11 +5,13 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
 import nl.softworks.calendarAggregator.domain.boundary.S;
+import nl.softworks.calendarAggregator.domain.service.OpenRouterService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.openai.OpenAiChatOptions;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -29,10 +31,14 @@ public class CalendarSourceAIScraper extends CalendarSourceScraperBaseHTML {
 
     @NotNull
     @Column(name = "subject")
-    private String model = "";
+    private String model = OpenRouterService.AUTO_MODEL;
     static public final String MODEL = "model";
     public String model() {
         return model;
+    }
+    public CalendarSourceAIScraper model(String v) {
+        this.model = v;
+        return this;
     }
 
     @NotNull
@@ -105,9 +111,13 @@ public class CalendarSourceAIScraper extends CalendarSourceScraperBaseHTML {
                     .replace("%content%", content);
             logAppend(systemPrompt + "\n" + userPrompt + "\n");
 
+            String selectedModel = (model == null || model.isBlank()) ? OpenRouterService.AUTO_MODEL : model;
+            logAppend("Model: " + selectedModel + "\n");
+
             String response = ChatClient
                     .create(S.chatModel())
                     .prompt()
+                    .options(OpenAiChatOptions.builder().model(selectedModel))
                     .system(systemPrompt)
                     .user(userPrompt)
                     .call()

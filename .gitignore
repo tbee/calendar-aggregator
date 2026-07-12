@@ -32,6 +32,7 @@ calendarAggregator.iml
 dbdumps
 pom.xml.versionsBackup
 application-default.properties
+application-secret.properties
 /app/src/main/dev-bundle
 /app/java.cmd
 /app/javaHome.cmd
