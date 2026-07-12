@@ -16,7 +16,7 @@ public class CalendarAggregatorApplicationPostgres {
                 .database("dancemoments")
                 .username("dancemoments")
                 .password("dancemoments")
-                .load(new File("dancemoments_pg_dump.sql"))
+                .restore(new File("dancemoments_pg_dump.sql"))
                 .log(LOGGER::info)
                 .start();
         System.setProperty("spring.jpa.database-platform", PostgreSQLOnHsqldbCompatibilityDialect.class.getName());
