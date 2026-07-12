@@ -21,6 +21,9 @@ public class OpenRouterService {
     /** OpenRouter's automatic model selection; used as the default. */
     public static final String AUTO_MODEL = "openrouter/auto";
 
+    /** OpenRouter's automatic selection among free models; no token cost. */
+    public static final String FREE_MODEL = "openrouter/free";
+
     public record Model(String id, String name) {
     }
 
@@ -44,9 +47,10 @@ public class OpenRouterService {
     }
 
     private List<Model> fetchModels() {
-        // Keep insertion order + dedupe by id, always starting with the auto model.
+        // Keep insertion order + dedupe by id, always starting with the auto models.
         Map<String, Model> modelsById = new LinkedHashMap<>();
         modelsById.put(AUTO_MODEL, new Model(AUTO_MODEL, "Auto (let OpenRouter pick)"));
+        modelsById.put(FREE_MODEL, new Model(FREE_MODEL, "Free (let OpenRouter pick a free model)"));
 
         try {
             ModelsResponse response = RestClient.create()
@@ -74,8 +78,21 @@ public class OpenRouterService {
             LOGGER.warn("Could not fetch models from OpenRouter, only the auto model is available", e);
         }
 
-        List<Model> models = new ArrayList<>(modelsById.values());
-        models.sort(Comparator.comparing(Model::name, String.CASE_INSENSITIVE_ORDER));
+        // Pin the auto and free entries first, then the rest sorted by name.
+        List<Model> pinned = new ArrayList<>();
+        List<Model> rest = new ArrayList<>();
+        for (Model model : modelsById.values()) {
+            if (AUTO_MODEL.equals(model.id()) || FREE_MODEL.equals(model.id())) {
+                pinned.add(model);
+            }
+            else {
+                rest.add(model);
+            }
+        }
+        rest.sort(Comparator.comparing(Model::name, String.CASE_INSENSITIVE_ORDER));
+
+        List<Model> models = new ArrayList<>(pinned);
+        models.addAll(rest);
         return models;
     }
 
