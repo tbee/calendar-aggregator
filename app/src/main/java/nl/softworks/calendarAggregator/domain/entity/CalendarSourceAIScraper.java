@@ -53,17 +53,6 @@ public class CalendarSourceAIScraper extends CalendarSourceScraperBaseHTML {
         return this;
     }
 
-    /**
-     * In addition to the base sanitizing, strip out script and style tags so their
-     * (often large and irrelevant) content is not sent to the LLM.
-     */
-    @Override
-    protected String sanatizeContent(String content) {
-        Document doc = Jsoup.parse(content);
-        doc.select("script, style").remove();
-        return super.sanatizeContent(doc.text());
-    }
-
     @Override
     public Set<CalendarEvent> generateEvents() {
         try {
@@ -73,7 +62,7 @@ public class CalendarSourceAIScraper extends CalendarSourceScraperBaseHTML {
             }
 
             // Get contents
-            String content = readScrapeUrlHTML();
+            String content = readScrapeUrlAsHtml();
             if (content.isBlank()) {
                 status("No contents");
                 return Set.of();
@@ -98,16 +87,14 @@ public class CalendarSourceAIScraper extends CalendarSourceScraperBaseHTML {
                     Only return the XML structure, nothing else.
                     """;
             String userPrompt = """
-                    %promp%
+                    %prompt%
 
-                    Below is the HTML content of the webpage at %url%, enclosed in <html> tags.
+                    Below is the HTML content of the webpage at %url%.
                     Extract the events from it and ignore any HTML that is not related to events.
-                    <html>
                     %content%
-                    </html>
                     """
-                    .replace("%promp%", prompt)
-                    .replace("%url%", url())
+                    .replace("%prompt%", prompt)
+                    .replace("%url%", scrapeUrl)
                     .replace("%content%", content);
             logAppend(systemPrompt + "\n" + userPrompt + "\n");
 

@@ -180,7 +180,7 @@ public class CalendarSourceRegexScraper extends CalendarSourceScraperBaseHTML {
             DateTimeFormatter timeFormatter = createTimeFormatter(timePattern, locale);
 
             // Get contents
-            String content = readScrapeUrlHTML();
+            String content = readScrapeUrlAsText();
             if (content.isBlank()) {
                 status("No contents");
                 return Set.of();

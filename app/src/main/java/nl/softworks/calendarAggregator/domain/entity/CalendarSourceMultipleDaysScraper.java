@@ -121,7 +121,7 @@ public class CalendarSourceMultipleDaysScraper extends CalendarSourceScraperBase
             Locale locale = new Locale(dateTimeLocale);
            logAppend("Locale " + locale + "\n");
 
-            String content = readScrapeUrlHTML();
+            String content = readScrapeUrlAsText();
             if (content.isBlank()) {
                 status("No contents");
                 return Set.of();

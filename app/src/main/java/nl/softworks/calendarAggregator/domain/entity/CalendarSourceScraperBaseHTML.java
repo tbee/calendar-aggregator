@@ -63,17 +63,35 @@ abstract public class CalendarSourceScraperBaseHTML extends CalendarSourceScrape
 		return this;
 	}
 
-	protected String readScrapeUrlHTML() {
+	protected String readScrapeUrlAsHtml() {
+		String html = null;
+		try {
+			String rawHtml = readScrapeUrl();
+
+			// Extract html information
+			Document doc = Jsoup.parse(rawHtml);
+			doc.select("script, style").remove();
+			html = doc.html();
+			logAppend("Content: " + html.length() + "\n");
+			return html;
+		}
+		catch (RuntimeException e) {
+			if (html != null) logAppend(html + "\n");
+			throw e;
+		}
+	}
+
+	protected String readScrapeUrlAsText() {
 		String text = null;
 		try {
-			String html = readScrapeUrl();
+			String rawHtml = readScrapeUrl();
 
 			// Extract text information
-			Document doc = Jsoup.parse(html);
+			Document doc = Jsoup.parse(rawHtml);
 			text = doc.text();
 			logAppend("Content: " + text.length() + "\n");
 
-			// special handling for certain elements: <eventbrite-modal :events="html escaped string"
+			// special handling for certain elements: <eventbrite-modal :events="rawHtml escaped string"
 			for (Element eventbrightModalElement : doc.selectXpath("//eventbrite-modal")) {
 				Attribute eventsAttribute = eventbrightModalElement.attribute(":events");
 				if (eventsAttribute != null) {
