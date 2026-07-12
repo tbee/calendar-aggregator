@@ -10,8 +10,8 @@ import nl.softworks.calendarAggregator.domain.entity.CalendarSourceScraperBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CalendarSourceScraperBaseForm extends CalendarSourceForm {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourceScraperBaseForm.class);
+public class CalendarSourceScraperBaseHtmlForm extends CalendarSourceForm {
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourceScraperBaseHtmlForm.class);
 
 	private final Binder<CalendarSourceScraperBase> binder = new Binder<>();
 
@@ -20,7 +20,7 @@ public class CalendarSourceScraperBaseForm extends CalendarSourceForm {
 
 	protected final FormLayout scrapeFormLayout;
 
-	public CalendarSourceScraperBaseForm() {
+	public CalendarSourceScraperBaseHtmlForm() {
 		scrapeURLTextField.setTooltipText("Use `=@{now.plusYears(1).format(yyyy_MM_dd)}` to insert code.");
 
 		scrapeFormLayout = addAsFormlayoutInAccordion("Scrape", scrapeURLTextField, emulateWebbrowserCheckbox);
@@ -33,7 +33,7 @@ public class CalendarSourceScraperBaseForm extends CalendarSourceForm {
 	}
 
 	@Override
-	public CalendarSourceScraperBaseForm populateWith(CalendarSource calendarSource) {
+	public CalendarSourceScraperBaseHtmlForm populateWith(CalendarSource calendarSource) {
 		super.populateWith(calendarSource);
 		if (calendarSource instanceof CalendarSourceScraperBase calendarSourceScraperBase) {
 			binder.readBean(calendarSourceScraperBase);
@@ -42,7 +42,7 @@ public class CalendarSourceScraperBaseForm extends CalendarSourceForm {
 	}
 
 	@Override
-	public CalendarSourceScraperBaseForm writeTo(CalendarSource calendarSource) throws ValidationException {
+	public CalendarSourceScraperBaseHtmlForm writeTo(CalendarSource calendarSource) throws ValidationException {
 		super.writeTo(calendarSource);
 		if (calendarSource instanceof CalendarSourceScraperBase calendarSourceScraperBase) {
 			binder.writeBean(calendarSourceScraperBase);

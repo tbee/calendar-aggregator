@@ -14,7 +14,7 @@ import nl.softworks.calendarAggregator.domain.service.OpenRouterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CalendarSourceAIScraperForm extends CalendarSourceScraperBaseHTMLForm {
+public class CalendarSourceAIScraperForm extends CalendarSourceScraperBaseHtmlForm {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourceAIScraperForm.class);
 
 	private final Binder<CalendarSourceAIScraper> binder = new Binder<>();

@@ -8,8 +8,8 @@ import nl.softworks.calendarAggregator.domain.entity.CalendarSourceScraperBaseHT
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CalendarSourceScraperBaseHTMLForm extends CalendarSourceScraperBaseForm {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourceScraperBaseHTMLForm.class);
+public class CalendarSourceScraperBaseTextForm extends CalendarSourceScraperBaseHtmlForm {
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourceScraperBaseTextForm.class);
 
 	private final Binder<CalendarSourceScraperBaseHTML> binder = new Binder<>();
 
@@ -17,7 +17,7 @@ public class CalendarSourceScraperBaseHTMLForm extends CalendarSourceScraperBase
 	private final TextField scrapeBlockEndTextField = new TextField("Scrape block end");
 	private final TextField removeCharsTextField = new TextField("Remove chars");
 
-	public CalendarSourceScraperBaseHTMLForm() {
+	public CalendarSourceScraperBaseTextForm() {
 		scrapeFormLayout.add(scrapeBlockStartTextField, scrapeBlockEndTextField, removeCharsTextField);
 
 		binder.forField(scrapeBlockStartTextField).bind(CalendarSourceScraperBaseHTML::scrapeBlockStart, CalendarSourceScraperBaseHTML::scrapeBlockStart);
@@ -26,7 +26,7 @@ public class CalendarSourceScraperBaseHTMLForm extends CalendarSourceScraperBase
 	}
 
 	@Override
-	public CalendarSourceScraperBaseHTMLForm populateWith(CalendarSource calendarSource) {
+	public CalendarSourceScraperBaseTextForm populateWith(CalendarSource calendarSource) {
 		super.populateWith(calendarSource);
 		if (calendarSource instanceof CalendarSourceScraperBaseHTML calendarSourceScraperBaseHTML) {
 			binder.readBean(calendarSourceScraperBaseHTML);
@@ -35,7 +35,7 @@ public class CalendarSourceScraperBaseHTMLForm extends CalendarSourceScraperBase
 	}
 
 	@Override
-	public CalendarSourceScraperBaseHTMLForm writeTo(CalendarSource calendarSource) throws ValidationException {
+	public CalendarSourceScraperBaseTextForm writeTo(CalendarSource calendarSource) throws ValidationException {
 		super.writeTo(calendarSource);
 		if (calendarSource instanceof CalendarSourceScraperBaseHTML calendarSourceScraperBaseHTML) {
 			binder.writeBean(calendarSourceScraperBaseHTML);
