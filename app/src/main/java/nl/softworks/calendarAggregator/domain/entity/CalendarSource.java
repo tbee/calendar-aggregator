@@ -307,7 +307,8 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 
 	/**
 	 * Using MVEL2 http://mvel.documentnode.com/
-	 * Example: ...&filter[from]=@{now.minusMonths(1).format(yyyy_MM_dd)}&filter[until]=@{now.plusYears(1).format(yyyy_MM_dd)}
+	 * Example: ...&filter[from]=@{now.minusMonths(1).format(DateTimeFormatter.ofPattern("yyyy-MM"))
+	 * Example: ...&filter[from]=@{now.minusMonths(1).format(yyyy_MM_dd)}
 	 * @param url
 	 * @return
 	 */
@@ -335,6 +336,7 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
 		Map<String, Object> vars = new HashMap<>(functionMap);
 		vars.put("now", localDateTimeNowSupplier.get());
 		vars.put("yyyy_MM_dd", DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+		vars.put("yyyy_MM", DateTimeFormatter.ofPattern("yyyy-MM"));
 		String newUrl = (String) TemplateRuntime.execute(compiledExpression, vars);
 		logAppend("URL after: " + newUrl + "\n");
 		return newUrl;
