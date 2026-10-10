@@ -187,6 +187,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+		<!-- XML message converter for content negotiation, e.g. browser Accept: application/xml -->
+		<dependency>
+			<groupId>tools.jackson.dataformat</groupId>
+			<artifactId>jackson-dataformat-xml</artifactId>
+		</dependency>
 		<!-- Expose actuator endpoints -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -251,6 +256,11 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>42.7.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <scope>runtime</scope>
         </dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
