@@ -70,10 +70,14 @@ public class CalendarController {
 
     // example http://localhost:8080/list
     @RequestMapping(value = {"/list", "/pub/html"}, produces = {"text/html"})
-    public String list(Model model, HttpServletRequest request
-            , @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance
-            , @RequestParam(required = false) Boolean showHidden
-            , @RequestParam(defaultValue = "", name = "labelInclude") List<String> labelNamesInclude, @RequestParam(defaultValue = "", name = "labelExclude") List<String> labelNamesExclude) {
+    public String list(Model model, HttpServletRequest request,
+                       @RequestParam(defaultValue = "") Long locationId,
+                       @RequestParam(defaultValue = "") Double lat,
+                       @RequestParam(defaultValue = "") Double lon,
+                       @RequestParam(defaultValue = "") Integer distance,
+                       @RequestParam(required = false) Boolean showHidden,
+                       @RequestParam(defaultValue = "", name = "labelInclude") List<String> labelNamesInclude,
+                       @RequestParam(defaultValue = "", name = "labelExclude") List<String> labelNamesExclude) {
 
         final ZoneId viewZoneId = ZoneId.of("Europe/Amsterdam"); // TODO: can the browser tell us this? Show the timezone in the page.
         model.addAttribute("viewZoneId", viewZoneId);
@@ -87,6 +91,7 @@ public class CalendarController {
         List<CalendarEvent> events = R.calendarEvent().findAllEager().stream()
                 .filter(ce -> ce.endDateTimeInZone(viewZoneId).isAfter(threshold))
                 .filter(ce -> showHidden != null && showHidden || !ce.calendarSource().hidden())
+                .filter(ce -> filterEventOnLocation(ce, locationId))
                 .filter(ce -> filterEventOnDistance(ce, lat, lon, distance))
                 .filter(ce -> filterEventOnLabels(ce, labelsInclude, labelsExclude))
                 .toList();
@@ -126,11 +131,15 @@ public class CalendarController {
 
     // example http://localhost:8080/month
     @RequestMapping(value = {"/", "/month", "/htmlmonth"}, produces = {"text/html"})
-    public String month(Model model, HttpServletRequest request
-            , @RequestParam(defaultValue = "") Double lat, @RequestParam(defaultValue = "") Double lon, @RequestParam(defaultValue = "") Integer distance
-            , @RequestParam(required = false) Boolean showHidden
-            , @RequestParam(defaultValue = "", name = "labelInclude") List<String> labelNamesInclude, @RequestParam(defaultValue = "", name = "labelExclude") List<String> labelNamesExclude
-            , @RequestParam(defaultValue = "0") Integer numberOfWeeks) {
+    public String month(Model model, HttpServletRequest request,
+                        @RequestParam(defaultValue = "") Long locationId,
+                        @RequestParam(defaultValue = "") Double lat,
+                        @RequestParam(defaultValue = "") Double lon,
+                        @RequestParam(defaultValue = "") Integer distance,
+                        @RequestParam(required = false) Boolean showHidden,
+                        @RequestParam(defaultValue = "", name = "labelInclude") List<String> labelNamesInclude,
+                        @RequestParam(defaultValue = "", name = "labelExclude") List<String> labelNamesExclude,
+                        @RequestParam(defaultValue = "0") Integer numberOfWeeks) {
 
         final ZoneId viewZoneId = ZoneId.of("Europe/Amsterdam"); // TODO: can the browser tell us this? Show the timezone in the page.
         model.addAttribute("viewZoneId", viewZoneId);
@@ -166,6 +175,7 @@ public class CalendarController {
         List<CalendarEvent> events = R.calendarEvent().findAllEager().stream()
                 .filter(ce -> ce.endDateTimeInZone(viewZoneId).isAfter(threshold))
                 .filter(ce -> showHidden != null && showHidden || !ce.calendarSource().hidden())
+                .filter(ce -> filterEventOnLocation(ce, locationId))
                 .filter(ce -> filterEventOnDistance(ce, lat, lon, distance))
                 .filter(ce -> filterEventOnLabels(ce, labelsInclude, labelsExclude))
                 .toList();
@@ -201,6 +211,10 @@ public class CalendarController {
         // done
         model.addAttribute("eventStartDateTimeComparator", Comparator.comparing((CalendarEvent e) -> e.startDateTimeInZone(viewZoneId)));
         return "month";
+    }
+
+    static boolean filterEventOnLocation(CalendarEvent ce, Long locationId) {
+        return locationId == null || locationId.equals(ce.calendarSource().calendarLocation().id());
     }
 
     static boolean filterEventOnDistance(CalendarEvent ce, Double lat, Double lon, Integer d) {
