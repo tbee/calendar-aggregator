@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+/// OpenAPI specs:
+/// - http://localhost:8080/openapi (JSON)
+/// - http://localhost:8080/openapi.yaml
+/// - http://localhost:8080/swagger-ui/index.html
 @RestController
 @RequestMapping("/api")
 public class CalendarResource {
