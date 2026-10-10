@@ -1,6 +1,7 @@
 package nl.softworks.calendarAggregator.application.http;
 
 import nl.softworks.calendarAggregator.application.http.dto.LocationDTO;
+import nl.softworks.calendarAggregator.application.http.dto.LocationsDTO;
 import nl.softworks.calendarAggregator.domain.boundary.R;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,8 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api")
 public class CalendarResource {
@@ -18,11 +17,10 @@ public class CalendarResource {
 
     // example http://localhost:8080/location
     @GetMapping(path = {"/v1/location"})
-    public List<LocationDTO> location(@RequestParam(defaultValue = "") Long locationId) {
-
-        return R.calendarLocation().findAll().stream()
+    public LocationsDTO location(@RequestParam(defaultValue = "") Long locationId) {
+        return new LocationsDTO(R.calendarLocation().findAll().stream()
                 .filter(cl -> locationId == null || locationId.equals(cl.id()))
                 .map(LocationDTO::new)
-                .toList();
+                .toList());
     }
 }
