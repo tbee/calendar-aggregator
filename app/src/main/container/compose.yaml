@@ -1,4 +1,4 @@
-name: spotifydanceinfo
+name: calendaraggregator
 
 services:
   app:
@@ -8,10 +8,12 @@ services:
       postgres:
         condition: service_healthy
     ports:
-      - "5005:5005" # java debug
-      - "8080:8080"
-#    volumes:
-#      - ./data-volume:/data
+#      - "5005:5005" # java debug
+      - "8090:8080"
+    volumes:
+      # git-ignored secrets (e.g. spring.ai.openai.api-key), pulled in via
+      # spring.config.import=optional:file:./application-secret.properties
+      - ../../../../application-secret.properties:/data/application-secret.properties:ro
     environment:
       BASEURL: http://127.0.0.1:8080
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
@@ -28,11 +30,13 @@ services:
       POSTGRES_USER: technical
       POSTGRES_PASSWORD: "technical"
     volumes:
-      # dancemoments role is needed it is in the pg_dump, and the restore will fail if it doesn't exist
+      # dancemoments role is needed; it is in the pg_dump, and the restore will fail if it doesn't exist
       - ./init/00-create-roles.sql:/docker-entrypoint-initdb.d/00-create-roles.sql:ro
       - ../../../../dancemoments_pg_dump.sql:/docker-entrypoint-initdb.d/01-dancemoments_pg_dump.sql:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U technical -d calendarAggregator"]
+      # psql (not pg_isready) so the DB is actually validated; pg_isready reports
+      # "accepting connections" even when the database does not exist.
+      test: ["CMD-SHELL", "psql -U technical -d calendarAggregator -c 'SELECT 1' -q >/dev/null"]
       interval: 10s
       timeout: 5s
       retries: 10

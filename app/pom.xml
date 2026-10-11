@@ -511,6 +511,7 @@
 								<mainClass>nl.softworks.calendarAggregator.CalendarAggregateApplication</mainClass>
 								<jvmFlags>
 									<jvmFlag>-Dlogging.config=file:/data/logback.xml</jvmFlag>
+									<jvmFlag>-Dlogback.configurationFile=file:/data/logback.xml</jvmFlag>
 									<jvmFlag>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005</jvmFlag>
 								</jvmFlags>
 								<ports>
