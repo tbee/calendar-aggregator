@@ -480,76 +480,105 @@
 			<properties>
 				<containerImageId>org.tbee.calendaraggregator/calendaraggregator</containerImageId>
 			</properties>
-			<dependencies>
-				<dependency>
-					<groupId>io.opentelemetry.javaagent</groupId>
-					<artifactId>opentelemetry-javaagent</artifactId>
-					<version>2.27.0</version>
-					<scope>provided</scope>
-				</dependency>
-			</dependencies>
+			<build>
+				<plugins>
+					<!--
+					     Shared configuration for building the container image using Jib.
+
+					     - container-local:  jib:dockerBuild @ package -> builds into the local
+					       Docker daemon, no push. Used by mvn_buildContainer.cmd.
+					     - container-remote: jib:build @ install -> builds and pushes to the
+					       nexus registry. Used by mvn_pushContainer.cmd.
+
+					     Registry credentials are taken from ~/.m2/settings.xml, from the
+					     <server> whose <id> matches the registry host (nexus.softworks.nl).
+					-->
+					<plugin>
+						<groupId>com.google.cloud.tools</groupId>
+						<artifactId>jib-maven-plugin</artifactId>
+						<version>3.5.2</version>
+						<configuration>
+							<from>
+								<image>eclipse-temurin:25-jre-alpine</image>
+							</from>
+							<to>
+								<image>nexus.softworks.nl/docker-private/${containerImageId}:${project.version}</image>
+								<tags>
+									<tag>latest</tag>
+								</tags>
+							</to>
+							<container>
+								<mainClass>nl.softworks.calendarAggregator.CalendarAggregateApplication</mainClass>
+								<jvmFlags>
+									<jvmFlag>-Dlogging.config=file:/data/logback.xml</jvmFlag>
+									<jvmFlag>-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005</jvmFlag>
+								</jvmFlags>
+								<ports>
+									<port>8080</port>
+									<port>5005</port>
+								</ports>
+								<!-- non-root user (UID/GID 1000) -->
+								<user>1000:1000</user>
+								<workingDirectory>/data</workingDirectory>
+								<creationTime>USE_CURRENT_TIMESTAMP</creationTime>
+							</container>
+							<extraDirectories>
+								<paths>
+									<path>
+										<from>${project.basedir}/src/main/container</from>
+										<includes>
+											<include>logback.xml</include>
+										</includes>
+										<into>/data</into>
+									</path>
+								</paths>
+							</extraDirectories>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- See the container profile: binds jib:dockerBuild -> build into the local Docker daemon. -->
+		<profile>
+			<id>container-local</id>
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<version>3.6.1</version>
+						<groupId>com.google.cloud.tools</groupId>
+						<artifactId>jib-maven-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>copy-otel-javaagent</id>
+								<id>build-container-local</id>
 								<phase>package</phase>
 								<goals>
-									<goal>copy</goal>
+									<goal>dockerBuild</goal>
 								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>io.opentelemetry.javaagent</groupId>
-											<artifactId>opentelemetry-javaagent</artifactId>
-											<version>2.27.0</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}</outputDirectory>
-											<destFileName>opentelemetry-javaagent.jar</destFileName>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
 							</execution>
 						</executions>
 					</plugin>
+				</plugins>
+			</build>
+		</profile>
 
+		<!-- See the container profile: binds jib:build -> build and push to the nexus registry
+		     (no local Docker daemon required). -->
+		<profile>
+			<id>container-remote</id>
+			<build>
+				<plugins>
 					<plugin>
-						<groupId>org.tbee</groupId>
-						<artifactId>podman-maven-plugin</artifactId>
-						<version>main</version>
+						<groupId>com.google.cloud.tools</groupId>
+						<artifactId>jib-maven-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>build-container</id>
-								<phase>package</phase>
+								<id>build-and-push-container</id>
+								<phase>install</phase>
 								<goals>
 									<goal>build</goal>
 								</goals>
 							</execution>
-							<execution>
-								<id>deploy-container</id>
-								<phase>install</phase>
-								<goals>
-									<goal>push</goal>
-								</goals>
-							</execution>
 						</executions>
-						<configuration>
-							<verbose>true</verbose>
-							<containerFile>src/main/container/Containerfile</containerFile>
-							<tags>
-								<tag>${containerImageId}:${project.version}</tag>
-								<tag>${containerImageId}:latest</tag>
-							</tags>
-							<registry>
-								<hostname>nexus.softworks.nl</hostname>
-								<hostpath>/docker-private</hostpath>
-								<url>https://nexus.softworks.nl/docker-private</url>
-							</registry>
-						</configuration>
 					</plugin>
 				</plugins>
 			</build>

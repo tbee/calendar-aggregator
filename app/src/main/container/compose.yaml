@@ -2,7 +2,7 @@ name: spotifydanceinfo
 
 services:
   app:
-    image: org.tbee.calendaraggregator/calendaraggregator:${PROJECT_VERSION}
+    image: nexus.softworks.nl/docker-private/org.tbee.calendaraggregator/calendaraggregator:${PROJECT_VERSION}
     container_name: calendaraggregator
     depends_on:
       postgres:
