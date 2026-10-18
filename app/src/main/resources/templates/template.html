@@ -116,14 +116,37 @@
         .htmx-request .spinner {
             display: block;
         }
+
+        .titleblock {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+        .titleblock .logo {
+            flex-shrink: 0;
+            margin-bottom: 10px;
+        }
+        .titleblock .logo img {
+            height: 200px;
+            width: auto;
+            display: block;
+        }
     </style>
     <th:block th:replace="${header}" />
 </head>
 <body hx-ext="morph">
 <section class="section">
-    <h1 class="title" th:text="${settings.title()}">...</h1>
-    <h2 class="subtitle" th:text="${settings.subtitle()}">...</h2>
-    <div class="block pagewidth" th:text="${settings.disclaimer()}">...</div>
+    <div class="titleblock pagewidth">
+        <div>
+            <h1 class="title" th:text="${settings.title()}">...</h1>
+            <h2 class="subtitle" th:text="${settings.subtitle()}">...</h2>
+            <div class="block pagewidth" th:text="${settings.disclaimer()}">...</div>
+        </div>
+        <div class="logo" th:if="${settings.logo()}">
+            <img src="/logo" alt="logo"/>
+        </div>
+    </div>
     <div id="iconbar" class="block alignright pagewidth">
 		<span class="icon">
 			<a th:href="${baseUrl + '/list?' + filterQueryString}"><i class="fas fa-list fa-xl"></i></a>

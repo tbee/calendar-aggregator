@@ -64,6 +64,26 @@ public class Settings extends EntityBase<Settings> {
 		return this;
 	}
 
+	protected byte[] logo;
+	static public final String LOGO = "logo";
+	public byte[] logo() {
+		return logo;
+	}
+	public Settings logo(byte[] v) {
+		this.logo = v;
+		return this;
+	}
+
+	protected String logoMimetype;
+	static public final String LOGOMIMETYPE = "logoMimetype";
+	public String logoMimetype() {
+		return logoMimetype;
+	}
+	public Settings logoMimetype(String v) {
+		this.logoMimetype = v;
+		return this;
+	}
+
 //	public String toString() {
 //		return super.toString() //
 //		     + ",websiteBaseurl=" + websiteBaseurl
