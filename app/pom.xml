@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.tbee</groupId>
 		<artifactId>calendarAggregator-top</artifactId>
-		<version>3.4.0</version>
+		<version>3.4.1</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>calendarAggregator</artifactId>
@@ -398,9 +398,33 @@
 		<profile>
 			<id>production</id>
             <dependencies>
+                <!--
+                     In production the Copilot / dev-server must not be packaged, otherwise
+                     the generated frontend bundle contains Copilot code that pushes onto
+                     window.Vaadin.devToolsPlugins (undefined in production) and the client
+                     crashes, leaving a blank Vaadin UI.
+                     - excluding vaadin-dev from vaadin-core does not cover the direct
+                       vaadin-dev dependency declared above, so override it to 'provided'
+                     - also exclude it from the starter in case it is pulled transitively
+                -->
+                <dependency>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-dev</artifactId>
+                    <scope>provided</scope>
+                </dependency>
                 <dependency>
                     <groupId>com.vaadin</groupId>
                     <artifactId>vaadin-core</artifactId>
+                    <exclusions>
+                        <exclusion>
+                            <groupId>com.vaadin</groupId>
+                            <artifactId>vaadin-dev</artifactId>
+                        </exclusion>
+                    </exclusions>
+                </dependency>
+                <dependency>
+                    <groupId>com.vaadin</groupId>
+                    <artifactId>vaadin-spring-boot-starter</artifactId>
                     <exclusions>
                         <exclusion>
                             <groupId>com.vaadin</groupId>
