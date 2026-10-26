@@ -34,6 +34,7 @@ import nl.softworks.calendarAggregator.application.vdn.form.CalendarSourceMultip
 import nl.softworks.calendarAggregator.application.vdn.form.CalendarSourceRegexScraperForm;
 import nl.softworks.calendarAggregator.application.vdn.form.CalendarSourceXmlScraperForm;
 import nl.softworks.calendarAggregator.domain.boundary.R;
+import nl.softworks.calendarAggregator.domain.control.GenerateEventsService;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
@@ -43,7 +44,6 @@ import nl.softworks.calendarAggregator.domain.entity.CalendarSourceManual;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceMultipleDaysScraper;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceRegexScraper;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceXmlScraper;
-import nl.softworks.calendarAggregator.domain.service.GenerateEventsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

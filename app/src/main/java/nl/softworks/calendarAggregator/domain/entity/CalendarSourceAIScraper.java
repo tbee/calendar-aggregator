@@ -5,7 +5,7 @@ import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
 import nl.softworks.calendarAggregator.domain.boundary.S;
-import nl.softworks.calendarAggregator.domain.service.OpenRouterService;
+import nl.softworks.calendarAggregator.domain.control.OpenRouterService;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;

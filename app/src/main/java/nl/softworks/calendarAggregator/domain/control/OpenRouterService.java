@@ -1,4 +1,4 @@
-package nl.softworks.calendarAggregator.domain.service;
+package nl.softworks.calendarAggregator.domain.control;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.slf4j.Logger;

@@ -1,9 +1,9 @@
 package nl.softworks.calendarAggregator.domain.boundary;
 
 import jakarta.annotation.PostConstruct;
-import nl.softworks.calendarAggregator.domain.service.GenerateEventsService;
-import nl.softworks.calendarAggregator.domain.service.ICalService;
-import nl.softworks.calendarAggregator.domain.service.OpenRouterService;
+import nl.softworks.calendarAggregator.domain.control.GenerateEventsService;
+import nl.softworks.calendarAggregator.domain.control.ICalService;
+import nl.softworks.calendarAggregator.domain.control.OpenRouterService;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;

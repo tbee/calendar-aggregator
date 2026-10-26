@@ -17,6 +17,9 @@ import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+// TODO:
+// - kunnen zoeken op scourc eclass
+// - MCP om websites te kunnen lezen (is die beter dan onze eigen emulate webbrowser)
 @SpringBootApplication
 @EnableJpaRepositories(repositoryBaseClass = RepoBaseImpl.class)
 @StyleSheet("context://aura/aura.css") // We cannot use Aura.STYLESHEET because the Vaadin application runs under a subfolder "/app".

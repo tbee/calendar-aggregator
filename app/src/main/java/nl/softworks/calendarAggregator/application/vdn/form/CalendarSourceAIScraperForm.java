@@ -7,10 +7,10 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import nl.softworks.calendarAggregator.domain.boundary.S;
+import nl.softworks.calendarAggregator.domain.control.OpenRouterService;
 import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceAIScraper;
-import nl.softworks.calendarAggregator.domain.service.OpenRouterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

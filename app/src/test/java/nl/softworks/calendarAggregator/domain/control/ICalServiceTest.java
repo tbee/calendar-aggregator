@@ -1,4 +1,4 @@
-package nl.softworks.calendarAggregator.domain.service;
+package nl.softworks.calendarAggregator.domain.control;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

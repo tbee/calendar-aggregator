@@ -1,4 +1,4 @@
-package nl.softworks.calendarAggregator.domain.service;
+package nl.softworks.calendarAggregator.domain.control;
 
 import jakarta.annotation.PreDestroy;
 import nl.softworks.calendarAggregator.domain.boundary.R;

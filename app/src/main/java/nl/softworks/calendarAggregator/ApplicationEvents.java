@@ -1,8 +1,8 @@
 package nl.softworks.calendarAggregator;
 
 import nl.softworks.calendarAggregator.domain.boundary.R;
+import nl.softworks.calendarAggregator.domain.control.GenerateEventsService;
 import nl.softworks.calendarAggregator.domain.entity.Person;
-import nl.softworks.calendarAggregator.domain.service.GenerateEventsService;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

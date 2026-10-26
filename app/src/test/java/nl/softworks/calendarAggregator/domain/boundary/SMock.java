@@ -1,7 +1,7 @@
 package nl.softworks.calendarAggregator.domain.boundary;
 
-import nl.softworks.calendarAggregator.domain.service.GenerateEventsService;
-import nl.softworks.calendarAggregator.domain.service.ICalService;
+import nl.softworks.calendarAggregator.domain.control.GenerateEventsService;
+import nl.softworks.calendarAggregator.domain.control.ICalService;
 
 public class SMock {
     public static void populate() {
