@@ -60,6 +60,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -156,9 +157,13 @@ implements AfterNavigationObserver
 		Comparator<CalendarLocation> compareByName = Comparator.comparing(CalendarLocation::name, String.CASE_INSENSITIVE_ORDER);
 
 		// Load data
-		String filter = filterTextField.getValue().toLowerCase();
+		String filter = filterTextField.getValue().toLowerCase(Locale.ROOT);
 		List<CalendarLocation> calendarLocations = R.calendarLocation().findAll().stream()
-				.filter(cl -> filter.isBlank() || cl.name().toLowerCase().contains(filter))
+				.filter(cl ->
+						filter.isBlank() ||
+						cl.name().toLowerCase().contains(filter) ||
+						cl.calendarSources().stream().anyMatch(cs -> cs.getClass().getSimpleName().toLowerCase(Locale.ROOT).contains(filter))
+				)
 				.sorted(compareByStatus.thenComparing(compareByName))
 				.toList();
 
