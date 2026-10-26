@@ -4,8 +4,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
-import nl.softworks.calendarAggregator.application.jpa.PersonRoleConverter;
 import nl.softworks.calendarAggregator.domain.entity.validator.PersonPasswordValidator;
+import nl.softworks.calendarAggregator.infrastructure.jpa.PersonRoleConverter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Entity

@@ -1,5 +1,6 @@
 package nl.softworks.calendarAggregator.domain.entity;
 
+import nl.softworks.calendarAggregator.domain.service.JsonToXml;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

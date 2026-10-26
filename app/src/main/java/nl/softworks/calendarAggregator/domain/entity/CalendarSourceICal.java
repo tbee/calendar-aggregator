@@ -17,7 +17,7 @@ import net.fortuna.ical4j.model.parameter.Value;
 import net.fortuna.ical4j.model.property.DateProperty;
 import net.fortuna.ical4j.model.property.DtEnd;
 import net.fortuna.ical4j.model.property.DtStart;
-import nl.softworks.calendarAggregator.domain.boundary.S;
+import nl.softworks.calendarAggregator.domain.interfaces.S;
 
 import java.io.IOException;
 import java.io.PrintWriter;

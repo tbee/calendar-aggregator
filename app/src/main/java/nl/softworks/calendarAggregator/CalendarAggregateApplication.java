@@ -2,7 +2,7 @@ package nl.softworks.calendarAggregator;
 
 import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.page.AppShellConfigurator;
-import nl.softworks.calendarAggregator.application.jpa.RepoBaseImpl;
+import nl.softworks.calendarAggregator.infrastructure.jpa.RepoBaseImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;

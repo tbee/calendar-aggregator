@@ -11,7 +11,8 @@ import net.sf.saxon.s9api.XdmItem;
 import net.sf.saxon.s9api.XdmNode;
 import net.sf.saxon.s9api.XdmValue;
 import net.sf.saxon.trans.XPathException;
-import nl.softworks.calendarAggregator.application.jpa.FormatConverter;
+import nl.softworks.calendarAggregator.domain.service.JsonToXml;
+import nl.softworks.calendarAggregator.infrastructure.jpa.FormatConverter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 

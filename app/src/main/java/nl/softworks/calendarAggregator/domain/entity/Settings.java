@@ -2,7 +2,7 @@ package nl.softworks.calendarAggregator.domain.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
-import nl.softworks.calendarAggregator.domain.boundary.R;
+import nl.softworks.calendarAggregator.domain.interfaces.R;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
