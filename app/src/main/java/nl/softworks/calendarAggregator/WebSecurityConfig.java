@@ -26,6 +26,17 @@ import java.util.List;
 @EnableWebSecurity 
 public class WebSecurityConfig {
 
+    /*
+     * Which sites may show this application inside a frame. where.shallwedance.org is embedded as a page of
+     * shallwedance.org (its /where page), so in production our own sites may frame it, and while developing any
+     * localhost port may.
+     *
+     * X-Frame-Options cannot express that: it only knows SAMEORIGIN (one origin) and ALLOW-FROM, which browsers
+     * dropped. So the header goes, and the rule moves to the CSP frame-ancestors directive.
+     */
+    private static final String FRAME_ANCESTORS =
+            "frame-ancestors 'self' https://shallwedance.org https://*.shallwedance.org http://localhost:*";
+
     @Autowired
     private DataSource dataSource;
 
@@ -43,7 +54,9 @@ public class WebSecurityConfig {
         httpSecurity
                 .authorizeHttpRequests(authorize -> authorize.requestMatchers("/app/**").authenticated())
                 .authorizeHttpRequests(authorize -> authorize.requestMatchers("/**").permitAll())
-                .headers(headers -> headers.frameOptions(config -> config.sameOrigin()))
+                .headers(headers -> headers
+                        .frameOptions(frameOptions -> frameOptions.disable())
+                        .contentSecurityPolicy(contentSecurityPolicy -> contentSecurityPolicy.policyDirectives(FRAME_ANCESTORS)))
                 .formLogin(config -> config.defaultSuccessUrl("/app", true))
                 .httpBasic(Customizer.withDefaults())
                 .csrf(config -> config.disable())
