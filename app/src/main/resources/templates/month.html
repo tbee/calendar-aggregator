@@ -26,6 +26,7 @@
         }
         #calendar {
             width:100%;
+            table-layout: fixed;
         }
         tbody td {
             height:5em;
@@ -35,6 +36,56 @@
         #calendar td,
         #calendar th {
             padding: 3px;
+        }
+        .weekday {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .tooltipped {
+            width: 100%;
+            max-width: 100%;
+        }
+        .event-summary {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+        }
+        .event-time {
+            flex: 0 0 auto;
+        }
+        .event-text {
+            flex: 1 1 auto;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .event-popup-summary {
+            display: block;
+            width: 100%;
+            margin-bottom: 4px;
+        }
+        .event-popup-meta {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            box-sizing: border-box;
+            padding-right: 36px;
+        }
+        .event-popup-date {
+            flex: 0 0 auto;
+        }
+        .event-popup-summary .event-text {
+            display: block;
+            overflow-wrap: anywhere;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
         }
         tbody h5 {
             margin-bottom: 0!important;
@@ -58,7 +109,7 @@
         .event-tooltip-text {
             display: block;
             min-height: 1.4em;
-            padding-right: 36px;
+            margin-top: 6px;
         }
 
         .event-labels {
@@ -103,13 +154,13 @@
         <table id="calendar" class="table">
             <thead>
             <tr>
-                <td style="width:12%;">Monday</td>
-                <td style="width:12%;">Tuesday</td>
-                <td style="width:12%;">Wednesday</td>
-                <td style="width:12%;">Thursday</td>
-                <td style="width:12%;">Friday</td>
-                <td style="width:12%;">Saturday</td>
-                <td style="width:12%;">Sunday</td>
+                <td style="width:12%;"><span class="weekday">Monday</span></td>
+                <td style="width:12%;"><span class="weekday">Tuesday</span></td>
+                <td style="width:12%;"><span class="weekday">Wednesday</span></td>
+                <td style="width:12%;"><span class="weekday">Thursday</span></td>
+                <td style="width:12%;"><span class="weekday">Friday</span></td>
+                <td style="width:12%;"><span class="weekday">Saturday</span></td>
+                <td style="width:12%;"><span class="weekday">Sunday</span></td>
             </tr>
             </thead>
             <tbody>
@@ -120,19 +171,29 @@
                             <ul>
                                 <li th:each="event : ${#lists.sort(dateToEvents.get(date), eventStartDateTimeComparator)}">
                                     <div class="tooltipped">
-                                        <span th:text="${(event.firstDateOfEvent(date) ? hhmm.format(event.startDateTimeInZone(viewZoneId)) : '00:00') + ' ' + eventToText.get(event)}">...</span>
+                                        <span class="event-summary">
+                                            <span class="event-time" th:if="${event.firstDateOfEvent(date)}" th:text="${hhmm.format(event.startDateTimeInZone(viewZoneId))}"></span>
+                                            <span class="event-text" th:text="${eventToText.get(event)}"></span>
+                                        </span>
                                         <span class="tooltiptext event-popup" th:classappend="${dateIterStat.index == 0 ? 'tooltip-right' : 'tooltip-left'}">
+                                            <span class="event-popup-summary">
+                                                <span class="event-popup-meta">
+                                                    <span class="event-popup-date" th:text="${mmmdd.format(date)}"></span>
+                                                    <span class="event-time" th:if="${event.firstDateOfEvent(date)}" th:text="${hhmm.format(event.startDateTimeInZone(viewZoneId))}"></span>
+                                                </span>
+                                                <span class="event-text" th:text="${eventToText.get(event)}"></span>
+                                            </span>
                                             <span class="event-links">
                                                 <a th:href="${event.calendarSource().determineUrl()}" target="_blank" title="Open website"><i class="fas fa-arrow-up-right-from-square fa-sm"></i></a>
                                                 <a th:href="${event.calendarSource().calendarLocation().determineGoogleMapURL()}" target="_blank" title="Open in Google Maps"><i class="fas fa-map-pin fa-sm"></i></a>
                                             </span>
-                                            <span class="event-tooltip-text" th:text="${eventToTooltip.get(event)}">...</span>
                                             <span class="event-labels" th:if="${!eventToLabels.get(event).isEmpty()}">
                                                 <span class="event-label" th:each="label : ${eventToLabels.get(event)}">
                                                     <i class="css-icon" th:style="${'color:' + label.labelGroup().color() + '; background:' + label.labelGroup().background() + ';'}" th:title="${label.description()}"><span th:text="${label.icon()}">...</span></i>
                                                     <span th:text="${label.description()}">...</span>
                                                 </span>
                                             </span>
+                                            <span class="event-tooltip-text" th:text="${eventToTooltip.get(event)}">...</span>
                                         </span>
                                     </div>
                                 </li>
