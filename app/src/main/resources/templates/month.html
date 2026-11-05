@@ -90,6 +90,10 @@
         tbody h5 {
             margin-bottom: 0!important;
         }
+        /* 60% smaller than Bulma's .is-5 (1.25rem) date title. */
+        #calendar .day h5 {
+            font-size: 1rem;
+        }
         .even-month {
         }
         .odd-month {
@@ -172,7 +176,7 @@
                                 <li th:each="event : ${#lists.sort(dateToEvents.get(date), eventStartDateTimeComparator)}">
                                     <div class="tooltipped">
                                         <span class="event-summary">
-                                            <span class="event-time" th:if="${event.firstDateOfEvent(date)}" th:text="${hhmm.format(event.startDateTimeInZone(viewZoneId))}"></span>
+                                            <span class="event-time" th:if="${event.firstDateOfEvent(date)}" th:text="${(event.firstDateOfEvent(date) ? hhmm.format(event.startDateTimeInZone(viewZoneId)) : '00:00')}"></span>
                                             <span class="event-text" th:text="${eventToText.get(event)}"></span>
                                         </span>
                                         <span class="tooltiptext event-popup" th:classappend="${dateIterStat.index == 0 ? 'tooltip-right' : 'tooltip-left'}">
