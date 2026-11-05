@@ -7,8 +7,8 @@ import org.tbee.webstack.postgres.PostgresTestContainer;
 
 import java.io.File;
 
-public class CalendarAggregatorApplicationPostgres {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CalendarAggregatorApplicationPostgres.class);
+public class CalendarAggregatorApplicationTestContainer {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CalendarAggregatorApplicationTestContainer.class);
 
     public static void main(String[] args) throws Exception {
         // Run "podman machine start" first

@@ -489,7 +489,7 @@
 									<goal>java</goal>
 								</goals>
 								<configuration>
-									<mainClass>nl.softworks.calendarAggregator.CalendarAggregatorApplicationPostgres</mainClass>
+									<mainClass>nl.softworks.calendarAggregator.CalendarAggregatorApplicationTestContainer</mainClass>
 									<classpathScope>test</classpathScope>
 								</configuration>
 							</execution>

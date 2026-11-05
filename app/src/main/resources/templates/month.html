@@ -176,7 +176,7 @@
                                 <li th:each="event : ${#lists.sort(dateToEvents.get(date), eventStartDateTimeComparator)}">
                                     <div class="tooltipped">
                                         <span class="event-summary">
-                                            <span class="event-time" th:if="${event.firstDateOfEvent(date)}" th:text="${(event.firstDateOfEvent(date) ? hhmm.format(event.startDateTimeInZone(viewZoneId)) : '00:00')}"></span>
+                                            <span class="event-time" th:text="${(event.firstDateOfEvent(date) ? hhmm.format(event.startDateTimeInZone(viewZoneId)) : '00:00')}"></span>
                                             <span class="event-text" th:text="${eventToText.get(event)}"></span>
                                         </span>
                                         <span class="tooltiptext event-popup" th:classappend="${dateIterStat.index == 0 ? 'tooltip-right' : 'tooltip-left'}">
