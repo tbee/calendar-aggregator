@@ -103,7 +103,9 @@ public class CalendarController {
         model.addAttribute("eventStartDateTimeComparator", Comparator.comparing((CalendarEvent e) -> e.startDateTimeInZone(viewZoneId)));
 
         // When
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("E yyyy-MM-dd HH:mm");
+        // Use non-breaking hyphens inside the date so the first column can only wrap at spaces,
+        // not in the middle of the date notation.
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("E yyyy\u2011MM\u2011dd HH:mm");
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
         Map<CalendarEvent, String> eventToWhen = events.stream()
                 .map(event -> Pair.of(event,
