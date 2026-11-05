@@ -179,7 +179,7 @@
                                             <span class="event-time" th:text="${(event.firstDateOfEvent(date) ? hhmm.format(event.startDateTimeInZone(viewZoneId)) : '00:00')}"></span>
                                             <span class="event-text" th:text="${eventToText.get(event)}"></span>
                                         </span>
-                                        <span class="tooltiptext event-popup" th:classappend="${dateIterStat.index == 0 ? 'tooltip-right' : 'tooltip-left'}">
+                                        <span class="tooltiptext event-popup" th:classappend="${dateIterStat.index < 4 ? 'tooltip-right' : 'tooltip-left'}">
                                             <span class="event-popup-summary">
                                                 <span class="event-popup-meta">
                                                     <span class="event-popup-date" th:text="${mmmdd.format(date)}"></span>
