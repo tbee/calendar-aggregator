@@ -191,13 +191,13 @@
                                                 <a th:href="${event.calendarSource().determineUrl()}" target="_blank" title="Open website"><i class="fas fa-arrow-up-right-from-square fa-sm"></i></a>
                                                 <a th:href="${event.calendarSource().calendarLocation().determineGoogleMapURL()}" target="_blank" title="Open in Google Maps"><i class="fas fa-map-pin fa-sm"></i></a>
                                             </span>
+                                            <span class="event-tooltip-text" th:text="${eventToTooltip.get(event)}">...</span>
                                             <span class="event-labels" th:if="${!eventToLabels.get(event).isEmpty()}">
                                                 <span class="event-label" th:each="label : ${eventToLabels.get(event)}">
                                                     <i class="css-icon" th:style="${'color:' + label.labelGroup().color() + '; background:' + label.labelGroup().background() + ';'}" th:title="${label.description()}"><span th:text="${label.icon()}">...</span></i>
                                                     <span th:text="${label.description()}">...</span>
                                                 </span>
                                             </span>
-                                            <span class="event-tooltip-text" th:text="${eventToTooltip.get(event)}">...</span>
                                         </span>
                                     </div>
                                 </li>
