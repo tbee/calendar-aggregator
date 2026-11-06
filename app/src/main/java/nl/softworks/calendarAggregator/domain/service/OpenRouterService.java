@@ -1,6 +1,7 @@
 package nl.softworks.calendarAggregator.domain.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +25,10 @@ public class OpenRouterService {
     /** OpenRouter's automatic selection among free models; no token cost. */
     public static final String FREE_MODEL = "openrouter/free";
 
-    public record Model(String id, String name) {
+    /** Default for the AIAgent scraper: a model that supports tool calling. */
+    public static final String DEFAULT_AGENT_MODEL = "~deepseek/deepseek-flash-latest";
+
+    public record Model(String id, String name, boolean supportsTools) {
     }
 
     @Value("${spring.ai.openai.base-url:https://openrouter.ai/api/v1}")
@@ -49,8 +53,8 @@ public class OpenRouterService {
     private List<Model> fetchModels() {
         // Keep insertion order + dedupe by id, always starting with the auto models.
         Map<String, Model> modelsById = new LinkedHashMap<>();
-        modelsById.put(AUTO_MODEL, new Model(AUTO_MODEL, "Auto (let OpenRouter pick)"));
-        modelsById.put(FREE_MODEL, new Model(FREE_MODEL, "Free (let OpenRouter pick a free model)"));
+        modelsById.put(AUTO_MODEL, new Model(AUTO_MODEL, "Auto (let OpenRouter pick)", false));
+        modelsById.put(FREE_MODEL, new Model(FREE_MODEL, "Free (let OpenRouter pick a free model)", false));
 
         try {
             ModelsResponse response = RestClient.create()
@@ -70,7 +74,8 @@ public class OpenRouterService {
                         continue;
                     }
                     String name = (modelData.name() == null || modelData.name().isBlank()) ? modelData.id() : modelData.name();
-                    modelsById.putIfAbsent(modelData.id(), new Model(modelData.id(), name));
+                    boolean supportsTools = modelData.supportedParameters() != null && modelData.supportedParameters().contains("tools");
+                    modelsById.putIfAbsent(modelData.id(), new Model(modelData.id(), name, supportsTools));
                 }
             }
         }
@@ -101,6 +106,7 @@ public class OpenRouterService {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    private record ModelData(String id, String name) {
+    private record ModelData(String id, String name,
+                             @JsonProperty("supported_parameters") List<String> supportedParameters) {
     }
 }

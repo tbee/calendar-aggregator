@@ -14,6 +14,9 @@ import nl.softworks.calendarAggregator.domain.service.OpenRouterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class CalendarSourceAIAgentScraperForm extends CalendarSourceForm {
 	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourceAIAgentScraperForm.class);
 
@@ -26,7 +29,7 @@ public class CalendarSourceAIAgentScraperForm extends CalendarSourceForm {
 
 		modelComboBox.setItemLabelGenerator(model -> model == null ? "" : model.name());
 		modelComboBox.setClearButtonVisible(true);
-		modelComboBox.setTooltipText("The LLM used for scraping. Defaults to OpenRouter's auto model.");
+		modelComboBox.setTooltipText("The LLM that drives the browser. Only models that advertise tool calling are listed. Defaults to DeepSeek.");
 
 		Button testButton = new Button("Test", evt -> test());
 
@@ -37,7 +40,7 @@ public class CalendarSourceAIAgentScraperForm extends CalendarSourceForm {
 
 		binder.forField(modelComboBox)
 				.withConverter(
-						model -> model == null ? OpenRouterService.AUTO_MODEL : model.id(),
+						model -> model == null ? OpenRouterService.DEFAULT_AGENT_MODEL : model.id(),
 						id -> modelComboBox.getListDataView().getItems()
 								.filter(model -> model.id().equals(id))
 								.findFirst()
@@ -56,7 +59,15 @@ public class CalendarSourceAIAgentScraperForm extends CalendarSourceForm {
 	public CalendarSourceAIAgentScraperForm populateWith(CalendarSource calendarSource) {
 		super.populateWith(calendarSource);
 		if (calendarSource instanceof CalendarSourceAIAgentScraper calendarSourceAIAgentScraper) {
-			modelComboBox.setItems(S.openRouterService().models());
+			List<OpenRouterService.Model> models = new ArrayList<>(S.openRouterService().models().stream()
+					.filter(OpenRouterService.Model::supportsTools)
+					.toList());
+			String selectedModelId = calendarSourceAIAgentScraper.model();
+			if (selectedModelId != null && models.stream().noneMatch(model -> model.id().equals(selectedModelId))) {
+				// Keep an existing (possibly tool-less) selection visible instead of blanking the field
+				models.add(0, new OpenRouterService.Model(selectedModelId, selectedModelId + " (tool calling not advertised)", false));
+			}
+			modelComboBox.setItems(models);
 			binder.readBean(calendarSourceAIAgentScraper);
 		}
 		return this;

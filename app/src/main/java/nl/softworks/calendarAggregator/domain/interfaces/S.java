@@ -46,4 +46,10 @@ public class S {
     static public OpenRouterService openRouterService() {
         return S.singleton.openRouterService;
     }
+
+    @Autowired
+    BrowserToolProvider browserToolProvider;
+    static public BrowserToolProvider browserToolProvider() {
+        return S.singleton.browserToolProvider;
+    }
 }

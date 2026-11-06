@@ -4,26 +4,36 @@ import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
+import nl.softworks.calendarAggregator.domain.interfaces.BrowserToolProvider;
 import nl.softworks.calendarAggregator.domain.interfaces.S;
+import nl.softworks.calendarAggregator.domain.service.CalendarEventsXmlParser;
 import nl.softworks.calendarAggregator.domain.service.OpenRouterService;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.parser.Parser;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.openai.OpenAiChatOptions;
+import org.springframework.ai.tool.ToolCallback;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
+import java.net.URI;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+/**
+ * Calendar source that hands a prompt with one or more URLs to an LLM and lets the model
+ * drive a real browser (via the Playwright MCP server) to find the events.
+ */
 @Entity
 @DiscriminatorValue("aiagent")
 public class CalendarSourceAIAgentScraper extends CalendarSource {
+
+    /** Hard limit on browser tool calls per run; the wrapper refuses calls after this. */
+    private static final int MAX_TOOL_CALLS = 30;
+    private static final Pattern URL_PATTERN = Pattern.compile("https?://[^\\s\"'<>()\\[\\]]+");
 
     public String type() {
         return "AIAgent";
@@ -31,7 +41,7 @@ public class CalendarSourceAIAgentScraper extends CalendarSource {
 
     @NotNull
     @Column(name = "subject")
-    private String model = OpenRouterService.AUTO_MODEL;
+    private String model = OpenRouterService.DEFAULT_AGENT_MODEL;
     static public final String MODEL = "model";
     public String model() {
         return model;
@@ -61,10 +71,33 @@ public class CalendarSourceAIAgentScraper extends CalendarSource {
                 return calendarEvents;
             }
 
-            // Apply prompt
+            Set<String> allowedHosts = extractAllowedHosts();
+            if (allowedHosts.isEmpty()) {
+                status("No URL in prompt");
+                logAppend("The prompt does not contain an http(s) URL, so there is nothing to browse\n");
+                return Set.of();
+            }
+
+            String timezone = determineTimezone() == null ? "" : determineTimezone().name();
+            String today = localDateTimeNowSupplier.get().toLocalDate().toString();
             String systemPrompt = """
-                    You are a web scraper, your task is to extract dancing events from websites.
-                    You need to find start and end moments for the events and return them as a XML structure similar to this:
+                    You are a web scraper that extracts dancing events from websites.
+                    You have a real browser and can read and navigate websites.
+
+                    Work like this:
+                    1. Open each URL from the assignment with browser_navigate.
+                    2. browser_navigate only reports the page URL and title; call browser_snapshot to read the page itself.
+                    3. Use the snapshot to find the agenda, calendar or events page, and click the link (use the [ref] from the latest snapshot).
+                    4. After browser_click, call browser_snapshot again to read the new page.
+                    5. Open event detail pages when the overview does not show the dates or times.
+                    6. Use browser_find when you only need to locate something; it is cheaper than reading a whole snapshot.
+                    7. Stay on these hosts: %s. Do not open pages on other hosts.
+                    8. Use at most %d browser tool calls. When you have enough information, stop calling tools and return the XML.
+
+                    Today is %s (%s). Resolve dates without a year against today, and never return events in the past.
+                    If events do not contain a time, make a reasonable assumption. For example: events in the evening usually start at 20:00 and end around 23:00.
+                    
+                    Return the events in exactly this XML structure:
                     <events>
                         <event>
                             <startDate>2024-01-01</startDate>
@@ -77,23 +110,49 @@ public class CalendarSourceAIAgentScraper extends CalendarSource {
                     Dates must be in the format yyyy-MM-dd.
                     Times must be in the format HH:mm.
                     Only return the XML structure, nothing else.
-                    """;
-            logAppend(systemPrompt + "\n" + prompt + "\n");
+                    """.formatted(String.join(", ", allowedHosts), MAX_TOOL_CALLS, today, timezone);
+            String userPrompt = prompt == null ? "" : prompt;
+            logAppend(systemPrompt + "\n" + userPrompt + "\n");
 
-            String selectedModel = (model == null || model.isBlank()) ? OpenRouterService.AUTO_MODEL : model;
+            String selectedModel = (model == null || model.isBlank()) ? OpenRouterService.DEFAULT_AGENT_MODEL : model;
+            if (!modelSupportsToolCalling(selectedModel)) {
+                status("Model does not support tool calling: " + selectedModel);
+                logAppend("Model " + selectedModel + " does not advertise tool calling, so it cannot drive the browser\n");
+                return Set.of();
+            }
             logAppend("Model: " + selectedModel + "\n");
+            logAppend("Browser: " + S.browserToolProvider().url() + "\n");
 
-            String response = ChatClient
-                    .create(S.chatModel())
-                    .prompt()
-                    .options(OpenAiChatOptions.builder().model(selectedModel))
-                    .system(systemPrompt)
-                    .user(prompt)
-                    .call()
-                    .content();
+            BrowserToolProvider.Session session = S.browserToolProvider().lease(allowedHosts, MAX_TOOL_CALLS, this::logAppend);
+            String response;
+            try {
+                List<ToolCallback> tools = session.tools();
+                logAppend("Tools: " + tools.stream().map(tool -> tool.getToolDefinition().name()).collect(Collectors.joining(", ")) + "\n");
+
+                response = ChatClient
+                        .create(S.chatModel())
+                        .prompt()
+                        .options(OpenAiChatOptions.builder().model(selectedModel))
+                        .system(systemPrompt)
+                        .user(userPrompt)
+                        .toolCallbacks(tools)
+                        .call()
+                        .content();
+            }
+            catch (RuntimeException e) {
+                // The MCP session may be broken (e.g. the browser server restarted); do not reuse it.
+                session.invalidate();
+                throw e;
+            }
+            finally {
+                session.close();
+            }
+
             logAppend(response + "\n");
-
-            parseEvents(response);
+            for (CalendarEvent calendarEvent : CalendarEventsXmlParser.parse(response, this::logAppend)) {
+                addCalendarEvent(calendarEvent);
+                logAppend("Added event: " + calendarEvent + "\n");
+            }
 
             dropExpiredEvents();
             sanatizeEvents();
@@ -116,78 +175,37 @@ public class CalendarSourceAIAgentScraper extends CalendarSource {
         }
     }
 
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
-
     /**
-     * Parse the XML returned by the LLM into CalendarEvents.
-     * Expected structure:
-     * <pre>
-     * &lt;events&gt;
-     *     &lt;event&gt;
-     *         &lt;startDate&gt;2024-01-01&lt;/startDate&gt;
-     *         &lt;endDate&gt;2024-01-02&lt;/endDate&gt;
-     *         &lt;startTime&gt;10:00&lt;/startTime&gt;
-     *         &lt;endTime&gt;12:00&lt;/endTime&gt;
-     *         &lt;description&gt;Dancing is fun&lt;/description&gt;
-     *     &lt;/event&gt;
-     * &lt;/events&gt;
-     * </pre>
+     * Returns false only when the model is known and does not advertise tool calling.
+     * An unknown model is allowed, because the model list may be unavailable; the call
+     * itself will show whether the model can use the tools.
      */
-    private void parseEvents(String response) {
-        Document doc = Jsoup.parse(stripCodeFences(response), "", Parser.xmlParser());
-        for (Element eventElement : doc.getElementsByTag("event")) {
-            String startDateString = tagText(eventElement, "startDate");
-            String endDateString = tagText(eventElement, "endDate");
-            String startTimeString = tagText(eventElement, "startTime");
-            String endTimeString = tagText(eventElement, "endTime");
-            String description = tagText(eventElement, "description");
-
-            if (startDateString.isBlank()) {
-                logAppend("Skipping event without a start date: " + eventElement + "\n");
-                continue;
-            }
-
-            LocalDate startDate = LocalDate.parse(startDateString, DATE_FORMATTER);
-            LocalDate endDate = endDateString.isBlank() ? startDate : LocalDate.parse(endDateString, DATE_FORMATTER);
-            LocalTime startTime = startTimeString.isBlank() ? LocalTime.MIDNIGHT : LocalTime.parse(startTimeString, TIME_FORMATTER);
-            LocalTime endTime = endTimeString.isBlank() ? startTime : LocalTime.parse(endTimeString, TIME_FORMATTER);
-
-            LocalDateTime startDateTime = LocalDateTime.of(startDate, startTime);
-            LocalDateTime endDateTime = LocalDateTime.of(endDate, endTime);
-            if (!endDateTime.isAfter(startDateTime)) {
-                // no (valid) end supplied: default to one hour after start
-                endDateTime = startDateTime.plusHours(1);
-            }
-            endDateTime = makeSureEndIsAfterStart(startDateTime, endDateTime);
-
-            CalendarEvent calendarEvent = new CalendarEvent()
-                    .subject(description)
-                    .startDateTime(startDateTime)
-                    .endDateTime(endDateTime);
-            addCalendarEvent(calendarEvent);
-            logAppend("Added event: " + calendarEvent + "\n");
-        }
-    }
-
-    private String tagText(Element parent, String tagName) {
-        Element element = parent.getElementsByTag(tagName).first();
-        return element == null ? "" : element.text().trim();
+    private boolean modelSupportsToolCalling(String modelId) {
+        return S.openRouterService().models().stream()
+                .filter(model -> model.id().equals(modelId))
+                .findFirst()
+                .map(OpenRouterService.Model::supportsTools)
+                .orElse(true);
     }
 
     /**
-     * LLMs frequently wrap their output in markdown code fences (```xml ... ```);
-     * strip those so the XML can be parsed.
+     * The prompt contains the seed URLs; their hosts are the only ones the agent may open.
      */
-    private String stripCodeFences(String response) {
-        String xml = response.trim();
-        if (xml.startsWith("```")) {
-            int firstNewline = xml.indexOf('\n');
-            xml = firstNewline < 0 ? "" : xml.substring(firstNewline + 1);
-            if (xml.endsWith("```")) {
-                xml = xml.substring(0, xml.length() - 3);
+    private Set<String> extractAllowedHosts() {
+        Set<String> hosts = new HashSet<>();
+        Matcher matcher = URL_PATTERN.matcher(prompt == null ? "" : prompt);
+        while (matcher.find()) {
+            String url = matcher.group().replaceAll("[.,;:]+$", "");
+            try {
+                String host = URI.create(url).getHost();
+                if (host != null && !host.isBlank()) {
+                    hosts.add(host.toLowerCase(Locale.ROOT));
+                }
+            }
+            catch (IllegalArgumentException e) {
+                logAppend("Ignoring invalid URL in prompt: " + url + "\n");
             }
         }
-        return xml.trim();
+        return hosts;
     }
 }

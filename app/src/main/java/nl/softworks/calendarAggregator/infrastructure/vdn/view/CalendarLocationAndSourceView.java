@@ -456,6 +456,9 @@ implements AfterNavigationObserver
 			else if (calendarSource instanceof CalendarSourceLLMScraper calendarSourceLLMScraper) {
 				return calendarSourceLLMScraper.prompt();
 			}
+			else if (calendarSource instanceof CalendarSourceAIAgentScraper calendarSourceAIAgentScraper) {
+				return calendarSourceAIAgentScraper.prompt();
+			}
 			return "";
 		}
 

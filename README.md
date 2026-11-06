@@ -48,6 +48,36 @@ To run locally create an application-default.properties file in the `app/src/mai
 Running `mvn package` will create a bootable-jar that can be started using `java -jar`, optionally provide some configuration parameters via -D (like the HTTP ports as Spring has it), and that's it.
 Do search the log of the first start for 'note down' to get the password of the automatically created administrator user.
 
+## AI agent scraper
+The `AIAgent` source type sends a system and user prompt to an LLM and lets the model drive a
+real browser to find the events. The browser is a separate
+[Playwright MCP](https://github.com/microsoft/playwright-mcp) server; the application connects to
+it as an MCP client.
+
+In development `CalendarAggregatorApplicationTestContainer` starts the server with Testcontainers
+and passes its mapped port to the application. To run the server by hand:
+
+```
+docker run --rm -it --init --ipc=host -p 8931:8931 \
+  mcr.microsoft.com/playwright/mcp:v0.0.83 \
+  --isolated --port 8931 --host 0.0.0.0 --allowed-hosts '*' --snapshot-mode none
+```
+
+Configure the url with `calendaraggregator.mcp.playwright.url` (default `http://localhost:8931`).
+In production the value comes from `CALENDARAGGREGATOR_MCP_PLAYWRIGHT_URL`.
+
+Two server flags matter:
+* `--isolated` gives every MCP client its own browser context, so concurrent scrapes do not
+  share a page. Without it, a second client fails because the browser profile is already in use.
+* `--allowed-hosts` must contain the `Host` header the application sends, e.g.
+  `playwright:8931`. The default only allows localhost, so a container-to-container connection
+  gets a 403.
+* `--snapshot-mode none` stops Playwright MCP from writing snapshots to files; the agent reads a
+  page with `browser_snapshot` instead, which returns the accessibility tree inline.
+
+The model must support tool calling; the AIAgent form only lists models that advertise it
+(OpenRouter's `supported_parameters` contains `tools`). Defaults to DeepSeek.
+
 ## Technology
 
 The technology stack of CA is intended to be simple and easy - basically allowing a 'MS-Access style' development.
