@@ -25,6 +25,7 @@ import jakarta.annotation.security.RolesAllowed;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
+import nl.softworks.calendarAggregator.domain.entity.CalendarSourceAIAgentScraper;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceICal;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceLLMScraper;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceManual;
@@ -37,6 +38,7 @@ import nl.softworks.calendarAggregator.infrastructure.vdn.CalendarAggregatorAppL
 import nl.softworks.calendarAggregator.infrastructure.vdn.component.AnchorIcon;
 import nl.softworks.calendarAggregator.infrastructure.vdn.component.ResultDialog;
 import nl.softworks.calendarAggregator.infrastructure.vdn.form.CalendarLocationForm;
+import nl.softworks.calendarAggregator.infrastructure.vdn.form.CalendarSourceAIAgentScraperForm;
 import nl.softworks.calendarAggregator.infrastructure.vdn.form.CalendarSourceForm;
 import nl.softworks.calendarAggregator.infrastructure.vdn.form.CalendarSourceICalForm;
 import nl.softworks.calendarAggregator.infrastructure.vdn.form.CalendarSourceLLMScraperForm;
@@ -333,8 +335,11 @@ implements AfterNavigationObserver
 			verticalLayout.add(new VButton("XML/JSON Source", e -> showInsertForm(addSelectionDialog, new CalendarSourceXmlScraper(), new CalendarSourceXmlScraperForm(), calendarSource))
 					.isPrimary(calendarSource instanceof CalendarSourceXmlScraper));
 
-			verticalLayout.add(new VButton("AI Source", e -> showInsertForm(addSelectionDialog, new CalendarSourceLLMScraper(), new CalendarSourceLLMScraperForm(), calendarSource))
+			verticalLayout.add(new VButton("LLM Source", e -> showInsertForm(addSelectionDialog, new CalendarSourceLLMScraper(), new CalendarSourceLLMScraperForm(), calendarSource))
 					.isPrimary(calendarSource instanceof CalendarSourceLLMScraper));
+
+			verticalLayout.add(new VButton("AIAgent Source", e -> showInsertForm(addSelectionDialog, new CalendarSourceAIAgentScraper(), new CalendarSourceAIAgentScraperForm(), calendarSource))
+					.isPrimary(calendarSource instanceof CalendarSourceAIAgentScraper));
 
 			addSelectionDialog.open();
 		}
@@ -508,7 +513,11 @@ implements AfterNavigationObserver
 			}
 			else if (calendarSource instanceof CalendarSourceLLMScraper) {
 				calendarSourceForm = new CalendarSourceLLMScraperForm().populateWith(calendarSource);
-				title = "AI source";
+				title = "LLM source";
+			}
+			else if (calendarSource instanceof CalendarSourceAIAgentScraper) {
+				calendarSourceForm = new CalendarSourceAIAgentScraperForm().populateWith(calendarSource);
+				title = "AIAgent source";
 			}
 			else {
 				throw new IllegalStateException("Unknown CalendarSource " + calendarSource.getClass().getSimpleName());
