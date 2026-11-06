@@ -8,21 +8,21 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
 import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
-import nl.softworks.calendarAggregator.domain.entity.CalendarSourceAIScraper;
+import nl.softworks.calendarAggregator.domain.entity.CalendarSourceLLMScraper;
 import nl.softworks.calendarAggregator.domain.interfaces.S;
 import nl.softworks.calendarAggregator.domain.service.OpenRouterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CalendarSourceAIScraperForm extends CalendarSourceScraperBaseHtmlForm {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourceAIScraperForm.class);
+public class CalendarSourceLLMScraperForm extends CalendarSourceScraperBaseHtmlForm {
+	private static final Logger LOGGER = LoggerFactory.getLogger(CalendarSourceLLMScraperForm.class);
 
-	private final Binder<CalendarSourceAIScraper> binder = new Binder<>();
+	private final Binder<CalendarSourceLLMScraper> binder = new Binder<>();
 
 	private final ComboBox<OpenRouterService.Model> modelComboBox = new ComboBox<>("Model");
 	private final TextArea promptTextArea = new TextArea("Prompt");
 
-	public CalendarSourceAIScraperForm() {
+	public CalendarSourceLLMScraperForm() {
 
 		modelComboBox.setItemLabelGenerator(model -> model == null ? "" : model.name());
 		modelComboBox.setClearButtonVisible(true);
@@ -42,31 +42,31 @@ public class CalendarSourceAIScraperForm extends CalendarSourceScraperBaseHtmlFo
 								.filter(model -> model.id().equals(id))
 								.findFirst()
 								.orElse(null))
-				.bind(CalendarSourceAIScraper::model, CalendarSourceAIScraper::model);
-		binder.forField(promptTextArea).bind(CalendarSourceAIScraper::prompt, CalendarSourceAIScraper::prompt);
+				.bind(CalendarSourceLLMScraper::model, CalendarSourceLLMScraper::model);
+		binder.forField(promptTextArea).bind(CalendarSourceLLMScraper::prompt, CalendarSourceLLMScraper::prompt);
 	}
 
 	private void test() {
-		CalendarSourceAIScraper calendarSource = new CalendarSourceAIScraper();
+		CalendarSourceLLMScraper calendarSource = new CalendarSourceLLMScraper();
 		new CalendarLocation().enabled(true).addCalendarSource(calendarSource);
 		generateAndShowTrace(calendarSource);
 	}
 
 	@Override
-	public CalendarSourceAIScraperForm populateWith(CalendarSource calendarSource) {
+	public CalendarSourceLLMScraperForm populateWith(CalendarSource calendarSource) {
 		super.populateWith(calendarSource);
-		if (calendarSource instanceof CalendarSourceAIScraper calendarSourceAIScraper) {
+		if (calendarSource instanceof CalendarSourceLLMScraper calendarSourceLLMScraper) {
 			modelComboBox.setItems(S.openRouterService().models());
-			binder.readBean(calendarSourceAIScraper);
+			binder.readBean(calendarSourceLLMScraper);
 		}
 		return this;
 	}
 
 	@Override
-	public CalendarSourceAIScraperForm writeTo(CalendarSource calendarSource) throws ValidationException {
+	public CalendarSourceLLMScraperForm writeTo(CalendarSource calendarSource) throws ValidationException {
 		super.writeTo(calendarSource);
-		if (calendarSource instanceof CalendarSourceAIScraper calendarSourceAIScraper) {
-			binder.writeBean(calendarSourceAIScraper);
+		if (calendarSource instanceof CalendarSourceLLMScraper calendarSourceLLMScraper) {
+			binder.writeBean(calendarSourceLLMScraper);
 		}
 		return this;
 	}

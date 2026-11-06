@@ -23,10 +23,10 @@ import java.util.Set;
 
 @Entity
 @DiscriminatorValue("ai")
-public class CalendarSourceAIScraper extends CalendarSourceScraperBaseHTML {
+public class CalendarSourceLLMScraper extends CalendarSourceScraperBaseHTML {
 
     public String type() {
-        return "AI";
+        return "LLM";
     }
 
     @NotNull
@@ -36,7 +36,7 @@ public class CalendarSourceAIScraper extends CalendarSourceScraperBaseHTML {
     public String model() {
         return model;
     }
-    public CalendarSourceAIScraper model(String v) {
+    public CalendarSourceLLMScraper model(String v) {
         this.model = v;
         return this;
     }
@@ -48,7 +48,7 @@ public class CalendarSourceAIScraper extends CalendarSourceScraperBaseHTML {
     public String prompt() {
         return prompt;
     }
-    public CalendarSourceAIScraper prompt(String v) {
+    public CalendarSourceLLMScraper prompt(String v) {
         this.prompt = v;
         return this;
     }

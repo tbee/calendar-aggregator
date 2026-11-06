@@ -25,8 +25,8 @@ import jakarta.annotation.security.RolesAllowed;
 import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import nl.softworks.calendarAggregator.domain.entity.CalendarLocation;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
-import nl.softworks.calendarAggregator.domain.entity.CalendarSourceAIScraper;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceICal;
+import nl.softworks.calendarAggregator.domain.entity.CalendarSourceLLMScraper;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceManual;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceMultipleDaysScraper;
 import nl.softworks.calendarAggregator.domain.entity.CalendarSourceRegexScraper;
@@ -37,9 +37,9 @@ import nl.softworks.calendarAggregator.infrastructure.vdn.CalendarAggregatorAppL
 import nl.softworks.calendarAggregator.infrastructure.vdn.component.AnchorIcon;
 import nl.softworks.calendarAggregator.infrastructure.vdn.component.ResultDialog;
 import nl.softworks.calendarAggregator.infrastructure.vdn.form.CalendarLocationForm;
-import nl.softworks.calendarAggregator.infrastructure.vdn.form.CalendarSourceAIScraperForm;
 import nl.softworks.calendarAggregator.infrastructure.vdn.form.CalendarSourceForm;
 import nl.softworks.calendarAggregator.infrastructure.vdn.form.CalendarSourceICalForm;
+import nl.softworks.calendarAggregator.infrastructure.vdn.form.CalendarSourceLLMScraperForm;
 import nl.softworks.calendarAggregator.infrastructure.vdn.form.CalendarSourceManualForm;
 import nl.softworks.calendarAggregator.infrastructure.vdn.form.CalendarSourceMultipleDaysScraperForm;
 import nl.softworks.calendarAggregator.infrastructure.vdn.form.CalendarSourceRegexScraperForm;
@@ -333,8 +333,8 @@ implements AfterNavigationObserver
 			verticalLayout.add(new VButton("XML/JSON Source", e -> showInsertForm(addSelectionDialog, new CalendarSourceXmlScraper(), new CalendarSourceXmlScraperForm(), calendarSource))
 					.isPrimary(calendarSource instanceof CalendarSourceXmlScraper));
 
-			verticalLayout.add(new VButton("AI Source", e -> showInsertForm(addSelectionDialog, new CalendarSourceAIScraper(), new CalendarSourceAIScraperForm(), calendarSource))
-					.isPrimary(calendarSource instanceof CalendarSourceAIScraper));
+			verticalLayout.add(new VButton("AI Source", e -> showInsertForm(addSelectionDialog, new CalendarSourceLLMScraper(), new CalendarSourceLLMScraperForm(), calendarSource))
+					.isPrimary(calendarSource instanceof CalendarSourceLLMScraper));
 
 			addSelectionDialog.open();
 		}
@@ -448,8 +448,8 @@ implements AfterNavigationObserver
 			else if (calendarSource instanceof CalendarSourceManual calendarSourceManual) {
 				return calendarSourceManual.startDateTime().toString() + " " + (calendarSourceManual.rrule() == null ? "" : calendarSourceManual.rrule());
 			}
-			else if (calendarSource instanceof CalendarSourceAIScraper calendarSourceAIScraper) {
-				return calendarSourceAIScraper.prompt();
+			else if (calendarSource instanceof CalendarSourceLLMScraper calendarSourceLLMScraper) {
+				return calendarSourceLLMScraper.prompt();
 			}
 			return "";
 		}
@@ -506,8 +506,8 @@ implements AfterNavigationObserver
 				calendarSourceForm = new CalendarSourceXmlScraperForm().populateWith(calendarSource);
 				title = "XML/JSON source";
 			}
-			else if (calendarSource instanceof CalendarSourceAIScraper) {
-				calendarSourceForm = new CalendarSourceAIScraperForm().populateWith(calendarSource);
+			else if (calendarSource instanceof CalendarSourceLLMScraper) {
+				calendarSourceForm = new CalendarSourceLLMScraperForm().populateWith(calendarSource);
 				title = "AI source";
 			}
 			else {
