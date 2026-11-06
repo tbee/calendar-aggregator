@@ -111,7 +111,7 @@ public class CalendarSourceAIAgentScraper extends CalendarSource {
                     Times must be in the format HH:mm.
                     Only return the XML structure, nothing else.
                     """.formatted(String.join(", ", allowedHosts), MAX_TOOL_CALLS, today, timezone);
-            String userPrompt = prompt == null ? "" : prompt;
+            String userPrompt = (prompt == null ? "" : prompt);
             logAppend(systemPrompt + "\n" + userPrompt + "\n");
 
             String selectedModel = (model == null || model.isBlank()) ? OpenRouterService.DEFAULT_AGENT_MODEL : model;
@@ -135,7 +135,7 @@ public class CalendarSourceAIAgentScraper extends CalendarSource {
                         .options(OpenAiChatOptions.builder().model(selectedModel))
                         .system(systemPrompt)
                         .user(userPrompt)
-                        .toolCallbacks(tools)
+                        .tools(tools)
                         .call()
                         .content();
             }

@@ -87,6 +87,7 @@ public class McpBrowserPool implements BrowserToolProvider {
             Thread.currentThread().interrupt();
             throw new RuntimeException("Interrupted while waiting for an MCP browser", e);
         }
+
         try {
             PooledClient client = available.poll();
             if (client == null) {
