@@ -1,4 +1,4 @@
 - Download and use IntelliJ's JCEF JDK distribution
 - Download latest hotswap agent jar from https://github.com/HotswapProjects/HotswapAgent/releases
-- Copy hotswap agent jar to $HOME/.jdks/jcefjdk.../lib/hotswap/hotswap-agent.jar
+- Copy hotswap agent jar to $HOME/.jdks/jbr-25/lib/hotswap/hotswap-agent.jar (create the lib/hotswap directory if missing; as of 2026-11 it holds version 2.0.3)
 - Add -XX:+AllowEnhancedClassRedefinition -XX:HotswapAgent=fatjar to JVM arguments
