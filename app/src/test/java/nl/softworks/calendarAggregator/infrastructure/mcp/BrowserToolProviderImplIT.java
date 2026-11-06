@@ -26,10 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * {@code mvnw -pl app test -Dtest=McpBrowserPoolIT -Dmcp.it=true}</p>
  */
 @EnabledIfSystemProperty(named = "mcp.it", matches = "true")
-class McpBrowserPoolIT {
+class BrowserToolProviderImplIT {
 
     private static GenericContainer<?> playwright;
-    private static McpBrowserPool pool;
+    private static BrowserToolProviderImpl pool;
 
     @BeforeAll
     static void start() {
@@ -41,7 +41,7 @@ class McpBrowserPoolIT {
                 .withStartupTimeout(Duration.ofMinutes(10));
         playwright.start();
 
-        pool = new McpBrowserPool();
+        pool = new BrowserToolProviderImpl();
         ReflectionTestUtils.setField(pool, "playwrightUrl", "http://localhost:" + playwright.getMappedPort(8931));
         ReflectionTestUtils.setField(pool, "poolSize", 2);
         ReflectionTestUtils.setField(pool, "requestTimeoutSeconds", 120L);

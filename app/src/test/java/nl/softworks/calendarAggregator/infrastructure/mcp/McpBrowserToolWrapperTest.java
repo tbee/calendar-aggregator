@@ -20,7 +20,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-class McpToolWrapperTest {
+class McpBrowserToolWrapperTest {
 
     private final List<String> log = new ArrayList<>();
 
@@ -32,7 +32,7 @@ class McpToolWrapperTest {
             return "snapshot";
         });
 
-        List<ToolCallback> wrapped = McpToolWrapper.wrap(List.of(delegate), 2, Set.of(), log::add);
+        List<ToolCallback> wrapped = McpBrowserToolWrapper.wrap(List.of(delegate), 2, Set.of(), log::add);
 
         assertEquals("snapshot", wrapped.get(0).call("{\"url\":\"https://example.com\"}"));
         assertEquals("snapshot", wrapped.get(0).call("{\"url\":\"https://example.com/2\"}"));
@@ -51,7 +51,7 @@ class McpToolWrapperTest {
             return "snapshot";
         });
 
-        List<ToolCallback> wrapped = McpToolWrapper.wrap(List.of(delegate), 5, Set.of("example.com"), log::add);
+        List<ToolCallback> wrapped = McpBrowserToolWrapper.wrap(List.of(delegate), 5, Set.of("example.com"), log::add);
 
         String blocked = wrapped.get(0).call("{\"url\":\"https://evil.example.net/events\"}");
 
@@ -68,7 +68,7 @@ class McpToolWrapperTest {
     void logsCallAndResult() {
         ToolCallback delegate = callback("browser_snapshot", input -> "### Page\n- Page URL: https://example.com");
 
-        List<ToolCallback> wrapped = McpToolWrapper.wrap(List.of(delegate), 5, Set.of("example.com"), log::add);
+        List<ToolCallback> wrapped = McpBrowserToolWrapper.wrap(List.of(delegate), 5, Set.of("example.com"), log::add);
         wrapped.get(0).call("{}");
 
         String logText = String.join("", log);
@@ -80,7 +80,7 @@ class McpToolWrapperTest {
     void toolsWithoutUrlAreAllowed() {
         ToolCallback delegate = callback("browser_snapshot", input -> "snapshot");
 
-        List<ToolCallback> wrapped = McpToolWrapper.wrap(List.of(delegate), 5, Set.of("example.com"), log::add);
+        List<ToolCallback> wrapped = McpBrowserToolWrapper.wrap(List.of(delegate), 5, Set.of("example.com"), log::add);
 
         assertEquals("snapshot", wrapped.get(0).call("{}"));
         verify(delegate, times(1)).call(anyString());
@@ -92,7 +92,7 @@ class McpToolWrapperTest {
         ToolCallback delegate = callback("browser_snapshot",
                 input -> "[{\"type\":\"text\",\"text\":\"### Page\\n- Page URL: https://example.com\"}]");
 
-        List<ToolCallback> wrapped = McpToolWrapper.wrap(List.of(delegate), 5, Set.of("example.com"), log::add);
+        List<ToolCallback> wrapped = McpBrowserToolWrapper.wrap(List.of(delegate), 5, Set.of("example.com"), log::add);
 
         assertEquals("### Page\n- Page URL: https://example.com", wrapped.get(0).call("{}"));
     }

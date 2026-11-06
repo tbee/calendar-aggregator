@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  * <p>The budget and the log are shared by all callbacks of a single run, so the model
  * cannot get around the limit by switching tools.</p>
  */
-final class McpToolWrapper implements ToolCallback {
+final class McpBrowserToolWrapper implements ToolCallback {
 
     private static final Pattern URL_IN_ARGUMENTS = Pattern.compile("\"url\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\"");
 
@@ -45,7 +45,7 @@ final class McpToolWrapper implements ToolCallback {
     private final Consumer<String> log;
     private final String toolName;
 
-    private McpToolWrapper(ToolCallback delegate, AtomicInteger remaining, int maxCalls, Set<String> allowedHosts, Consumer<String> log) {
+    private McpBrowserToolWrapper(ToolCallback delegate, AtomicInteger remaining, int maxCalls, Set<String> allowedHosts, Consumer<String> log) {
         this.delegate = delegate;
         this.remaining = remaining;
         this.maxCalls = maxCalls;
@@ -58,7 +58,7 @@ final class McpToolWrapper implements ToolCallback {
         AtomicInteger remaining = new AtomicInteger(maxCalls);
         List<ToolCallback> wrapped = new ArrayList<>(tools.size());
         for (ToolCallback tool : tools) {
-            wrapped.add(new McpToolWrapper(tool, remaining, maxCalls, allowedHosts, log));
+            wrapped.add(new McpBrowserToolWrapper(tool, remaining, maxCalls, allowedHosts, log));
         }
         return wrapped;
     }

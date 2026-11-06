@@ -36,9 +36,9 @@ import java.util.stream.Collectors;
  * idle clients costs nothing.</p>
  */
 @Service
-public class McpBrowserPool implements BrowserToolProvider {
+public class BrowserToolProviderImpl implements BrowserToolProvider {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(McpBrowserPool.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BrowserToolProviderImpl.class);
 
     /** Tools the agent is allowed to use; anything else (vision, pdf, devtools, code execution) is hidden from the model. */
     private static final Set<String> ALLOWED_TOOL_NAMES = Set.of(
@@ -95,9 +95,9 @@ public class McpBrowserPool implements BrowserToolProvider {
                 all.add(client);
             }
             Set<String> normalizedHosts = allowedHosts.stream()
-                    .map(McpToolWrapper::normalizeHost)
+                    .map(McpBrowserToolWrapper::normalizeHost)
                     .collect(Collectors.toSet());
-            List<ToolCallback> tools = McpToolWrapper.wrap(client.tools, maxToolCalls, normalizedHosts, log);
+            List<ToolCallback> tools = McpBrowserToolWrapper.wrap(client.tools, maxToolCalls, normalizedHosts, log);
             return new Lease(client, tools);
         }
         catch (RuntimeException e) {
@@ -199,14 +199,14 @@ public class McpBrowserPool implements BrowserToolProvider {
         @Override
         public void invalidate() {
             if (finished.compareAndSet(false, true)) {
-                McpBrowserPool.this.invalidate(client);
+                BrowserToolProviderImpl.this.invalidate(client);
             }
         }
 
         @Override
         public void close() {
             if (finished.compareAndSet(false, true)) {
-                McpBrowserPool.this.release(client);
+                BrowserToolProviderImpl.this.release(client);
             }
         }
     }
