@@ -44,19 +44,19 @@ final class GuardedMcpBrowserTool implements ToolCallback {
     private static final int LOG_ARGUMENTS_MAX = 1_000;
     private static final int LOG_RESULT_MAX = 4_000;
 
-    private final ToolCallback delegate;
+    private final ToolCallback toolCallback;
     private final AtomicInteger remainingCallsAtomicInteger;
     private final int maxCalls;
     private final Set<String> allowedHosts;
     private final Consumer<String> log;
     private final String toolName;
 
-    private GuardedMcpBrowserTool(ToolCallback delegate, int maxCalls, Set<String> allowedHosts, Consumer<String> log) {
-        this.delegate = delegate;
+    private GuardedMcpBrowserTool(ToolCallback toolCallback, int maxCalls, Set<String> allowedHosts, Consumer<String> log) {
+        this.toolCallback = toolCallback;
         this.remainingCallsAtomicInteger = new AtomicInteger(maxCalls);
         this.maxCalls = maxCalls;
         this.log = log;
-        this.toolName = delegate.getToolDefinition().name();
+        this.toolName = toolCallback.getToolDefinition().name();
 
         this.allowedHosts = allowedHosts.stream()
                 .map(GuardedMcpBrowserTool::normalizeHost)
@@ -71,12 +71,12 @@ final class GuardedMcpBrowserTool implements ToolCallback {
 
     @Override
     public ToolDefinition getToolDefinition() {
-        return delegate.getToolDefinition();
+        return toolCallback.getToolDefinition();
     }
 
     @Override
     public ToolMetadata getToolMetadata() {
-        return delegate.getToolMetadata();
+        return toolCallback.getToolMetadata();
     }
 
     @Override
@@ -105,14 +105,13 @@ final class GuardedMcpBrowserTool implements ToolCallback {
             return blocked;
         }
 
+        // Perform the tool call
         log.accept("Tool " + callNumber + "/" + maxCalls + " " + toolName + " " + abbreviate(toolInput, LOG_ARGUMENTS_MAX) + "\n");
         long start = System.nanoTime();
         try {
-            String result = unwrapMcpContent(toolContext == null ? delegate.call(toolInput) : delegate.call(toolInput, toolContext));
+            String result = unwrapMcpContent(toolContext == null ? toolCallback.call(toolInput) : toolCallback.call(toolInput, toolContext));
             long millis = (System.nanoTime() - start) / 1_000_000;
-            log.accept("Tool " + callNumber + " result (" + millis + " ms, "
-                    + (result == null ? 0 : result.length()) + " chars): "
-                    + abbreviate(result, LOG_RESULT_MAX) + "\n");
+            log.accept("Tool " + callNumber + " result (" + millis + " ms, " + (result == null ? 0 : result.length()) + " chars): " + abbreviate(result, LOG_RESULT_MAX) + "\n");
             return result;
         }
         catch (RuntimeException e) {
@@ -221,8 +220,6 @@ final class GuardedMcpBrowserTool implements ToolCallback {
         }
         int head = max / 2;
         int tail = max - head;
-        return s.substring(0, head)
-                + "\n... (" + (s.length() - max) + " chars omitted) ...\n"
-                + s.substring(s.length() - tail);
+        return s.substring(0, head) + "\n... (" + (s.length() - max) + " chars omitted) ...\n" + s.substring(s.length() - tail);
     }
 }
