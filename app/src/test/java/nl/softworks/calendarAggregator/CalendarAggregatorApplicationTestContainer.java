@@ -38,9 +38,11 @@ public class CalendarAggregatorApplicationTestContainer {
         LOGGER.info("Playwright MCP on port {}", playwright.getMappedPort(8931));
         System.setProperty("calendaraggregator.mcp.playwright.url", "http://localhost:" + playwright.getMappedPort(8931));
 
+        // Setup Spring
         System.setProperty("spring.jpa.database-platform", PostgreSQLOnHsqldbCompatibilityDialect.class.getName());
         System.setProperty("spring.profiles.active", "dev");
 
+        // Start application
         CalendarAggregateApplication.main(args);
     }
 }
