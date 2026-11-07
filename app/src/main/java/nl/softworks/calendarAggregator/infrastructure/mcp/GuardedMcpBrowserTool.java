@@ -51,9 +51,9 @@ final class GuardedMcpBrowserTool implements ToolCallback {
     private final Consumer<String> log;
     private final String toolName;
 
-    private GuardedMcpBrowserTool(ToolCallback toolCallback, int maxCalls, Set<String> allowedHosts, Consumer<String> log) {
+    private GuardedMcpBrowserTool(ToolCallback toolCallback, AtomicInteger remainingCallsAtomicInteger, int maxCalls, Set<String> allowedHosts, Consumer<String> log) {
         this.toolCallback = toolCallback;
-        this.remainingCallsAtomicInteger = new AtomicInteger(maxCalls);
+        this.remainingCallsAtomicInteger = remainingCallsAtomicInteger;
         this.maxCalls = maxCalls;
         this.log = log;
         this.toolName = toolCallback.getToolDefinition().name();
@@ -64,8 +64,9 @@ final class GuardedMcpBrowserTool implements ToolCallback {
     }
 
     static List<GuardedMcpBrowserTool> wrap(List<? extends ToolCallback> tools, int maxCalls, Set<String> allowedHosts, Consumer<String> log) {
+        AtomicInteger remainingCallsAtomicInteger = new AtomicInteger(maxCalls);
         return tools.stream()
-                .map(tool -> new GuardedMcpBrowserTool(tool, maxCalls, allowedHosts, log))
+                .map(tool -> new GuardedMcpBrowserTool(tool, remainingCallsAtomicInteger, maxCalls, allowedHosts, log))
                 .toList();
     }
 
@@ -177,7 +178,7 @@ final class GuardedMcpBrowserTool implements ToolCallback {
         }
     }
 
-    private static String normalizeHost(String host) {
+    static String normalizeHost(String host) {
         String normalized = host.toLowerCase(Locale.ROOT);
         return normalized.startsWith("www.") ? normalized.substring(4) : normalized;
     }

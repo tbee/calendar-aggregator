@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="20261107a" author="tom">
+        <createTable tableName="flyer_cache">
+            <column name="id" type="bigint" autoIncrement="true" startWith="1">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="lazylock" type="bigint" defaultValue="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image_hash" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="prompt_version" type="varchar(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="vision_model" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="image_url" type="varchar(2000)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="transcription" type="clob">
+                <constraints nullable="true"/>
+            </column>
+            <column name="events_xml" type="clob">
+                <constraints nullable="true"/>
+            </column>
+            <column name="first_seen" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_seen" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+            <column name="latest_event_end" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint constraintName="flyer_cache__key"
+                             tableName="flyer_cache"
+                             columnNames="image_hash, prompt_version, vision_model"/>
+        <createIndex indexName="flyer_cache__last_seen" tableName="flyer_cache">
+            <column name="last_seen"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

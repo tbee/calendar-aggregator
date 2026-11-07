@@ -70,6 +70,7 @@ public class CalendarSourceLLMScraper extends CalendarSourceScraperBaseHTML {
                     Today is %s. Resolve dates without a year against today, and never return events in the past.
                     If events do not contain a time, make a reasonable assumption. For example: events in the evening usually start at 20:00 and end around 23:00.
                     Ignore events that are about getting people to start taking lessons, like "kennismakingsles" of "proefles", or the start of a new season or block of lessons.
+                    Ignore events that actually are indicators there are no lessons ("Geen les / Geen lessen").
                     
                     Return the events in exactly this XML structure:
                     <events>

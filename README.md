@@ -78,6 +78,20 @@ Two server flags matter:
 The model must support tool calling; the AIAgent form only lists models that advertise it
 (OpenRouter's `supported_parameters` contains `tools`). Defaults to DeepSeek.
 
+### Flyer images
+Some venues publish their events only as a poster image. During a run the agent can call the
+`inspectFlyers` tool. That tool scrolls the rendered page, collects the large `<img>` elements,
+downloads them (plain HTTP first, the browser itself as fallback) and sends them to a vision model.
+It extracts the events and adds them to the source directly.
+
+* `calendaraggregator.aiAgent.visionModel` selects the vision model (default
+  `deepseek/deepseek-v4-flash-vision-exp`). It must accept image input.
+* Downloaded images are restricted to the seed hosts plus hosts the page actually contacted, and
+  never to loopback or private addresses.
+* Extractions are cached in `flyer_cache`, keyed by image hash, prompt version and model, so an
+  unchanged flyer is not sent to the vision model on every daily run. Rows not seen for
+  `flyerCacheRetentionDays` (default 90) whose events have also passed are removed automatically.
+
 ## Technology
 
 The technology stack of CA is intended to be simple and easy - basically allowing a 'MS-Access style' development.

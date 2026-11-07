@@ -5,14 +5,17 @@ import io.modelcontextprotocol.client.transport.HttpClientStreamableHttpTranspor
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import nl.softworks.calendarAggregator.domain.interfaces.BrowserToolProvider;
+import nl.softworks.calendarAggregator.domain.service.FlyerCacheService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.BlockingQueue;
@@ -20,7 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 
 /**
  * Playwright MCP implementation of {@link BrowserToolProvider}.
@@ -57,6 +59,24 @@ public class BrowserToolProviderImpl implements BrowserToolProvider {
     @Value("${calendaraggregator.mcp.requestTimeoutSeconds:120}")
     private long requestTimeoutSeconds;
 
+    @Autowired
+    FlyerImageFetcher flyerImageFetcher;
+
+    @Autowired
+    FlyerVisionReader flyerVisionReader;
+
+    @Autowired
+    FlyerCacheService flyerCacheService;
+
+    @Value("${calendaraggregator.aiAgent.flyerMinWidth:400}")
+    private int flyerMinWidth;
+
+    @Value("${calendaraggregator.aiAgent.flyerMinHeight:300}")
+    private int flyerMinHeight;
+
+    @Value("${calendaraggregator.aiAgent.flyerMaxImages:8}")
+    private int flyerMaxImages;
+
     private final BlockingQueue<BrowserMcpSyncClient> availableBrowserMcpSyncClients = new LinkedBlockingQueue<>();
     private final Set<BrowserMcpSyncClient> allBrowserMcpSyncClients = ConcurrentHashMap.newKeySet();
     private Semaphore poolSizeSemaphore;
@@ -77,7 +97,7 @@ public class BrowserToolProviderImpl implements BrowserToolProvider {
      * Blocks when all clients are in use; always release the lease in a try-with-resources or a finally block.
      */
     @Override
-    public Session lease(Set<String> allowedHosts, int maxToolCalls, Consumer<String> log) {
+    public Session lease(RunContext context) {
 
         // Check if the pool has a BrowserTool available
         try {
@@ -96,8 +116,13 @@ public class BrowserToolProviderImpl implements BrowserToolProvider {
                 allBrowserMcpSyncClients.add(client);
             }
 
+            // Add the flyer inspector to the tools; it drives the same MCP client deterministically
+            List<ToolCallback> allTools = new ArrayList<>(client.tools);
+            allTools.add(new FlyerInspector(client.client, context, flyerImageFetcher, flyerVisionReader,
+                    flyerCacheService, flyerMinWidth, flyerMinHeight, flyerMaxImages));
+
             // Create a session with the client
-            List<GuardedMcpBrowserTool> tools = GuardedMcpBrowserTool.wrap(client.tools, maxToolCalls, allowedHosts, log);
+            List<GuardedMcpBrowserTool> tools = GuardedMcpBrowserTool.wrap(allTools, context.maxToolCalls(), context.allowedHosts(), context.log());
             return new SessionImpl(client, tools);
         }
         catch (RuntimeException e) {

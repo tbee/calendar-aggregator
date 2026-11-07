@@ -5,6 +5,7 @@ import nl.softworks.calendarAggregator.domain.entity.CalendarSource;
 import nl.softworks.calendarAggregator.domain.interfaces.R;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.PrintWriter;
@@ -18,6 +19,9 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class GenerateEventsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenerateEventsService.class);
+
+    @Autowired
+    FlyerCacheService flyerCacheService;
 
 //    @Value("${spring.datasource.hikari.maximumPoolSize}")
 //    private int hikariMaximumPoolSize;
@@ -58,6 +62,12 @@ public class GenerateEventsService {
 
     public void generateEvents(Runnable onStarted) {
         try {
+            try {
+                flyerCacheService.cleanup();
+            }
+            catch (RuntimeException e) {
+                LOGGER.warn("Flyer cache cleanup failed", e);
+            }
             if (LOGGER.isInfoEnabled()) LOGGER.info("Scheduling event generations");
             R.calendarLocation().findAll().stream()
                     .flatMap(cl -> cl.calendarSources().stream())

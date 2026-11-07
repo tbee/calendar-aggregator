@@ -1,7 +1,9 @@
 package nl.softworks.calendarAggregator.domain.interfaces;
 
+import nl.softworks.calendarAggregator.domain.entity.CalendarEvent;
 import org.springframework.ai.tool.ToolCallback;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -12,17 +14,16 @@ import java.util.function.Consumer;
  */
 public interface BrowserToolProvider {
 
+    // everything one run needs; the sink receives events the tools extract themselves
+    record RunContext(Set<String> allowedHosts, int maxToolCalls, Consumer<String> log,
+                      Consumer<CalendarEvent> eventSink, LocalDate today, String timezone) {
+    }
+
     /** Url of the browser server, for logging. */
     String url();
 
-    /**
-     * Lease an isolated browser session for one run. Blocks when all sessions are in use.
-     *
-     * @param allowedHosts  hosts the agent may open; matching ignores case and a leading "www."
-     * @param maxToolCalls  hard budget for tool calls in this run
-     * @param log           receives one line per tool interaction
-     */
-    Session lease(Set<String> allowedHosts, int maxToolCalls, Consumer<String> log);
+    /** Lease an isolated browser session for one run. Blocks when all sessions are in use. */
+    Session lease(RunContext context);
 
     /** One exclusive session for one run; always close it. */
     interface Session extends AutoCloseable {

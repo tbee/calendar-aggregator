@@ -46,6 +46,17 @@ class GuardedMcpBrowserToolTest {
     }
 
     @Test
+    void sharesBudgetAcrossTools() {
+        ToolCallback first = callback("browser_snapshot", input -> "snapshot");
+        ToolCallback second = callback("browser_find", input -> "found");
+
+        List<? extends ToolCallback> wrapped = GuardedMcpBrowserTool.wrap(List.of(first, second), 1, Set.of(), log::add);
+
+        assertEquals("snapshot", wrapped.getFirst().call("{}"));
+        assertTrue(wrapped.get(1).call("{}").contains("budget"));
+    }
+
+    @Test
     void blocksOtherHosts() {
         AtomicReference<String> lastInput = new AtomicReference<>();
         ToolCallback delegate = callback("browser_navigate", input -> {
