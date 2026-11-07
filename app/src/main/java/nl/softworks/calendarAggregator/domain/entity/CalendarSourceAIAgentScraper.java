@@ -9,6 +9,7 @@ import nl.softworks.calendarAggregator.domain.interfaces.S;
 import nl.softworks.calendarAggregator.domain.service.CalendarEventsXmlParser;
 import nl.softworks.calendarAggregator.domain.service.OpenRouterService;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.tool.ToolCallback;
 
@@ -125,12 +126,12 @@ public class CalendarSourceAIAgentScraper extends CalendarSource {
             logAppend("Browser: " + S.browserToolProvider().url() + "\n");
 
             BrowserToolProvider.Session session = S.browserToolProvider().lease(allowedHosts, MAX_TOOL_CALLS, this::logAppend);
-            String response;
+            ChatResponse chatResponse;
             try {
                 List<? extends ToolCallback> tools = session.tools();
                 logAppend("Tools: " + tools.stream().map(tool -> tool.getToolDefinition().name()).collect(Collectors.joining(", ")) + "\n");
 
-                response = ChatClient
+                chatResponse = ChatClient
                         .create(S.chatModel())
                         .prompt()
                         .options(OpenAiChatOptions.builder().model(selectedModel))
@@ -138,7 +139,7 @@ public class CalendarSourceAIAgentScraper extends CalendarSource {
                         .user(userPrompt)
                         .tools(tools)
                         .call()
-                        .content();
+                        .chatResponse();
             }
             catch (RuntimeException e) {
                 // The MCP session may be broken (e.g. the browser server restarted); do not reuse it.
@@ -149,6 +150,8 @@ public class CalendarSourceAIAgentScraper extends CalendarSource {
                 session.close();
             }
 
+            String response = chatResponse == null ? null : chatResponse.getResult().getOutput().getText();
+            logAppend("Resolved model: " + (chatResponse == null ? "unknown" : chatResponse.getMetadata().getModel()) + "\n");
             logAppend(response + "\n");
             for (CalendarEvent calendarEvent : CalendarEventsXmlParser.parse(response, this::logAppend)) {
                 addCalendarEvent(calendarEvent);

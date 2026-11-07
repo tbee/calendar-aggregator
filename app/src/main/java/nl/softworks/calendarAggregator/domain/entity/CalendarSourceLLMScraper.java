@@ -8,6 +8,7 @@ import nl.softworks.calendarAggregator.domain.interfaces.S;
 import nl.softworks.calendarAggregator.domain.service.CalendarEventsXmlParser;
 import nl.softworks.calendarAggregator.domain.service.OpenRouterService;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.openai.OpenAiChatOptions;
 
 import java.io.PrintWriter;
@@ -99,14 +100,16 @@ public class CalendarSourceLLMScraper extends CalendarSourceScraperBaseHTML {
             String selectedModel = (model == null || model.isBlank()) ? OpenRouterService.AUTO_MODEL : model;
             logAppend("Model: " + selectedModel + "\n");
 
-            String response = ChatClient
+            ChatResponse chatResponse = ChatClient
                     .create(S.chatModel())
                     .prompt()
                     .options(OpenAiChatOptions.builder().model(selectedModel))
                     .system(systemPrompt)
                     .user(userPrompt)
                     .call()
-                    .content();
+                    .chatResponse();
+            String response = chatResponse == null ? null : chatResponse.getResult().getOutput().getText();
+            logAppend("Resolved model: " + (chatResponse == null ? "unknown" : chatResponse.getMetadata().getModel()) + "\n");
             logAppend(response + "\n");
 
             for (CalendarEvent calendarEvent : CalendarEventsXmlParser.parse(response, this::logAppend)) {
