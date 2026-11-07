@@ -20,6 +20,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 // TODO:
 // - Extract generate events into application services
 // - MCP om websites te kunnen lezen (is die beter dan onze eigen emulate webbrowser)
+// - Thymeleaf heeft deprecation warnings tijdens het renderen
 @SpringBootApplication
 @EnableJpaRepositories(repositoryBaseClass = RepoBaseImpl.class)
 @StyleSheet("context://aura/aura.css") // We cannot use Aura.STYLESHEET because the Vaadin application runs under a subfolder "/app".
