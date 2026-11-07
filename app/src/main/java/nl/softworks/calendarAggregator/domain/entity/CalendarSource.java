@@ -14,8 +14,11 @@ import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.io.IOUtils;
 import org.hibernate.annotations.BatchSize;
+import org.htmlunit.IncorrectnessListener;
+import org.htmlunit.ScriptException;
 import org.htmlunit.WebClient;
 import org.htmlunit.html.HtmlPage;
+import org.htmlunit.javascript.JavaScriptErrorListener;
 import org.mvel2.MVEL;
 import org.mvel2.ParserConfiguration;
 import org.mvel2.ParserContext;
@@ -30,8 +33,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -369,6 +374,30 @@ abstract public class CalendarSource extends EntityBase<CalendarSource> {
         try (WebClient webClient = new WebClient()) {
             webClient.getOptions().setDownloadImages(false);
             webClient.getOptions().setThrowExceptionOnScriptError(false);
+            // Report HtmlUnit warnings and script errors to the scraper log instead of only the server log
+            webClient.setIncorrectnessListener((message, origin) -> logAppend(message + "\n"));
+            webClient.setJavaScriptErrorListener(new JavaScriptErrorListener() {
+                @Override
+                public void scriptException(HtmlPage page, ScriptException scriptException) {
+                    logAppend("JavaScript execution error: " + scriptException.getMessage() + "\n");
+                }
+                @Override
+                public void timeoutError(HtmlPage page, long allowedTime, long executionTime) {
+                    logAppend("JavaScript execution timeout: allowed " + allowedTime + " ms, took " + executionTime + " ms\n");
+                }
+                @Override
+                public void malformedScriptURL(HtmlPage page, String url, MalformedURLException e) {
+                    logAppend("Malformed script URL: " + url + ", " + e.getMessage() + "\n");
+                }
+                @Override
+                public void loadScriptError(HtmlPage page, URL scriptUrl, Exception e) {
+                    logAppend("Error loading script " + scriptUrl + ": " + e.getMessage() + "\n");
+                }
+                @Override
+                public void warn(String message, String sourceName, int line, String lineSource, int lineOffset) {
+                    logAppend("JavaScript warning: " + message + " at " + sourceName + ":" + line + "\n");
+                }
+            });
 
             final HtmlPage page = webClient.getPage(urlString);
 			return page.asXml();
