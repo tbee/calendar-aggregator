@@ -78,7 +78,6 @@ public class CalendarSourceAIAgentScraper extends CalendarSource {
                 return Set.of();
             }
 
-            String timezone = determineTimezone() == null ? "" : determineTimezone().name();
             String today = localDateTimeNowSupplier.get().toLocalDate().toString();
             String systemPrompt = """
                     You are a web scraper that extracts dancing events from websites.
@@ -88,13 +87,14 @@ public class CalendarSourceAIAgentScraper extends CalendarSource {
                     1. Open each URL from the assignment with browser_navigate.
                     2. browser_navigate only reports the page URL and title; call browser_snapshot to read the page itself.
                     3. Use the snapshot to find the agenda, calendar or events page, and click the link (use the [ref] from the latest snapshot).
-                    4. After browser_click, call browser_snapshot again to read the new page.
-                    5. Open event detail pages when the overview does not show the dates or times.
-                    6. Use browser_find when you only need to locate something; it is cheaper than reading a whole snapshot.
-                    7. Stay on these hosts: %s. Do not open pages on other hosts.
-                    8. Use at most %d browser tool calls. When you have enough information, stop calling tools and return the XML.
+                    4. A [ref] is only valid in the snapshot it came from. After every browser_navigate or browser_click the page has changed: call browser_snapshot again before you use a [ref].
+                    5. When a tool call fails with an error such as "Ref ... not found in the current page snapshot", call browser_snapshot and retry with a [ref] from that new snapshot.
+                    6. Open event detail pages when the overview does not show the dates or times.
+                    7. Use browser_find when you only need to locate something; it is cheaper than reading a whole snapshot.
+                    8. Stay on these hosts: %s. Do not open pages on other hosts.
+                    9. Use at most %d browser tool calls. When you have enough information, stop calling tools and return the XML.
 
-                    Today is %s (%s). Resolve dates without a year against today, and never return events in the past.
+                    Today is %s. Resolve dates without a year against today, and never return events in the past.
                     If events do not contain a time, make a reasonable assumption. For example: events in the evening usually start at 20:00 and end around 23:00.
                     
                     Return the events in exactly this XML structure:
@@ -110,7 +110,7 @@ public class CalendarSourceAIAgentScraper extends CalendarSource {
                     Dates must be in the format yyyy-MM-dd.
                     Times must be in the format HH:mm.
                     Only return the XML structure, nothing else.
-                    """.formatted(String.join(", ", allowedHosts), MAX_TOOL_CALLS, today, timezone);
+                    """.formatted(String.join(", ", allowedHosts), MAX_TOOL_CALLS, today);
             String userPrompt = (prompt == null ? "" : prompt);
             logAppend(systemPrompt + "\n" + userPrompt + "\n");
 

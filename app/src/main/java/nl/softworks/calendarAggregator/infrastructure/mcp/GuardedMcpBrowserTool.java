@@ -3,6 +3,7 @@ package nl.softworks.calendarAggregator.infrastructure.mcp;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
+import org.springframework.ai.tool.execution.ToolExecutionException;
 import org.springframework.ai.tool.metadata.ToolMetadata;
 import org.springframework.ai.util.JsonHelper;
 import org.springframework.core.ParameterizedTypeReference;
@@ -29,6 +30,11 @@ import java.util.stream.Collectors;
 final class GuardedMcpBrowserTool implements ToolCallback {
 
     private static final Pattern URL_IN_ARGUMENTS = Pattern.compile("\"url\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\"");
+
+    /** SyncMcpToolCallback throws a ToolExecutionException with this prefix when the MCP server returned an error result. */
+    private static final String MCP_ERROR_MARKER = "Error calling tool: ";
+    /** Pulls the human readable text out of the "[TextContent[annotations=null, text=..., meta=null]]" serialization. */
+    private static final Pattern MCP_ERROR_TEXT = Pattern.compile("text=(.*?), meta=null", Pattern.DOTALL);
 
     private static final ParameterizedTypeReference<List<Map<String, Object>>> MCP_CONTENT =
             new ParameterizedTypeReference<>() {
@@ -111,9 +117,36 @@ final class GuardedMcpBrowserTool implements ToolCallback {
         }
         catch (RuntimeException e) {
             long millis = (System.nanoTime() - start) / 1_000_000;
+            // An error result the MCP server itself returned (e.g. a stale element ref after the
+            // page changed) is recoverable: the model can take a new snapshot and retry. Return
+            // the error text to the model instead of killing the whole run. Transport failures
+            // still propagate, so the broken session gets invalidated.
+            String errorText = e instanceof ToolExecutionException t ? mcpErrorText(t) : null;
+            if (errorText != null) {
+                log.accept("Tool " + callNumber + " failed after " + millis + " ms: " + abbreviate(errorText, LOG_RESULT_MAX) + "\n");
+                return errorText;
+            }
             log.accept("Tool " + callNumber + " failed after " + millis + " ms: " + e.getMessage() + "\n");
             throw e;
         }
+    }
+
+    /**
+     * Returns the human readable text of an error result the MCP server itself returned,
+     * or null when the failure was not a server-reported error (transport timeouts,
+     * protocol errors, ...).
+     *
+     * <p>SyncMcpToolCallback throws {@code ToolExecutionException} with a message like
+     * {@code Error calling tool: [TextContent[annotations=null, text=### Error ..., meta=null]]}.</p>
+     */
+    private static String mcpErrorText(ToolExecutionException e) {
+        String message = e.getMessage();
+        if (message == null || !message.startsWith(MCP_ERROR_MARKER)) {
+            return null;
+        }
+        String serialized = message.substring(MCP_ERROR_MARKER.length());
+        Matcher matcher = MCP_ERROR_TEXT.matcher(serialized);
+        return matcher.find() ? matcher.group(1) : serialized;
     }
 
     /**

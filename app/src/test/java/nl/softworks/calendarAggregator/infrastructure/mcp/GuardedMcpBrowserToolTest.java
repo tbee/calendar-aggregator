@@ -3,6 +3,7 @@ package nl.softworks.calendarAggregator.infrastructure.mcp;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
+import org.springframework.ai.tool.execution.ToolExecutionException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -95,6 +97,38 @@ class GuardedMcpBrowserToolTest {
         List<? extends ToolCallback> wrapped = GuardedMcpBrowserTool.wrap(List.of(delegate), 5, Set.of("example.com"), log::add);
 
         assertEquals("### Page\n- Page URL: https://example.com", wrapped.getFirst().call("{}"));
+    }
+
+    @Test
+    void returnsMcpErrorResultToModelInsteadOfFailingTheRun() {
+        // SyncMcpToolCallback throws this when the MCP server answered with an error result,
+        // e.g. a stale element ref after the page changed.
+        String mcpError = "Error calling tool: [TextContent[annotations=null, text=### Error\n"
+                + "Error: Ref f1e50 not found in the current page snapshot. Try capturing new snapshot., meta=null]]";
+        ToolCallback delegate = callback("browser_click", input -> {
+            throw new ToolExecutionException(delegateDefinition("browser_click"), new IllegalStateException(mcpError));
+        });
+
+        List<? extends ToolCallback> wrapped = GuardedMcpBrowserTool.wrap(List.of(delegate), 5, Set.of("example.com"), log::add);
+
+        String result = wrapped.getFirst().call("{\"element\":\"Agenda\",\"ref\":\"f1e50\"}");
+        assertEquals("### Error\nError: Ref f1e50 not found in the current page snapshot. Try capturing new snapshot.", result);
+        assertTrue(log.stream().anyMatch(line -> line.contains("failed after") && line.contains("Ref f1e50 not found")));
+    }
+
+    @Test
+    void rethrowsFailuresTheMcpServerDidNotReport() {
+        ToolCallback delegate = callback("browser_click", input -> {
+            throw new ToolExecutionException(delegateDefinition("browser_click"), new IllegalStateException("Connection refused"));
+        });
+
+        List<? extends ToolCallback> wrapped = GuardedMcpBrowserTool.wrap(List.of(delegate), 5, Set.of("example.com"), log::add);
+
+        assertThrows(ToolExecutionException.class, () -> wrapped.getFirst().call("{}"));
+    }
+
+    private static ToolDefinition delegateDefinition(String name) {
+        return ToolDefinition.builder().name(name).description("test tool").inputSchema("{}").build();
     }
 
     private static ToolCallback callback(String name, java.util.function.Function<String, String> handler) {
