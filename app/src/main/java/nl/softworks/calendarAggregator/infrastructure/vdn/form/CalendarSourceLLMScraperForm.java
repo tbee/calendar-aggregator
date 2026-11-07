@@ -37,7 +37,7 @@ public class CalendarSourceLLMScraperForm extends CalendarSourceScraperBaseHtmlF
 
 		binder.forField(modelComboBox)
 				.withConverter(
-						model -> model == null ? OpenRouterService.AUTO_MODEL : model.id(),
+						model -> model == null ? OpenRouterService.DEFAULT_AGENT_MODEL : model.id(),
 						id -> modelComboBox.getListDataView().getItems()
 								.filter(model -> model.id().equals(id))
 								.findFirst()

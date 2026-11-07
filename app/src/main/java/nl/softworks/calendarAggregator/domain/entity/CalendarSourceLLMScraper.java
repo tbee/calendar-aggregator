@@ -65,7 +65,12 @@ public class CalendarSourceLLMScraper extends CalendarSourceScraperBaseHTML {
             // Apply prompt
             String systemPrompt = """
                     You are a web scraper, your task is to extract dancing events from websites.
-                    You need to find start and end moments for the events and return them as a XML structure similar to this:
+                    
+                    Today is %s. Resolve dates without a year against today, and never return events in the past.
+                    If events do not contain a time, make a reasonable assumption. For example: events in the evening usually start at 20:00 and end around 23:00.
+                    Ignore events that are about getting people to start taking lessons, like "kennismakingsles" of "proefles", or the start of a new season or block of lessons.
+                    
+                    Return the events in exactly this XML structure:
                     <events>
                         <event>
                             <startDate>2024-01-01</startDate>
