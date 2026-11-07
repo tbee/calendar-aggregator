@@ -7,9 +7,11 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      playwright:
+        condition: service_started
     ports:
 #      - "5005:5005" # java debug
-      - "8090:8080"
+      - "8080:8080"
     volumes:
       # git-ignored secrets (e.g. spring.ai.openai.api-key), pulled in via
       # spring.config.import=optional:file:./application-secret.properties
@@ -21,6 +23,7 @@ services:
       SPRING_DATASOURCE_USERNAME: technical
       SPRING_DATASOURCE_PASSWORD: "technical"
       SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.tbee.webstack.postgres.PostgreSQLOnHsqldbCompatibilityDialect
+      CALENDARAGGREGATOR_MCP_PLAYWRIGHT_URL: http://playwright:8931
 
   postgres:
     image: postgres:18.3
@@ -40,3 +43,23 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+
+  playwright:
+    image: mcr.microsoft.com/playwright/mcp:v0.0.83
+    container_name: calendaraggregator-playwright
+    # Same flags as CalendarAggregatorApplicationTestContainer; --allowed-hosts '*'
+    # because the app connects with Host: playwright (default only allows localhost -> 403)
+    command:
+      - --isolated
+      - --port
+      - "8931"
+      - --host
+      - 0.0.0.0
+      - --allowed-hosts
+      - '*'
+      - --snapshot-mode
+      - none
+      - --idle-timeout
+      - "900000"
+    init: true            # reap chromium zombies (docker run --init equivalent)
+    shm_size: "1gb"       # chromium shared memory (docker run --ipc=host equivalent)
