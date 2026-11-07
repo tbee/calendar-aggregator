@@ -126,7 +126,7 @@ public class CalendarSourceAIAgentScraper extends CalendarSource {
             BrowserToolProvider.Session session = S.browserToolProvider().lease(allowedHosts, MAX_TOOL_CALLS, this::logAppend);
             String response;
             try {
-                List<ToolCallback> tools = session.tools();
+                List<? extends ToolCallback> tools = session.tools();
                 logAppend("Tools: " + tools.stream().map(tool -> tool.getToolDefinition().name()).collect(Collectors.joining(", ")) + "\n");
 
                 response = ChatClient

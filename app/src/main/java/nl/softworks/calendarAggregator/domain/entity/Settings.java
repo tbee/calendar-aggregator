@@ -1,5 +1,6 @@
 package nl.softworks.calendarAggregator.domain.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.validation.constraints.NotNull;
 import nl.softworks.calendarAggregator.domain.interfaces.R;
@@ -64,6 +65,8 @@ public class Settings extends EntityBase<Settings> {
 		return this;
 	}
 
+	// varbinary(1M) instead of the default varbinary(255), so a logo image actually fits
+	@Column(length = 1048576)
 	protected byte[] logo;
 	static public final String LOGO = "logo";
 	public byte[] logo() {

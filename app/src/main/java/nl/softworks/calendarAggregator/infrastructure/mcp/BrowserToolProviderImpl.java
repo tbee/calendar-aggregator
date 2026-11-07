@@ -1,7 +1,6 @@
 package nl.softworks.calendarAggregator.infrastructure.mcp;
 
 import io.modelcontextprotocol.client.McpClient;
-import io.modelcontextprotocol.client.McpSyncClient;
 import io.modelcontextprotocol.client.transport.HttpClientStreamableHttpTransport;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -22,7 +21,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 /**
  * Playwright MCP implementation of {@link BrowserToolProvider}.
@@ -59,13 +57,13 @@ public class BrowserToolProviderImpl implements BrowserToolProvider {
     @Value("${calendaraggregator.mcp.requestTimeoutSeconds:120}")
     private long requestTimeoutSeconds;
 
-    private final BlockingQueue<PooledClient> available = new LinkedBlockingQueue<>();
-    private final Set<PooledClient> all = ConcurrentHashMap.newKeySet();
-    private Semaphore permits;
+    private final BlockingQueue<BrowserMcpSyncClient> availableBrowserMcpSyncClients = new LinkedBlockingQueue<>();
+    private final Set<BrowserMcpSyncClient> allBrowserMcpSyncClients = ConcurrentHashMap.newKeySet();
+    private Semaphore poolSizeSemaphore;
 
     @PostConstruct
     private void init() {
-        permits = new Semaphore(Math.max(1, poolSize));
+        poolSizeSemaphore = new Semaphore(Math.max(1, poolSize));
         LOGGER.info("MCP browser pool for {} with {} client(s)", playwrightUrl, Math.max(1, poolSize));
     }
 
@@ -75,13 +73,15 @@ public class BrowserToolProviderImpl implements BrowserToolProvider {
     }
 
     /**
-     * Lease a client for one run. Blocks when all clients are in use; always release the
-     * lease in a try-with-resources or a finally block.
+     * Lease a client for one run.
+     * Blocks when all clients are in use; always release the lease in a try-with-resources or a finally block.
      */
     @Override
     public Session lease(Set<String> allowedHosts, int maxToolCalls, Consumer<String> log) {
+
+        // Check if the pool has a BrowserTool available
         try {
-            permits.acquire();
+            poolSizeSemaphore.acquire();
         }
         catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -89,47 +89,47 @@ public class BrowserToolProviderImpl implements BrowserToolProvider {
         }
 
         try {
-            PooledClient client = available.poll();
+            // Fetch an available client from the pool, or create a new one and add it to the poll
+            BrowserMcpSyncClient client = availableBrowserMcpSyncClients.poll();
             if (client == null) {
                 client = createClient();
-                all.add(client);
+                allBrowserMcpSyncClients.add(client);
             }
-            Set<String> normalizedHosts = allowedHosts.stream()
-                    .map(McpBrowserToolWrapper::normalizeHost)
-                    .collect(Collectors.toSet());
-            List<ToolCallback> tools = McpBrowserToolWrapper.wrap(client.tools, maxToolCalls, normalizedHosts, log);
-            return new Lease(client, tools);
+
+            // Create a session with the client
+            List<GuardedMcpBrowserTool> tools = GuardedMcpBrowserTool.wrap(client.tools, maxToolCalls, allowedHosts, log);
+            return new SessionImpl(client, tools);
         }
         catch (RuntimeException e) {
-            permits.release();
+            poolSizeSemaphore.release();
             throw e;
         }
     }
 
-    private PooledClient createClient() {
+    private BrowserMcpSyncClient createClient() {
         LOGGER.info("Connecting MCP client to {}", playwrightUrl);
         HttpClientStreamableHttpTransport transport = HttpClientStreamableHttpTransport
                 .builder(playwrightUrl)
                 .endpoint("/mcp")
                 .build();
 
-        McpSyncClient client = McpClient.sync(transport)
+        io.modelcontextprotocol.client.McpSyncClient client = McpClient.sync(transport)
                 .requestTimeout(Duration.ofSeconds(requestTimeoutSeconds))
                 .initializationTimeout(Duration.ofSeconds(20))
                 .build();
         try {
             client.initialize();
 
-            List<ToolCallback> tools = McpToolUtils.getToolCallbacksFromSyncClients(client)
+            // Get all possible tools for this client and filter for the allowed ones
+            List<ToolCallback> allowedTools = McpToolUtils.getToolCallbacksFromSyncClients(client)
                     .stream()
                     .filter(tool -> ALLOWED_TOOL_NAMES.contains(tool.getToolDefinition().name()))
                     .toList();
-            if (tools.isEmpty()) {
-                throw new IllegalStateException("The MCP browser at " + playwrightUrl
-                        + " exposes none of the expected tools " + ALLOWED_TOOL_NAMES);
+            if (allowedTools.isEmpty()) {
+                throw new IllegalStateException("The MCP browser at " + playwrightUrl + " exposes none of the expected tools " + ALLOWED_TOOL_NAMES);
             }
-            LOGGER.info("MCP client connected, tools: {}", tools.stream().map(tool -> tool.getToolDefinition().name()).toList());
-            return new PooledClient(client, tools);
+            LOGGER.info("MCP client connected, tools: {}", allowedTools.stream().map(tool -> tool.getToolDefinition().name()).toList());
+            return new BrowserMcpSyncClient(client, allowedTools);
         }
         catch (RuntimeException e) {
             closeQuietly(client);
@@ -137,18 +137,18 @@ public class BrowserToolProviderImpl implements BrowserToolProvider {
         }
     }
 
-    private void release(PooledClient client) {
-        available.offer(client);
-        permits.release();
+    private void release(BrowserMcpSyncClient client) {
+        availableBrowserMcpSyncClients.offer(client);
+        poolSizeSemaphore.release();
     }
 
-    private void invalidate(PooledClient client) {
-        all.remove(client);
+    private void invalidate(BrowserMcpSyncClient client) {
+        allBrowserMcpSyncClients.remove(client);
         closeQuietly(client.client);
-        permits.release();
+        poolSizeSemaphore.release();
     }
 
-    private void closeQuietly(McpSyncClient client) {
+    private void closeQuietly(io.modelcontextprotocol.client.McpSyncClient client) {
         try {
             client.close();
         }
@@ -159,36 +159,36 @@ public class BrowserToolProviderImpl implements BrowserToolProvider {
 
     @PreDestroy
     public void close() {
-        for (PooledClient client : all) {
+        for (BrowserMcpSyncClient client : allBrowserMcpSyncClients) {
             closeQuietly(client.client);
         }
-        all.clear();
-        available.clear();
+        allBrowserMcpSyncClients.clear();
+        availableBrowserMcpSyncClients.clear();
     }
 
-    private static final class PooledClient {
-        private final McpSyncClient client;
+    private static final class BrowserMcpSyncClient {
+        private final io.modelcontextprotocol.client.McpSyncClient client;
         private final List<ToolCallback> tools;
 
-        private PooledClient(McpSyncClient client, List<ToolCallback> tools) {
+        private BrowserMcpSyncClient(io.modelcontextprotocol.client.McpSyncClient client, List<ToolCallback> tools) {
             this.client = client;
             this.tools = tools;
         }
     }
 
     /** One client, borrowed for one run. Closing returns it to the pool; invalidating discards it. */
-    private final class Lease implements BrowserToolProvider.Session {
-        private final PooledClient client;
-        private final List<ToolCallback> tools;
+    private final class SessionImpl implements BrowserToolProvider.Session {
+        private final BrowserMcpSyncClient client;
+        private final List<? extends ToolCallback> tools;
         private final AtomicBoolean finished = new AtomicBoolean();
 
-        private Lease(PooledClient client, List<ToolCallback> tools) {
+        private SessionImpl(BrowserMcpSyncClient client, List<? extends ToolCallback> tools) {
             this.client = client;
             this.tools = tools;
         }
 
         @Override
-        public List<ToolCallback> tools() {
+        public List<? extends ToolCallback> tools() {
             return tools;
         }
 

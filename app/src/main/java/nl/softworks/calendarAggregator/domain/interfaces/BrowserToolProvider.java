@@ -28,7 +28,7 @@ public interface BrowserToolProvider {
     interface Session extends AutoCloseable {
 
         /** Tool callbacks to hand to the chat client, already budgeted, guarded and logged. */
-        List<ToolCallback> tools();
+        List<? extends ToolCallback> tools();
 
         /** Discard the underlying client instead of reusing it, e.g. after a transport error. */
         void invalidate();

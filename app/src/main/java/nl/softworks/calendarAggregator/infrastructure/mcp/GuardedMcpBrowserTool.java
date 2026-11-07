@@ -8,7 +8,6 @@ import org.springframework.ai.util.JsonHelper;
 import org.springframework.core.ParameterizedTypeReference;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -17,6 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Decorates MCP browser tool callbacks with the guardrails an unattended agent needs:
@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
  * <p>The budget and the log are shared by all callbacks of a single run, so the model
  * cannot get around the limit by switching tools.</p>
  */
-final class McpBrowserToolWrapper implements ToolCallback {
+final class GuardedMcpBrowserTool implements ToolCallback {
 
     private static final Pattern URL_IN_ARGUMENTS = Pattern.compile("\"url\"\\s*:\\s*\"((?:[^\"\\\\]|\\\\.)*)\"");
 
@@ -39,28 +39,28 @@ final class McpBrowserToolWrapper implements ToolCallback {
     private static final int LOG_RESULT_MAX = 4_000;
 
     private final ToolCallback delegate;
-    private final AtomicInteger remaining;
+    private final AtomicInteger remainingCallsAtomicInteger;
     private final int maxCalls;
     private final Set<String> allowedHosts;
     private final Consumer<String> log;
     private final String toolName;
 
-    private McpBrowserToolWrapper(ToolCallback delegate, AtomicInteger remaining, int maxCalls, Set<String> allowedHosts, Consumer<String> log) {
+    private GuardedMcpBrowserTool(ToolCallback delegate, int maxCalls, Set<String> allowedHosts, Consumer<String> log) {
         this.delegate = delegate;
-        this.remaining = remaining;
+        this.remainingCallsAtomicInteger = new AtomicInteger(maxCalls);
         this.maxCalls = maxCalls;
-        this.allowedHosts = allowedHosts;
         this.log = log;
         this.toolName = delegate.getToolDefinition().name();
+
+        this.allowedHosts = allowedHosts.stream()
+                .map(GuardedMcpBrowserTool::normalizeHost)
+                .collect(Collectors.toSet());
     }
 
-    static List<ToolCallback> wrap(List<ToolCallback> tools, int maxCalls, Set<String> allowedHosts, Consumer<String> log) {
-        AtomicInteger remaining = new AtomicInteger(maxCalls);
-        List<ToolCallback> wrapped = new ArrayList<>(tools.size());
-        for (ToolCallback tool : tools) {
-            wrapped.add(new McpBrowserToolWrapper(tool, remaining, maxCalls, allowedHosts, log));
-        }
-        return wrapped;
+    static List<GuardedMcpBrowserTool> wrap(List<? extends ToolCallback> tools, int maxCalls, Set<String> allowedHosts, Consumer<String> log) {
+        return tools.stream()
+                .map(tool -> new GuardedMcpBrowserTool(tool, maxCalls, allowedHosts, log))
+                .toList();
     }
 
     @Override
@@ -80,9 +80,11 @@ final class McpBrowserToolWrapper implements ToolCallback {
 
     @Override
     public String call(String toolInput, ToolContext toolContext) {
-        int remainingAfterThisCall = remaining.getAndDecrement();
+
+        // Number of calls guard
+        int remainingAfterThisCall = remainingCallsAtomicInteger.getAndDecrement();
         if (remainingAfterThisCall <= 0) {
-            remaining.set(0);
+            remainingCallsAtomicInteger.set(0);
             String message = "Tool budget of " + maxCalls + " calls is exhausted. "
                     + "Do not call any more tools, return the final XML with the events found so far.";
             log.accept("Tool budget exhausted\n");
@@ -90,6 +92,7 @@ final class McpBrowserToolWrapper implements ToolCallback {
         }
         int callNumber = maxCalls - remainingAfterThisCall + 1;
 
+        // Host guard
         String blocked = checkHost(toolInput);
         if (blocked != null) {
             log.accept("Tool " + callNumber + "/" + maxCalls + " " + toolName + " blocked: " + blocked + "\n");
@@ -99,7 +102,7 @@ final class McpBrowserToolWrapper implements ToolCallback {
         log.accept("Tool " + callNumber + "/" + maxCalls + " " + toolName + " " + abbreviate(toolInput, LOG_ARGUMENTS_MAX) + "\n");
         long start = System.nanoTime();
         try {
-            String result = unwrapMcpContent((toolContext == null) ? delegate.call(toolInput) : delegate.call(toolInput, toolContext));
+            String result = unwrapMcpContent(toolContext == null ? delegate.call(toolInput) : delegate.call(toolInput, toolContext));
             long millis = (System.nanoTime() - start) / 1_000_000;
             log.accept("Tool " + callNumber + " result (" + millis + " ms, "
                     + (result == null ? 0 : result.length()) + " chars): "
@@ -142,7 +145,7 @@ final class McpBrowserToolWrapper implements ToolCallback {
         }
     }
 
-    static String normalizeHost(String host) {
+    private static String normalizeHost(String host) {
         String normalized = host.toLowerCase(Locale.ROOT);
         return normalized.startsWith("www.") ? normalized.substring(4) : normalized;
     }

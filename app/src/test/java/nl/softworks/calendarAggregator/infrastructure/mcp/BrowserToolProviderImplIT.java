@@ -76,7 +76,7 @@ class BrowserToolProviderImplIT {
         }
     }
 
-    private static ToolCallback byName(List<ToolCallback> tools, String name) {
+    private static ToolCallback byName(List<? extends ToolCallback> tools, String name) {
         return tools.stream()
                 .filter(tool -> tool.getToolDefinition().name().equals(name))
                 .findFirst()

@@ -1,5 +1,9 @@
-# Non negotiable rules
+# Non-negotiable rules
 - Never ever perform any git actions: committing, pushing deleting is done by the user.
+
+# Styleguides
+- Be concise in your anwsers.
+- Prefer markdown-style comments for methods. Prefer multiple single line comments over multiline comments.
 
 # Functionality
 This is an application that scrawls websites or ical feeds in search for events.
