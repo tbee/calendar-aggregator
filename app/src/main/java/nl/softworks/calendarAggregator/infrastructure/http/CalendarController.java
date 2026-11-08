@@ -47,12 +47,14 @@ public class CalendarController {
     @Autowired
     private Environment environment;
 
-    private void prepareTemplate(Model model, HttpServletRequest request,
+    private void prepareTemplate(Model model, HttpServletRequest request, PageMeta.View view, Long locationId,
                                  Double lat, Double lon, Integer distance,
                                  List<Label> labelInclude, List<Label> labelExclude,
                                  Boolean showHidden) {
-        model.addAttribute("settings", Settings.get());
-        model.addAttribute("baseUrl", baseUrl());
+        Settings settings = Settings.get();
+        String baseUrl = baseUrl();
+        model.addAttribute("settings", settings);
+        model.addAttribute("baseUrl", baseUrl);
         model.addAttribute("request", request);
         model.addAttribute("lat", lat);
         model.addAttribute("lon", lon);
@@ -61,11 +63,38 @@ public class CalendarController {
         model.addAttribute("labelsInclude", labelInclude);
         model.addAttribute("labelsExclude", labelExclude);
 
-        String filterQueryString = "lat=" + nullToEmpty(lat) + "&lon=" + nullToEmpty(lon) + "&distance=" + nullToEmpty(distance)
-                + labelInclude.stream().map(l -> "&labelInclude=" + URLEncoder.encode(l.name(), StandardCharsets.UTF_8)).collect(Collectors.joining())
-                + labelExclude.stream().map(l -> "&labelExclude=" + URLEncoder.encode(l.name(), StandardCharsets.UTF_8)).collect(Collectors.joining())
-                + (showHidden == null ? "" : "&showHidden=" + showHidden);
-        model.addAttribute("filterQueryString", filterQueryString);
+        // Only the parameters the visitor actually set: an empty filter must not put a query string on every
+        // link, because the pages without one are the addresses that may be indexed.
+        String filterQueryString = filterQueryString(locationId, lat, lon, distance, labelInclude, labelExclude, showHidden);
+        model.addAttribute("filterQuerySuffix", filterQueryString.isEmpty() ? "" : "?" + filterQueryString);
+
+        // The bare calendar is the page; a query string makes a variant of it, which a search engine must not
+        // index (the canonical in the page points back at the calendar itself).
+        boolean filtered = request.getQueryString() != null && !request.getQueryString().isBlank();
+        model.addAttribute("pageMeta", PageMeta.of(settings, baseUrl, view, filtered));
+    }
+
+    private static String filterQueryString(Long locationId, Double lat, Double lon, Integer distance,
+                                            List<Label> labelInclude, List<Label> labelExclude, Boolean showHidden) {
+        List<String> parameters = new ArrayList<>();
+        if (locationId != null) {
+            parameters.add("locationId=" + locationId);
+        }
+        if (lat != null) {
+            parameters.add("lat=" + lat);
+        }
+        if (lon != null) {
+            parameters.add("lon=" + lon);
+        }
+        if (distance != null) {
+            parameters.add("distance=" + distance);
+        }
+        labelInclude.forEach(l -> parameters.add("labelInclude=" + URLEncoder.encode(l.name(), StandardCharsets.UTF_8)));
+        labelExclude.forEach(l -> parameters.add("labelExclude=" + URLEncoder.encode(l.name(), StandardCharsets.UTF_8)));
+        if (showHidden != null) {
+            parameters.add("showHidden=" + showHidden);
+        }
+        return String.join("&", parameters);
     }
 
     // example http://localhost:8080/list
@@ -84,7 +113,7 @@ public class CalendarController {
 
         List<Label> labelsInclude = labelsNameToEntities(labelNamesInclude);
         List<Label> labelsExclude = labelsNameToEntities(labelNamesExclude);
-        prepareTemplate(model, request, lat, lon, distance, labelsInclude, labelsExclude, showHidden);
+        prepareTemplate(model, request, PageMeta.View.LIST, locationId, lat, lon, distance, labelsInclude, labelsExclude, showHidden);
 
         // Collect events
         LocalDateTime threshold = LocalDateTime.now();
@@ -148,7 +177,7 @@ public class CalendarController {
 
         List<Label> labelsInclude = labelsNameToEntities(labelNamesInclude);
         List<Label> labelsExclude = labelsNameToEntities(labelNamesExclude);
-        prepareTemplate(model, request, lat, lon, distance, labelsInclude, labelsExclude, showHidden);
+        prepareTemplate(model, request, PageMeta.View.CALENDAR, locationId, lat, lon, distance, labelsInclude, labelsExclude, showHidden);
         DateTimeFormatter mmmdd = DateTimeFormatter.ofPattern("MMM dd", Locale.ENGLISH);
         DateTimeFormatter hhmm = DateTimeFormatter.ofPattern("HH:mm", Locale.ENGLISH);
         model.addAttribute("mmmdd", mmmdd);
@@ -237,10 +266,6 @@ public class CalendarController {
             }
         }
         return true;
-    }
-
-    private <T> String nullToEmpty(T obj) {
-        return obj == null ? "" : obj.toString();
     }
 
     static List<Label> labelsNameToEntities(List<String> names) {

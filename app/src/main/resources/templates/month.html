@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" th:replace="~{template :: template(~{::head},~{::body})}">
+<html lang="en" th:replace="~{template :: template(~{::pageHead},~{::pageBody})}">
 <head>
+    <th:block th:fragment="pageHead">
     <style>
         body {
             background-color: Canvas;
@@ -147,8 +148,10 @@
             text-decoration: none;
         }
     </style>
+    </th:block>
 </head>
 <body>
+    <th:block th:fragment="pageBody">
     <div id="legenda">
         <span class="icon" th:each="labelGroup : ${labelGroups}" th:style="${'width:' + (labelGroup.name.length() * 10) + 'px; margin-right:5px;'}">
             <i class="css-icon" th:style="${'color:' + labelGroup.color() + '; background:' + labelGroup.background() + ';width:' + (labelGroup.name.length() * 10) + 'px;'}"><span th:text="${labelGroup.name()}">...</span></i>
@@ -219,5 +222,6 @@
             </span>
         </div>
     </div>
+    </th:block>
 </body>
 </html>
