@@ -14,6 +14,10 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.ai.util.JsonHelper;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -51,14 +55,31 @@ public final class FlyerInspector implements ToolCallback {
                 await new Promise(resolve => setTimeout(resolve, 600));
               }
               window.scrollTo(0, 0);
-              const images = Array.from(document.images).map(img => ({
-                src: img.currentSrc || img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy-src') || '',
-                w: img.naturalWidth || 0,
-                h: img.naturalHeight || 0,
-                alt: img.alt || ''
-              }));
+
+              const byUrl = new Map();
+              const add = (src, w, h, alt) => {
+                if (!src || src.startsWith('data:') || src.startsWith('blob:') || byUrl.has(src)) return;
+                byUrl.set(src, { src: src, w: w || 0, h: h || 0, alt: alt || '' });
+              };
+
+              Array.from(document.images).forEach(img => add(
+                img.currentSrc || img.src || img.getAttribute('data-src') || img.getAttribute('data-lazy-src') || '',
+                img.naturalWidth, img.naturalHeight, img.alt));
+
+              Array.from(document.querySelectorAll('a[href]')).forEach(a => {
+                if (/\\.(png|jpe?g|gif|webp|avif|bmp)(\\?|#|$)/i.test(a.href))
+                  add(a.href, 0, 0, a.textContent || '');
+              });
+
               const observed = performance.getEntriesByType('resource').map(entry => entry.name);
-              return { pageUrl: location.href, pageTitle: document.title, images: images, observed: observed };
+              performance.getEntriesByType('resource').forEach(entry => {
+                if (/\\.(woff2?|ttf|otf|eot|css|js|json|ico)(\\?|$)/i.test(entry.name)) return;
+                if (entry.initiatorType === 'img' || entry.initiatorType === 'css'
+                    || /\\.(png|jpe?g|gif|webp|avif|bmp)(\\?|$)/i.test(entry.name))
+                  add(entry.name, 0, 0, '');
+              });
+
+              return { pageUrl: location.href, pageTitle: document.title, images: Array.from(byUrl.values()), observed: observed };
             }
             """;
 
@@ -82,6 +103,7 @@ public final class FlyerInspector implements ToolCallback {
     private final int minWidth;
     private final int minHeight;
     private final int maxImages;
+    private final int maxCandidates;
 
     public FlyerInspector(McpSyncClient client, BrowserToolProvider.RunContext context,
                           FlyerImageFetcher imageFetcher, FlyerVisionReader visionReader,
@@ -94,6 +116,7 @@ public final class FlyerInspector implements ToolCallback {
         this.minWidth = minWidth;
         this.minHeight = minHeight;
         this.maxImages = maxImages;
+        this.maxCandidates = Math.max(16, maxImages * 4);
     }
 
     @Override
@@ -136,10 +159,14 @@ public final class FlyerInspector implements ToolCallback {
         int cacheHits = 0;
         int addedEvents = 0;
         int skipped = 0;
+        int processed = 0;
         for (ImageInfo candidate : candidates) {
-            context.log().accept("Flyer image " + candidate.src() + " (" + candidate.w() + "x" + candidate.h() + ")\n");
+            if (processed >= maxImages) {
+                break;
+            }
+            context.log().accept("Flyer image " + abbreviateUrl(candidate.src()) + " (" + candidate.w() + "x" + candidate.h() + ")\n");
             if (!imageFetcher.isAllowed(candidate.src(), fetchHosts)) {
-                context.log().accept("Flyer image host not allowed: " + candidate.src() + "\n");
+                context.log().accept("Flyer image host not allowed: " + abbreviateUrl(candidate.src()) + "\n");
                 skipped++;
                 continue;
             }
@@ -152,6 +179,16 @@ public final class FlyerInspector implements ToolCallback {
                 skipped++;
                 continue;
             }
+
+            // the size filter above only sees loaded thumbnails; verify the original bytes here
+            int[] dimensions = imageDimensions(image.bytes());
+            context.log().accept("Flyer downloaded " + (dimensions == null ? "unknown size" : dimensions[0] + "x" + dimensions[1]) + ": " + abbreviateUrl(candidate.src()) + "\n");
+            if (dimensions != null && (dimensions[0] < minWidth || dimensions[1] < minHeight)) {
+                context.log().accept("Flyer skip (downloaded too small): " + abbreviateUrl(candidate.src()) + "\n");
+                skipped++;
+                continue;
+            }
+            processed++;
 
             String imageHash = sha256(image.bytes());
             Optional<FlyerCache> cached = cacheService.find(imageHash, visionReader.promptVersion(), visionReader.model());
@@ -195,34 +232,45 @@ public final class FlyerInspector implements ToolCallback {
     }
 
     private List<ImageInfo> filter(List<ImageInfo> images, String pageUrl) {
+        context.log().accept("Flyer discovered " + images.size() + " image reference(s)\n");
         Set<String> seen = new HashSet<>();
         List<ImageInfo> candidates = new ArrayList<>();
         for (ImageInfo image : images) {
             String src = image.src();
             if (src == null || src.isBlank() || src.startsWith("data:") || src.startsWith("blob:")) {
+                context.log().accept("Flyer skip (data/blob/empty): " + abbreviateUrl(src) + "\n");
                 continue;
             }
             URI uri = resolve(pageUrl, src);
             if (uri == null || uri.getHost() == null
                     || (!"http".equalsIgnoreCase(uri.getScheme()) && !"https".equalsIgnoreCase(uri.getScheme()))) {
+                context.log().accept("Flyer skip (not http): " + abbreviateUrl(src) + "\n");
                 continue;
             }
-            if (image.w() < minWidth || image.h() < minHeight) {
+            if (image.w() > 0 && image.h() > 0 && (image.w() < minWidth || image.h() < minHeight)) {
+                context.log().accept("Flyer skip (too small " + image.w() + "x" + image.h() + "): " + abbreviateUrl(src) + "\n");
                 continue;
             }
             String haystack = (src + " " + image.alt()).toLowerCase(Locale.ROOT);
             if (haystack.contains("logo") || haystack.contains("icon") || haystack.contains("sprite")
                     || haystack.contains("favicon") || haystack.contains("avatar") || haystack.contains("pixel")
                     || haystack.contains("tracking") || haystack.contains("social")) {
+                context.log().accept("Flyer skip (looks like chrome): " + abbreviateUrl(src) + "\n");
                 continue;
             }
             if (!seen.add(uri.toString())) {
                 continue;
             }
+            String size = (image.w() > 0 && image.h() > 0) ? image.w() + "x" + image.h() : "unknown size";
+            context.log().accept("Flyer candidate (" + size + "): " + abbreviateUrl(uri.toString()) + "\n");
             candidates.add(new ImageInfo(uri.toString(), image.w(), image.h(), image.alt()));
         }
-        candidates.sort(Comparator.comparingInt((ImageInfo image) -> image.w() * image.h()).reversed());
-        return candidates.stream().limit(maxImages).toList();
+        // images without a known size (CSS backgrounds, link targets) are the ones the old filter missed,
+        // so give them priority; the post-download check rejects the small ones without a vision call
+        candidates.sort(Comparator
+                .comparingInt((ImageInfo image) -> (image.w() > 0 && image.h() > 0) ? 1 : 0)
+                .thenComparing(Comparator.comparingInt((ImageInfo image) -> image.w() * image.h()).reversed()));
+        return candidates.stream().limit(maxCandidates).toList();
     }
 
     private FlyerImageFetcher.FetchedImage fetchViaBrowser(String imageUrl) {
@@ -297,6 +345,13 @@ public final class FlyerInspector implements ToolCallback {
         }
     }
 
+    private static String abbreviateUrl(String url) {
+        if (url == null) {
+            return "null";
+        }
+        return url.length() <= 250 ? url : url.substring(0, 250) + "...";
+    }
+
     private static void addHost(Set<String> hosts, String url) {
         if (url == null) {
             return;
@@ -333,6 +388,17 @@ public final class FlyerInspector implements ToolCallback {
         }
         String mimeType = headerMimeType.split(";")[0].trim().toLowerCase(Locale.ROOT);
         return mimeType.startsWith("image/") ? mimeType : null;
+    }
+
+    // ImageIO gives the real pixel size; WebP may return null, in which case the image is accepted
+    private static int[] imageDimensions(byte[] bytes) {
+        try (ByteArrayInputStream input = new ByteArrayInputStream(bytes)) {
+            BufferedImage image = ImageIO.read(input);
+            return image == null ? null : new int[]{image.getWidth(), image.getHeight()};
+        }
+        catch (IOException | RuntimeException e) {
+            return null;
+        }
     }
 
     private static String sha256(byte[] bytes) {

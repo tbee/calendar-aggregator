@@ -86,6 +86,9 @@ It extracts the events and adds them to the source directly.
 
 * `calendaraggregator.aiAgent.visionModel` selects the vision model (default
   `deepseek/deepseek-v4-flash-vision-exp`). It must accept image input.
+* Candidates come from rendered `<img>` elements, links to image files, and the page's resource
+  timeline (which covers CSS background images). Each candidate is size-checked from the DOM and,
+  more reliably, from the downloaded bytes (`flyerMinWidth` × `flyerMinHeight`, default 400 × 300).
 * Downloaded images are restricted to the seed hosts plus hosts the page actually contacted, and
   never to loopback or private addresses.
 * Extractions are cached in `flyer_cache`, keyed by image hash, prompt version and model, so an
