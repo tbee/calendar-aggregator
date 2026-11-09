@@ -198,7 +198,7 @@
                                             <span class="event-labels" th:if="${!eventToLabels.get(event).isEmpty()}">
                                                 <span class="event-label" th:each="label : ${eventToLabels.get(event)}">
                                                     <i class="css-icon" th:style="${'color:' + label.labelGroup().color() + '; background:' + label.labelGroup().background() + ';'}" th:title="${label.description()}"><span th:text="${label.icon()}">...</span></i>
-                                                    <span th:text="${label.description()}">...</span>
+                                                    <span th:text="${label.name()}">...</span>
                                                 </span>
                                             </span>
                                         </span>
