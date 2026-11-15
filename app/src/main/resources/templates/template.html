@@ -13,7 +13,7 @@
     <meta property="og:description" th:content="${pageMeta.description}">
     <meta property="og:url" th:content="${pageMeta.canonicalUrl}">
     <meta property="og:image" th:if="${pageMeta.ogImageUrl != null}" th:content="${pageMeta.ogImageUrl}">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" th:if="${settings.logo() != null and settings.logo().length > 0}">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="alternate" type="text/calendar" th:href="${baseUrl + '/ical' + filterQuerySuffix}">
     <script type="application/ld+json" th:utext="${pageMeta.structuredData}"></script>
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>

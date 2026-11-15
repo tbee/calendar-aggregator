@@ -141,15 +141,15 @@ class PublicPageHtmlTest {
         assertFalse(html.contains("/ical?"));
     }
 
-    /** The favicon is made from the logo, so a site without a logo has none to advertise. */
+    /** The icon is either made from the logo or the one that ships with the application, so the head always names it. */
     @Test
-    void aLogoMeansThePageAdvertisesAnIcon() {
-        Context context = context(PageMeta.View.CALENDAR, false, "");
-        assertFalse(render("month", context).contains("rel=\"icon\""), "no logo, no icon");
+    void thePageNamesTheIcon() {
+        String html = render("month", context(PageMeta.View.CALENDAR, false, ""));
+        assertTrue(html.contains("<link rel=\"icon\" type=\"image/x-icon\" href=\"/favicon.ico\">"), "no logo");
 
+        Context context = context(PageMeta.View.CALENDAR, false, "");
         context.setVariable("settings", settings().logo(new byte[]{1, 2, 3}).logoMimetype("image/png"));
-        assertTrue(render("month", context)
-                .contains("<link rel=\"icon\" type=\"image/x-icon\" href=\"/favicon.ico\">"));
+        assertTrue(render("month", context).contains("<link rel=\"icon\" type=\"image/x-icon\" href=\"/favicon.ico\">"), "with a logo");
     }
 
     @Test

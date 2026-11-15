@@ -1,6 +1,7 @@
 package nl.softworks.calendarAggregator.infrastructure.http;
 
 import nl.softworks.calendarAggregator.domain.entity.Settings;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.context.request.WebRequest;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 import java.util.Arrays;
 
@@ -17,11 +20,14 @@ public class LogoController {
 
     private static final MediaType ICON = MediaType.parseMediaType("image/x-icon");
 
+    /** What the site shows as long as no logo is set, or when the logo cannot be read as an image. */
+    private static final Icon DEFAULT_ICON = defaultIcon();
+
     // the icon is built from the logo, which changes at most a few times a year, so the bytes are kept
-    private volatile CachedIco cachedIco;
+    private volatile Icon cachedIcon;
 
     /** @param etag the version of the logo the icon was made from */
-    private record CachedIco(String etag, byte[] ico) {
+    private record Icon(String etag, byte[] bytes) {
     }
 
     @GetMapping("/logo")
@@ -41,33 +47,38 @@ public class LogoController {
     @GetMapping("/favicon.ico")
     public ResponseEntity<byte[]> favicon(WebRequest webRequest) {
         byte[] logo = Settings.get().logo();
-        if (logo == null || logo.length == 0) {
-            return ResponseEntity.notFound().build();
-        }
-        // the logo's content is the icon's version: a changed logo is a changed icon
-        String etag = "\"" + logo.length + "-" + Integer.toHexString(Arrays.hashCode(logo)) + "\"";
-        if (webRequest.checkNotModified(etag)) {
+        Icon icon = logo == null || logo.length == 0 ? DEFAULT_ICON : iconOf(logo);
+        if (webRequest.checkNotModified(icon.etag())) {
             return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
-        }
-        byte[] ico = ico(etag, logo);
-        if (ico == null) {
-            return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok() //
                 .contentType(ICON) //
-                .eTag(etag) //
+                .eTag(icon.etag()) //
                 .cacheControl(CacheControl.maxAge(Duration.ofDays(1)).cachePublic()) //
-                .body(ico);
+                .body(icon.bytes());
     }
 
-    /** @return the icon for this version of the logo, scaled only once; null when the logo is not an image */
-    private byte[] ico(String etag, byte[] logo) {
-        CachedIco current = cachedIco;
+    /** @return the icon for this logo, scaled only once; the bundled icon when the logo is not an image */
+    private Icon iconOf(byte[] logo) {
+        // the logo's content is the icon's version: a changed logo is a changed icon
+        String etag = "\"" + logo.length + "-" + Integer.toHexString(Arrays.hashCode(logo)) + "\"";
+        Icon current = cachedIcon;
         // two requests may convert at the same time after a change; the last one wins, which costs nothing
         if (current == null || !current.etag().equals(etag)) {
-            current = new CachedIco(etag, Favicon.fromImage(logo));
-            cachedIco = current;
+            byte[] ico = Favicon.fromImage(logo);
+            current = ico == null ? DEFAULT_ICON : new Icon(etag, ico);
+            cachedIcon = current;
         }
-        return current.ico();
+        return current;
+    }
+
+    /** The icon that ships with the application, served as long as no logo of its own can be made. */
+    private static Icon defaultIcon() {
+        try (InputStream inputStream = new ClassPathResource("static/favicon.ico").getInputStream()) {
+            return new Icon("\"default\"", inputStream.readAllBytes());
+        } catch (IOException e) {
+            // the file is part of the jar, so this only happens in a broken build
+            throw new IllegalStateException("the bundled favicon.ico cannot be read", e);
+        }
     }
 }
