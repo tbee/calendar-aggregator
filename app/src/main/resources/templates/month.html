@@ -111,6 +111,16 @@
             white-space: normal;
         }
 
+        /* the cell padding between two days is a dead zone for hover: a popup placed beside the cell
+           loses the hover there and the neighbour opens instead, so let it overlap its trigger slightly */
+        .tooltiptext.event-popup.tooltip-right {
+            left: calc(100% - 1px);
+        }
+
+        .tooltiptext.event-popup.tooltip-left {
+            right: calc(100% - 1px);
+        }
+
         .event-tooltip-text {
             display: block;
             min-height: 1.4em;
