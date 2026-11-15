@@ -141,6 +141,17 @@ class PublicPageHtmlTest {
         assertFalse(html.contains("/ical?"));
     }
 
+    /** The favicon is made from the logo, so a site without a logo has none to advertise. */
+    @Test
+    void aLogoMeansThePageAdvertisesAnIcon() {
+        Context context = context(PageMeta.View.CALENDAR, false, "");
+        assertFalse(render("month", context).contains("rel=\"icon\""), "no logo, no icon");
+
+        context.setVariable("settings", settings().logo(new byte[]{1, 2, 3}).logoMimetype("image/png"));
+        assertTrue(render("month", context)
+                .contains("<link rel=\"icon\" type=\"image/x-icon\" href=\"/favicon.ico\">"));
+    }
+
     @Test
     void theListIsOneDocumentAndIsNoIndexed() {
         String html = render("list", context(PageMeta.View.LIST, false, ""));

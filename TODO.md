@@ -87,6 +87,5 @@ Release notes:
       provides both beans).
 - [ ] The head loads htmx, idiomorph, Bulma and a FontAwesome kit from three CDNs. For Core Web Vitals,
       self-host or defer what the first paint does not need.
-- [ ] No favicon; only `/logo`, a 200px PNG.
 - [ ] The weekday header in `month.html` is hardcoded English. Correct while English is the default, but it is
       where i18n would start.
