@@ -13,6 +13,7 @@ import org.springframework.ai.openai.OpenAiChatOptions;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
@@ -64,6 +65,7 @@ public class CalendarSourceLLMScraper extends CalendarSourceScraperBaseHTML {
             content = sanatizeContent(content);
 
             // Apply prompt
+            LocalDate today = localDateTimeNowSupplier.get().toLocalDate();
             String systemPrompt = """
                     You are a web scraper, your task is to extract dancing events from websites.
                     
@@ -85,7 +87,7 @@ public class CalendarSourceLLMScraper extends CalendarSourceScraperBaseHTML {
                     Dates must be in the format yyyy-MM-dd.
                     Times must be in the format HH:mm.
                     Only return the XML structure, nothing else.
-                    """;
+                    """.formatted(today);
             String userPrompt = """
                     %prompt%
 
