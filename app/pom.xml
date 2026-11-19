@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.tbee</groupId>
 		<artifactId>calendarAggregator-top</artifactId>
-		<version>3.10.1</version>
+		<version>3.10.2</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>calendarAggregator</artifactId>
@@ -528,7 +528,7 @@
 						<version>3.5.2</version>
 						<configuration>
 							<from>
-								<image>eclipse-temurin:25-jre-alpine</image>
+								<image>eclipse-temurin:25-jre-noble</image>
 							</from>
 							<to>
 								<image>nexus.softworks.nl/docker-private/${containerImageId}:${project.version}</image>
